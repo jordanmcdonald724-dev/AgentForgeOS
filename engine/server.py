@@ -6,7 +6,10 @@ from fastapi import APIRouter, FastAPI
 
 from .config import get_settings
 from .database import db
+from .module_loader import load_modules
 from .worker_system import worker_system
+from .routes import modules_router
+from control.module_registry import module_registry
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +28,7 @@ def _health_router() -> APIRouter:
 @asynccontextmanager
 async def engine_lifespan(app: FastAPI):
     logger.info("Starting AgentForgeOS engine")
+    load_modules(registry=module_registry)
     await db.connect()
     await worker_system.start()
     try:
@@ -47,5 +51,5 @@ def register_routers(
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
-    register_routers(app, [_health_router()], prefix="/api")
+    register_routers(app, [_health_router(), modules_router], prefix="/api")
     return app

@@ -4,7 +4,7 @@ from .vector_store import VectorStore
 
 
 class EmbeddingService:
-    """Placeholder embedding service that stores vectors in the shared VectorStore."""
+    """Generates vector embeddings for knowledge and memory systems."""
 
     def __init__(self, vector_store: Optional[VectorStore] = None) -> None:
         self.vector_store = vector_store or VectorStore()

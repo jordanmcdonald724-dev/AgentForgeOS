@@ -13,7 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 def _sanitize_identifier(value: str) -> Optional[str]:
-    """Convert an arbitrary string to a safe Python identifier fragment."""
+    """
+    Convert a string to a safe Python identifier fragment.
+
+    - Keeps alphanumeric characters and underscores only.
+    - Prefixes an underscore if the cleaned value would start with a digit.
+    - Returns None when no valid characters remain.
+    """
     cleaned = "".join(ch for ch in value if ch.isalnum() or ch == "_")
     if not cleaned:
         return None
@@ -44,7 +50,16 @@ def _import_module(entry_path: Path, module_name: str) -> Optional[ModuleType]:
 
 
 def _resolve_module_class(mod: ModuleType, manifest: Dict) -> Optional[type]:
-    """Resolve the module class using manifest hint or common naming conventions."""
+    """
+    Resolve the module class using manifest hints and naming conventions.
+
+    Candidate order:
+    1. Value of manifest["class"] (if provided)
+    2. "{name}Module" derived from manifest["name"]
+    3. "{id}Module" derived from manifest["id"]
+    4. "Module"
+    Returns the first matching type or None.
+    """
     preferred = manifest.get("class")
     candidates = []
     if preferred:
@@ -73,6 +88,13 @@ def load_modules(
     """
     Scan the /apps directory, load module manifests, import module classes,
     and register active modules in the runtime registry.
+
+    Args:
+        apps_path: Optional path override for the apps directory. Defaults to ../apps.
+        registry: Optional ModuleRegistry to populate. Defaults to the global module_registry.
+
+    Returns:
+        Dict mapping module IDs to instantiated module objects.
     """
     apps_dir = apps_path or Path(__file__).resolve().parent.parent / "apps"
     active_registry = registry or module_registry

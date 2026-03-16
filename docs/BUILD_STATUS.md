@@ -44,31 +44,33 @@ Tauri wrapper is complete.
 
 ---
 
-## Phase 3 — Provider System ⚠️ INTERFACES ONLY
+## Phase 3 — Provider System ✅ DONE
 
-Abstract interfaces exist. No concrete implementations have been written.
+All provider interfaces and concrete implementations are complete.
 
 | Item | Status |
 |---|---|
 | `providers/llm_provider.py` — Abstract LLM interface | ✅ DONE |
 | `providers/image_provider.py` — Abstract image interface | ✅ DONE |
 | `providers/tts_provider.py` — Abstract TTS interface | ✅ DONE |
-| `providers/ollama_provider.py` — Local Ollama LLM | ❌ TODO |
-| `providers/openai_provider.py` — OpenAI GPT adapter | ❌ TODO |
-| `providers/fal_provider.py` — Fal image generation | ❌ TODO |
-| `providers/comfyui_provider.py` — ComfyUI image adapter | ❌ TODO |
-| `providers/piper_provider.py` — Piper TTS adapter | ❌ TODO |
+| `providers/noop_provider.py` — NoOp fallback (safe default) | ✅ DONE |
+| `providers/ollama_provider.py` — Local Ollama LLM | ✅ DONE |
+| `providers/openai_provider.py` — OpenAI GPT adapter | ✅ DONE |
+| `providers/fal_provider.py` — Fal image generation | ✅ DONE |
+| `providers/comfyui_provider.py` — ComfyUI image adapter | ✅ DONE |
+| `providers/piper_provider.py` — Piper TTS adapter | ✅ DONE |
 
 ---
 
 ## Phase 4 — Services Layer ⚠️ SCAFFOLDED
 
-All service files exist but use in-memory storage only. No database persistence is wired.
+All service files exist but use in-memory storage only. MongoDB persistence is now available via `MongoMemoryManager` but not yet wired into all services.
 
 | Item | Status |
 |---|---|
-| `services/agent_service.py` — Agent runner | ⚠️ SCAFFOLD |
-| `services/memory_manager.py` — Conversation history | ⚠️ SCAFFOLD |
+| `services/agent_service.py` — Agent runner (optional provider) | ✅ DONE |
+| `services/memory_manager.py` — Conversation history (in-memory) | ⚠️ SCAFFOLD |
+| `services/mongo_memory.py` — MongoDB-backed memory manager | ✅ DONE |
 | `services/vector_store.py` — Semantic search | ⚠️ SCAFFOLD |
 | `services/knowledge_graph.py` — Graph storage | ⚠️ SCAFFOLD |
 | `services/embedding_service.py` — Embedding generation | ⚠️ SCAFFOLD |
@@ -76,43 +78,49 @@ All service files exist but use in-memory storage only. No database persistence 
 | `services/project_genome_service.py` — Project tracker | ⚠️ SCAFFOLD |
 | `services/autopsy_service.py` — Build failure analyzer | ⚠️ SCAFFOLD |
 | `services/agent_pipeline.py` — 12-agent pipeline definition | ✅ DONE |
-| MongoDB persistence for all services | ❌ TODO |
+| MongoDB persistence wired into all services | ❌ TODO |
 
 ---
 
-## Phase 5 — Agent System ⚠️ PARTIAL
+## Phase 5 — Agent System ✅ DONE
 
-Control layer is complete. Agents package scaffold exists. Individual agent classes are not implemented.
+All 12 agent classes implemented in sub-packages. Control layer complete. Supervisor dispatches to typed agent classes.
 
 | Item | Status |
 |---|---|
 | `control/ai_router.py` — Task classifier | ✅ DONE |
 | `control/file_guard.py` — Path protection | ✅ DONE |
-| `control/agent_supervisor.py` — Pipeline coordinator | ✅ DONE |
+| `control/agent_supervisor.py` — Pipeline coordinator (typed dispatch) | ✅ DONE |
 | `control/permission_matrix.yaml` — Role permissions | ✅ DONE |
-| `agents/__init__.py` — Package init | ✅ DONE |
+| `agents/__init__.py` — Package with AGENT_CLASS_MAP | ✅ DONE |
+| `agents/base_agent.py` — Abstract BaseAgent | ✅ DONE |
 | `agents/pipeline.py` — Pipeline runner entry-point | ✅ DONE |
-| `agents/planner_agent.py` — Project Planner | ❌ TODO |
-| `agents/architect_agent.py` — System Architect | ❌ TODO |
-| `agents/router_agent.py` — Task Router | ❌ TODO |
-| `agents/builder_agent.py` — Module Builder | ❌ TODO |
-| `agents/backend_agent.py` — Backend Engineer | ❌ TODO |
-| `agents/frontend_agent.py` — Frontend Engineer | ❌ TODO |
-| `agents/tester_agent.py` — Integration Tester | ❌ TODO |
-| `agents/auditor_agent.py` — Security Auditor | ❌ TODO |
+| `agents/strategic/planner_agent.py` — Project Planner | ✅ DONE |
+| `agents/strategic/architect_agent.py` — System Architect | ✅ DONE |
+| `agents/strategic/router_agent.py` — Task Router | ✅ DONE |
+| `agents/architecture/builder_agent.py` — Module Builder | ✅ DONE |
+| `agents/architecture/api_architect_agent.py` — API Architect | ✅ DONE |
+| `agents/architecture/data_architect_agent.py` — Data Architect | ✅ DONE |
+| `agents/production/backend_agent.py` — Backend Engineer | ✅ DONE |
+| `agents/production/frontend_agent.py` — Frontend Engineer | ✅ DONE |
+| `agents/production/ai_integration_agent.py` — AI Integration Engineer | ✅ DONE |
+| `agents/validation/tester_agent.py` — Integration Tester | ✅ DONE |
+| `agents/validation/auditor_agent.py` — Security Auditor | ✅ DONE |
+| `agents/validation/stabilizer_agent.py` — System Stabilizer | ✅ DONE |
 
 ---
 
-## Phase 6 — Studio Interface ⚠️ SCAFFOLD
+## Phase 6 — Studio Interface ⚠️ PARTIAL
 
-Static five-region HTML layout exists. No interactivity or module panel loading.
+Five-region layout complete. Agent Console and Pipeline Monitor are now interactive. Module loader and dynamic panels still needed.
 
 | Item | Status |
 |---|---|
-| `frontend/index.html` — Five-region layout | ⚠️ SCAFFOLD |
-| `frontend/style.css` — Base styles | ⚠️ SCAFFOLD |
+| `frontend/index.html` — Five-region layout | ✅ DONE |
+| `frontend/style.css` — Base styles + console + pipeline | ✅ DONE |
+| Agent Console — prompt input, conversation history, keyboard shortcut | ✅ DONE |
+| Pipeline Monitor — 12-stage chip grid with active stage highlight | ✅ DONE |
 | Dynamic module panel loader | ❌ TODO |
-| Real-time agent progress display | ❌ TODO |
 | Project file browser | ❌ TODO |
 | Terminal / output panel | ❌ TODO |
 
@@ -135,18 +143,17 @@ All knowledge files exist with in-memory implementations. No real embeddings or 
 
 ---
 
-## Phase 8 — Applications ⚠️ SCAFFOLDED
+## Phase 8 — Applications ⚠️ PARTIAL
 
-Module directories exist with README stubs and manifests. No backend routes or frontend panels.
+Module directories exist with manifests, module classes, and backend routes. Frontend panels not yet implemented.
 
 | Item | Status |
 |---|---|
-| `apps/studio/` — module scaffold with manifest | ⚠️ SCAFFOLD |
-| `apps/builds/` — module scaffold with manifest | ⚠️ SCAFFOLD |
-| `apps/research/` — module scaffold with manifest | ⚠️ SCAFFOLD |
-| `apps/assets/` — module scaffold with manifest | ⚠️ SCAFFOLD |
-| `apps/deployment/` — module scaffold with manifest | ⚠️ SCAFFOLD |
-| Backend routes for each module | ❌ TODO |
+| `apps/studio/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/builds/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/research/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/assets/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/deployment/` — manifest, module class, backend routes | ✅ DONE |
 | Frontend panel components for each module | ❌ TODO |
 | `apps/sandbox/` module | ❌ TODO |
 | `apps/game_dev/` module | ❌ TODO |
@@ -156,16 +163,18 @@ Module directories exist with README stubs and manifests. No backend routes or f
 
 ## Phase 9 — Final Integration ⚠️ PARTIAL
 
-Core wiring works. Agents and providers not functional end-to-end.
+Core wiring works. Providers, agents and module routes are all functional. End-to-end pipeline requires running Ollama.
 
 | Item | Status |
 |---|---|
 | Backend server starts and serves `/api/health` | ✅ DONE |
 | Desktop wrapper launches backend | ✅ DONE |
-| Frontend scaffold renders five-region layout | ✅ DONE |
+| Frontend renders five-region layout with interactive console | ✅ DONE |
 | Module registry discovers and loads modules | ✅ DONE |
+| Module backend routes registered at `/api/modules/<module>` | ✅ DONE |
+| `/api/agent/run` endpoint (single-shot + full pipeline) | ✅ DONE |
 | Control layer enforces permissions | ✅ DONE |
-| Agent pipeline executes with real providers | ❌ TODO |
+| Agent pipeline executes with real Ollama provider | ⚠️ REQUIRES Ollama running |
 | Knowledge system persists across restarts | ❌ TODO |
 | Bridge provides filesystem access to agents | ❌ TODO |
 
@@ -173,16 +182,18 @@ Core wiring works. Agents and providers not functional end-to-end.
 
 ## Phase 10 — Compliance & Reporting ⚠️ PARTIAL
 
-Test suite passes. Compliance checklist is documented. Runtime testing gaps remain.
+Test suite passes (94 tests). Compliance checklist is documented. Runtime testing gaps remain.
 
 | Item | Status |
 |---|---|
 | `docs/PHASE_AUDIT.md` covers all phases | ✅ DONE |
 | `docs/PHASE10_COMPLIANCE.md` exists | ✅ DONE |
 | `tests/test_phase_integration.py` passes | ✅ DONE |
+| `tests/test_providers.py` — all 6 providers covered | ✅ DONE |
+| `tests/test_agents.py` — all 12 agent classes covered | ✅ DONE |
+| `tests/test_module_routes.py` — module routes and MongoMemoryManager | ✅ DONE |
 | Full test suite passes (`python -m unittest discover -s tests`) | ✅ DONE |
-| End-to-end agent pipeline smoke test | ❌ TODO |
-| Provider integration tests | ❌ TODO |
+| End-to-end agent pipeline smoke test (requires Ollama) | ❌ TODO |
 
 ---
 
@@ -227,21 +238,21 @@ All required dependencies are declared.
 
 ### Critical — system cannot function without these
 
-1. **Provider implementations** — at minimum `OllamaProvider` for local LLM
-2. **MongoDB collection initialization** — services currently lose all data on restart
-3. **Agent class implementations** — individual agents under `agents/`
-4. **Real bridge filesystem access** — bridge reads/writes to local disk
+1. **MongoDB persistence wired into all services** — MemoryManager, VectorStore etc. still in-memory only; data lost on restart
+2. **Real bridge filesystem access** — bridge reads/writes to local disk
+3. **Real embedding model** — EmbeddingService uses placeholder; no actual vectors
 
 ### High — major features currently missing
 
-5. **Frontend interactivity** — dynamic module panels, agent progress, file browser
-6. **Knowledge persistence** — real vector store (Chroma or similar)
-7. **Backend routes per module** — each app needs `backend/routes.py`
-8. **End-to-end integration test** — full pipeline smoke test
+4. **Frontend dynamic module panels** — sidebar modules should load per-module UI
+5. **Project file browser** — left sidebar workspace panel
+6. **Terminal / output panel** — bottom-right live output area
+7. **Knowledge persistence** — real vector store (Chroma or similar)
+8. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
 
 ### Medium — important but deferrable
 
-9. **Additional provider adapters** — OpenAI, Fal, ComfyUI, Piper
-10. **Additional app modules** — sandbox, game_dev, saas_builder
-11. **Game engine bridge** — Godot / Unity integration
-12. **CI/CD pipeline** — GitHub Actions workflows
+9. **Additional app modules** — sandbox, game_dev, saas_builder
+10. **Game engine bridge** — Godot / Unity integration
+11. **CI/CD pipeline** — GitHub Actions workflows
+12. **Frontend module panel components** — per-module UI panels in Studio sidebar

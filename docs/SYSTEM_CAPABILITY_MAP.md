@@ -61,11 +61,11 @@ This map is the primary reference for understanding current system state and pla
 | LLM provider interface (abstract) | `providers/llm_provider.py` | ✅ COMPLETE |
 | Image provider interface (abstract) | `providers/image_provider.py` | ✅ COMPLETE |
 | TTS provider interface (abstract) | `providers/tts_provider.py` | ✅ COMPLETE |
-| Ollama local LLM adapter | `providers/ollama_provider.py` | ❌ MISSING |
-| OpenAI LLM adapter | `providers/openai_provider.py` | ❌ MISSING |
-| Fal image generation adapter | `providers/fal_provider.py` | ❌ MISSING |
-| ComfyUI image adapter | `providers/comfyui_provider.py` | ❌ MISSING |
-| Piper TTS adapter | `providers/piper_provider.py` | ❌ MISSING |
+| Ollama local LLM adapter | `providers/ollama_provider.py` | ✅ COMPLETE |
+| OpenAI LLM adapter | `providers/openai_provider.py` | ✅ COMPLETE |
+| Fal image generation adapter | `providers/fal_provider.py` | ✅ COMPLETE |
+| ComfyUI image adapter | `providers/comfyui_provider.py` | ✅ COMPLETE |
+| Piper TTS adapter | `providers/piper_provider.py` | ✅ COMPLETE |
 
 ---
 
@@ -73,8 +73,9 @@ This map is the primary reference for understanding current system state and pla
 
 | Capability | File | Status |
 |---|---|---|
-| Agent task execution runner | `services/agent_service.py` | ⚠️ SCAFFOLD |
-| Conversation history storage | `services/memory_manager.py` | ⚠️ SCAFFOLD |
+| Agent task execution runner | `services/agent_service.py` | ✅ COMPLETE |
+| Conversation history storage (in-memory) | `services/memory_manager.py` | ⚠️ SCAFFOLD |
+| MongoDB-backed memory manager | `services/mongo_memory.py` | ✅ COMPLETE |
 | Semantic vector store | `services/vector_store.py` | ⚠️ SCAFFOLD |
 | In-memory knowledge graph | `services/knowledge_graph.py` | ⚠️ SCAFFOLD |
 | Embedding generation service | `services/embedding_service.py` | ⚠️ SCAFFOLD |
@@ -89,16 +90,21 @@ This map is the primary reference for understanding current system state and pla
 
 | Capability | File | Status |
 |---|---|---|
-| Agents package | `agents/__init__.py` | ✅ COMPLETE |
+| Agents package with AGENT_CLASS_MAP | `agents/__init__.py` | ✅ COMPLETE |
+| Abstract base agent | `agents/base_agent.py` | ✅ COMPLETE |
 | Pipeline execution entry-point | `agents/pipeline.py` | ✅ COMPLETE |
-| Project Planner agent class | `agents/planner_agent.py` | ❌ MISSING |
-| System Architect agent class | `agents/architect_agent.py` | ❌ MISSING |
-| Task Router agent class | `agents/router_agent.py` | ❌ MISSING |
-| Module Builder agent class | `agents/builder_agent.py` | ❌ MISSING |
-| Backend Engineer agent class | `agents/backend_agent.py` | ❌ MISSING |
-| Frontend Engineer agent class | `agents/frontend_agent.py` | ❌ MISSING |
-| Integration Tester agent class | `agents/tester_agent.py` | ❌ MISSING |
-| Security Auditor agent class | `agents/auditor_agent.py` | ❌ MISSING |
+| Project Planner agent class | `agents/strategic/planner_agent.py` | ✅ COMPLETE |
+| System Architect agent class | `agents/strategic/architect_agent.py` | ✅ COMPLETE |
+| Task Router agent class | `agents/strategic/router_agent.py` | ✅ COMPLETE |
+| Module Builder agent class | `agents/architecture/builder_agent.py` | ✅ COMPLETE |
+| API Architect agent class | `agents/architecture/api_architect_agent.py` | ✅ COMPLETE |
+| Data Architect agent class | `agents/architecture/data_architect_agent.py` | ✅ COMPLETE |
+| Backend Engineer agent class | `agents/production/backend_agent.py` | ✅ COMPLETE |
+| Frontend Engineer agent class | `agents/production/frontend_agent.py` | ✅ COMPLETE |
+| AI Integration Engineer agent class | `agents/production/ai_integration_agent.py` | ✅ COMPLETE |
+| Integration Tester agent class | `agents/validation/tester_agent.py` | ✅ COMPLETE |
+| Security Auditor agent class | `agents/validation/auditor_agent.py` | ✅ COMPLETE |
+| System Stabilizer agent class | `agents/validation/stabilizer_agent.py` | ✅ COMPLETE |
 
 ---
 

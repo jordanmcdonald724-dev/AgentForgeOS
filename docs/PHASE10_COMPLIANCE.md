@@ -21,20 +21,18 @@ This checklist confirms the build is exercised (not just audited) through tests 
 
 - [x] Phase 1 — Engine: FastAPI server starts, `/api/health` responds
 - [x] Phase 2 — Desktop: Tauri wrapper present, `launch_backend` command available
-- [x] Phase 3 — Providers: Abstract interfaces importable without errors
-- [x] Phase 4 — Services: All service scaffolds importable without errors
-- [x] Phase 5 — Agents: `agents/pipeline.py` and control layer import without errors
-- [x] Phase 6 — Frontend: `frontend/index.html` renders five-region layout
+- [x] Phase 3 — Providers: All concrete adapters implemented (Ollama, OpenAI, Fal, ComfyUI, Piper, NoOp)
+- [x] Phase 4 — Services: All service scaffolds importable; `MongoMemoryManager` provides optional MongoDB persistence
+- [x] Phase 5 — Agents: All 12 agent classes implemented; `AGENT_CLASS_MAP` complete; supervisor dispatches to typed agents
+- [x] Phase 6 — Frontend: Interactive Agent Console + Pipeline Monitor; `/api/agent/run` endpoint wired
 - [x] Phase 7 — Knowledge: All `knowledge/` modules importable without errors
-- [x] Phase 8 — Apps: All module directories present with `manifest.json` and `module.py`
-- [x] Phase 9 — Integration: `test_phase_integration.py` passes
+- [x] Phase 8 — Apps: All 5 module directories have `manifest.json`, `module.py`, and `backend/routes.py`
+- [x] Phase 9 — Integration: `test_phase_integration.py` passes; module backend routes registered
 - [x] Phase 10 — Compliance: This checklist is reviewed and current
 
 ## Known Gaps (track until resolved)
 
-- [ ] Provider implementations — no concrete adapters yet (Ollama, OpenAI, Fal, Piper)
-- [ ] Services persistence — all services are in-memory; MongoDB not wired
-- [ ] Agent classes — individual agent implementations not written
+- [ ] Services persistence — MemoryManager and other services still in-memory (MongoMemoryManager exists but not yet wired into all services)
 - [ ] Bridge filesystem access — bridge scaffolds exist but are not functional
-- [ ] Frontend interactivity — static scaffold only, no dynamic panels
+- [ ] Frontend dynamic module panels — sidebar module loading not yet implemented
 - [ ] Knowledge persistence — no real vector store or embedding model wired

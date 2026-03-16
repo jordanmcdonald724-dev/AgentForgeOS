@@ -8,6 +8,7 @@ from .config import get_settings
 from .database import db
 from .module_loader import load_modules
 from .worker_system import worker_system
+from .routes import modules_router
 from control.module_registry import module_registry
 
 logger = logging.getLogger(__name__)
@@ -20,17 +21,6 @@ def _health_router() -> APIRouter:
     async def health_check():
         """Basic health endpoint used by the desktop runtime and monitors."""
         return {"success": True, "data": {"status": "ok"}, "error": None}
-
-    return router
-
-
-def _modules_router() -> APIRouter:
-    router = APIRouter()
-
-    @router.get("/modules", tags=["modules"])
-    async def list_modules():
-        """Expose active module manifests for the Studio UI."""
-        return {"success": True, "data": module_registry.list_manifests(), "error": None}
 
     return router
 
@@ -61,5 +51,5 @@ def register_routers(
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
-    register_routers(app, [_health_router(), _modules_router()], prefix="/api")
+    register_routers(app, [_health_router(), modules_router], prefix="/api")
     return app

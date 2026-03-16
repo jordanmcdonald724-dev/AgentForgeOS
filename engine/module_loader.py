@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _sanitize_identifier(value: str) -> Optional[str]:
+    """Convert an arbitrary string to a safe Python identifier fragment."""
     cleaned = "".join(ch for ch in value if ch.isalnum() or ch == "_")
     if not cleaned:
         return None
@@ -101,7 +102,7 @@ def load_modules(
             logger.warning("Entry file %s missing for module %s", entry_path, module_id)
             continue
 
-        module_name = f"apps.{module_dir.name}.{entry_name.replace('.py', '')}"
+        module_name = f"apps.{module_dir.name}.{entry_path.stem}"
         imported = _import_module(entry_path, module_name)
         if not imported:
             continue
@@ -113,9 +114,10 @@ def load_modules(
 
         try:
             instance = cls()
-            if hasattr(instance, "initialize") and callable(getattr(instance, "initialize")):
+            initializer = getattr(instance, "initialize", None)
+            if callable(initializer):
                 try:
-                    instance.initialize()
+                    initializer()
                 except Exception as exc:  # pragma: no cover - defensive log path
                     logger.warning("Module %s initialize() failed: %s", module_id, exc)
             active_registry.register_module(module_id, instance, manifest)

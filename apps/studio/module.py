@@ -1,4 +1,5 @@
 class StudioModule:
+    """Primary AI development environment module for AgentForgeOS Studio."""
     def __init__(self):
         self.id = "studio"
         self.name = "Studio"

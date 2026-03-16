@@ -38,7 +38,7 @@ class ModuleRegistrySingletonTests(unittest.TestCase):
         self.assertIn("demo", registry.get_all_modules())
 
         registry.clear()
-        self.assertEqual(dict(registry.get_all_modules()), {})
+        self.assertFalse(registry.get_all_modules())
 
 
 if __name__ == "__main__":

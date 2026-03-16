@@ -13,6 +13,10 @@ class ModuleRegistry:
     _data_lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, "_instance_lock"):
+            cls._instance_lock = threading.Lock()
+        if not hasattr(cls, "_data_lock"):
+            cls._data_lock = threading.Lock()
         if cls._instance is None:
             with cls._instance_lock:
                 if cls._instance is None:

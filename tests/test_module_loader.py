@@ -16,11 +16,19 @@ class ModuleLoaderManifestTests(unittest.TestCase):
         ModuleRegistry().clear()
 
     def _create_module(
-        self, base: Path, name: str, manifest: dict, body: str = textwrap.dedent("""\
-        class Module:
-            pass
-        """),
+        self,
+        base: Path,
+        name: str,
+        manifest: dict,
+        body: str | None = None,
     ):
+        if body is None:
+            body = textwrap.dedent(
+                """\
+                class Module:
+                    pass
+                """
+            )
         module_dir = base / name
         module_dir.mkdir(parents=True, exist_ok=True)
         (module_dir / "manifest.json").write_text(json.dumps(manifest))

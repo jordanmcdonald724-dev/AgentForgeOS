@@ -15,7 +15,7 @@ class LLMProvider(ABC):
         {
             "success": bool,
             "data": <provider-specific payload>,
-            "error": Optional[str],
+            "error": Optional[str] (None when successful),
         }
         """
         raise NotImplementedError

@@ -40,11 +40,18 @@ def _load_manifest(manifest_path: Path) -> Optional[Dict]:
 
 
 def _validate_manifest(manifest: Dict, module_dir: Path) -> bool:
-    required = ["id", "name", "version", "entry"]
-    missing = [field for field in required if not manifest.get(field)]
+    required = {"id": str, "name": str, "version": str, "entry": str}
+    missing = []
+    for field, expected_type in required.items():
+        value = manifest.get(field)
+        if not isinstance(value, expected_type):
+            missing.append(field)
+            continue
+        if isinstance(value, str) and not value.strip():
+            missing.append(field)
     if missing:
         logger.warning(
-            "Skipping %s: manifest missing required fields: %s",
+            "Skipping %s: manifest missing or invalid required fields: %s",
             module_dir.name,
             ", ".join(missing),
         )

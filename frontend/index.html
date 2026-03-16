@@ -70,7 +70,7 @@
     <script>
       (() => {
         const MODULE_FETCH_TIMEOUT_MS = 8000;
-        const MODULE_VERSION_PREFIX = "v";
+        const MODULE_VERSION_DISPLAY_PREFIX = "v";
         const moduleListEl = document.getElementById("module-list");
         const activeModuleName = document.getElementById("active-module-name");
         const activeModuleVersion = document.getElementById("active-module-version");
@@ -95,7 +95,8 @@
         const setActiveModule = (module) => {
           activeModule = module;
           activeModuleName.textContent = getModuleDisplayName(module);
-          activeModuleVersion.textContent = module && module.version ? `${MODULE_VERSION_PREFIX}${module.version}` : "";
+          activeModuleVersion.textContent =
+            module && module.version ? `${MODULE_VERSION_DISPLAY_PREFIX}${module.version}` : "";
           activeModuleDescription.textContent =
             module && module.description ? module.description : "Modules are not currently available.";
           updateActiveHighlight(module?.id || null);
@@ -156,7 +157,12 @@
             } else if (payload && typeof payload === "object") {
               modules = Array.isArray(payload.data) ? payload.data : [];
             } else {
-              const typeLabel = payload === null ? "null" : typeof payload;
+              const typeLabel =
+                payload === null
+                  ? "null"
+                  : typeof payload === "string"
+                    ? `string: ${payload.slice(0, 80)}`
+                    : typeof payload;
               throw new Error(
                 `Invalid module response: expected array or object with a data property but received ${typeLabel}`
               );

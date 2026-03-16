@@ -85,10 +85,10 @@
 
         const setActiveModule = (module) => {
           activeModule = module;
-          activeModuleName.textContent = module ? module.name || "Unnamed Module" : "No module selected";
+          activeModuleName.textContent = module ? module.name || "Unnamed Module" : "No modules available";
           activeModuleVersion.textContent = module && module.version ? `v${module.version}` : "";
           activeModuleDescription.textContent =
-            module && module.description ? module.description : "Select a module to begin.";
+            module && module.description ? module.description : "Modules are not currently available.";
           updateActiveHighlight(module?.id || null);
         };
 
@@ -131,9 +131,7 @@
             const response = await fetch("/api/modules");
             if (!response.ok) {
               const statusLabel = response.statusText ? ` ${response.statusText}` : "";
-              throw new Error(
-                `Failed to fetch modules: ${response.status}${statusLabel}. Please try again or check connectivity.`
-              );
+              throw new Error(`Failed to fetch modules: ${response.status}${statusLabel}`);
             }
             const payload = await response.json();
             if (!payload || typeof payload !== "object") {

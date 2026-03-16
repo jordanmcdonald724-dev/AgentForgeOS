@@ -8,7 +8,7 @@ Provides endpoints for the AI development Studio workspace:
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 router = APIRouter(prefix="/studio", tags=["studio"])
 
@@ -28,13 +28,20 @@ async def studio_status():
 
 
 @router.get("/workspace")
-async def list_workspace():
-    """List the top-level entries in the active workspace via the bridge."""
+async def list_workspace(
+    path: str = Query(".", description="Relative path within the workspace to list"),
+):
+    """List entries in a workspace directory via the bridge.
+
+    Accepts an optional ``path`` query parameter (defaults to ``"."`` for the
+    workspace root) so the frontend file browser can navigate into
+    subdirectories without a separate endpoint.
+    """
     try:
         from bridge.bridge_server import BridgeServer
 
         server = BridgeServer()
-        result = server.list_directory(".")
+        result = server.list_directory(path)
         return {"success": True, "data": result, "error": None}
     except Exception as exc:
         return {"success": False, "data": None, "error": str(exc)}

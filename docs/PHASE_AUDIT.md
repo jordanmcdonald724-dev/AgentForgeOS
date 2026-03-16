@@ -33,11 +33,13 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - Control layer present under `control/` with `ai_router.py`, `file_guard.py`, `agent_supervisor.py` (typed dispatch, fault-tolerant pipeline), and `permission_matrix.yaml`.
 - `services/agent_registry.py` provides `AGENT_REGISTRY` as the authoritative role-to-class mapping used by `AgentSupervisor`.
 
-## Phase 6 — Studio Interface ⚠️ PARTIAL
+## Phase 6 — Studio Interface ✅ COMPLETE
 - Frontend studio under `frontend/` (`index.html`, `style.css`) following `docs/UI_STUDIO_LAYOUT.md`.
-- Agent Console is now interactive: prompt textarea, send button, conversation history, keyboard shortcut.
+- Agent Console is interactive: prompt textarea, send button, conversation history, keyboard shortcut.
 - Pipeline Monitor renders 12-stage chip grid with active stage highlight.
-- **Still needed:** dynamic module panel loading, project file browser, terminal panel.
+- Dynamic module panel loader: selecting a module in the sidebar renders a module-specific panel in the workspace.
+- Project file browser: Studio module panel fetches from `/api/modules/studio/workspace?path=` and renders a navigable file tree with breadcrumbs.
+- Terminal / output log panel: added to the Pipeline Monitor panel; logs all system events, module loads, agent runs, and file browser operations.
 
 ## Phase 7 — Knowledge System ⚠️ SCAFFOLDED
 - Knowledge system under `knowledge/`: `knowledge_graph.py`, `vector_store.py`, `embedding_service.py`, `pattern_extractor.py`, `project_genome.py`, with package exports in `__init__.py`.

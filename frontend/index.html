@@ -34,25 +34,8 @@
           </div>
           <p id="active-module-description">Modules are loading from the backend.</p>
         </div>
-        <div class="workspace-card">
-          <div class="title">Module Workspace</div>
-          <p>
-            Render module-specific workspaces here. Content will update as you select a module from the sidebar.
-          </p>
-        </div>
-        <div class="grid">
-          <div class="workspace-card">
-            <div class="title">Project Files</div>
-            <p>Preview files, configuration, and agent outputs.</p>
-          </div>
-          <div class="workspace-card">
-            <div class="title">Agent Interaction</div>
-            <p>Coordinate multi-agent instructions and view responses.</p>
-          </div>
-          <div class="workspace-card">
-            <div class="title">Build Config</div>
-            <p>Manage pipelines, providers, and runtime toggles.</p>
-          </div>
+        <div id="module-panel" class="workspace-card module-panel">
+          <div class="module-panel-placeholder">Select a module from the sidebar to view its workspace.</div>
         </div>
       </section>
     </main>
@@ -75,6 +58,8 @@
       <div class="panel panel--pipeline">
         <div class="title">Pipeline / System Monitor</div>
         <div id="pipeline-stages" class="pipeline-stages" aria-label="Pipeline stages"></div>
+        <div class="title output-log-title">Output Log</div>
+        <div id="output-log" class="output-log" aria-live="polite" aria-label="System output log"></div>
       </div>
     </section>
     <script>
@@ -85,6 +70,7 @@
         const activeModuleName = document.getElementById("active-module-name");
         const activeModuleVersion = document.getElementById("active-module-version");
         const activeModuleDescription = document.getElementById("active-module-description");
+        const modulePanelEl = document.getElementById("module-panel");
 
         let activeModule = null;
 
@@ -109,6 +95,7 @@
           activeModuleDescription.textContent =
             module && module.description ? module.description : "Modules are not currently available.";
           updateActiveHighlight(module?.id || null);
+          loadModulePanel(module);
         };
 
         const renderModules = (modules) => {
@@ -178,12 +165,15 @@
               );
             }
             renderModules(modules);
+            appendLog("info", `Loaded ${modules.length} module(s) from the server`);
           } catch (error) {
             console.error(error);
             if (error.name === "AbortError") {
               showError("Module request timed out. Please try again.");
+              appendLog("error", "Module request timed out");
               return;
             }
+            appendLog("error", `Module load failed: ${error.message}`);
             showError();
           }
         };
@@ -242,8 +232,10 @@
               (payload?.error) ||
               "No response received.";
             appendMessage("agent", text);
+            appendLog("info", `Agent responded to: "${prompt.slice(0, 60)}${prompt.length > 60 ? "…" : ""}"`);
           } catch (err) {
             appendMessage("agent", `Error: ${err.message || "request failed"}`);
+            appendLog("error", `Agent run error: ${err.message}`);
           } finally {
             setConsoleLoading(false);
             consoleInput.focus();
@@ -268,7 +260,6 @@
         // Pipeline Monitor
         // ----------------------------------------------------------------
 
-        const PIPELINE_STAGES_URL = "/api/modules";
         const pipelineStages = document.getElementById("pipeline-stages");
 
         const PIPELINE_ROLES = [
@@ -289,6 +280,371 @@
         };
 
         renderPipelineStages(null);
+
+        // ----------------------------------------------------------------
+        // Output Log
+        // ----------------------------------------------------------------
+
+        const outputLog = document.getElementById("output-log");
+
+        const appendLog = (level, message) => {
+          if (!outputLog) return;
+          const entry = document.createElement("div");
+          entry.className = `log-entry log-entry--${level}`;
+          const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          const tsEl = document.createElement("span");
+          tsEl.className = "log-ts";
+          tsEl.textContent = ts;
+          const lvlEl = document.createElement("span");
+          lvlEl.className = "log-lvl";
+          lvlEl.textContent = `[${level.toUpperCase()}]`;
+          const msgEl = document.createElement("span");
+          msgEl.className = "log-msg";
+          msgEl.textContent = message;
+          entry.appendChild(tsEl);
+          entry.appendChild(lvlEl);
+          entry.appendChild(msgEl);
+          outputLog.appendChild(entry);
+          outputLog.scrollTop = outputLog.scrollHeight;
+        };
+
+        // ----------------------------------------------------------------
+        // Dynamic Module Panels
+        // ----------------------------------------------------------------
+
+        const formatBytes = (bytes) => {
+          if (bytes == null) return "";
+          if (bytes < 1024) return `${bytes} B`;
+          if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+          return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        };
+
+        const loadModulePanel = (module) => {
+          if (!module) {
+            modulePanelEl.innerHTML = '<div class="module-panel-placeholder">Select a module from the sidebar to view its workspace.</div>';
+            return;
+          }
+          const id = (module.id || "").toLowerCase();
+          switch (id) {
+            case "studio":     renderStudioPanel(); break;
+            case "builds":     renderBuildsPanel(); break;
+            case "research":   renderResearchPanel(); break;
+            case "assets":     renderAssetsPanel(); break;
+            case "deployment": renderDeploymentPanel(); break;
+            default:
+              modulePanelEl.innerHTML = `<div class="module-panel-placeholder">No dedicated panel for "${module.id}".</div>`;
+          }
+        };
+
+        // ---- Studio: Project File Browser --------------------------------
+
+        const renderStudioPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Project Files</div>
+            <div id="file-browser-breadcrumb" class="breadcrumb" aria-label="File path"></div>
+            <div id="file-browser-list" class="file-browser">
+              <div class="file-browser-loading">Loading workspace…</div>
+            </div>
+          `;
+          loadFileBrowser(".");
+        };
+
+        const loadFileBrowser = async (path) => {
+          const listEl = document.getElementById("file-browser-list");
+          const crumbEl = document.getElementById("file-browser-breadcrumb");
+          if (!listEl) return;
+
+          listEl.innerHTML = '<div class="file-browser-loading">Loading…</div>';
+
+          // Render breadcrumb
+          const parts = path === "." ? [] : path.split("/").filter(Boolean);
+          let crumbHTML = `<span class="crumb" data-path=".">workspace</span>`;
+          parts.forEach((part, i) => {
+            const crumbPath = parts.slice(0, i + 1).join("/");
+            crumbHTML += ` <span class="crumb-sep">›</span> <span class="crumb" data-path="${crumbPath}">${part}</span>`;
+          });
+          if (crumbEl) {
+            crumbEl.innerHTML = crumbHTML;
+            crumbEl.querySelectorAll(".crumb").forEach((el) => {
+              el.addEventListener("click", () => loadFileBrowser(el.dataset.path));
+            });
+          }
+
+          try {
+            const response = await fetchWithTimeout(
+              `/api/modules/studio/workspace?path=${encodeURIComponent(path)}`
+            );
+            const payload = await response.json();
+            const entries = payload?.data?.entries || [];
+
+            if (!entries.length) {
+              listEl.innerHTML = '<div class="file-browser-empty">Empty directory</div>';
+              appendLog("info", `Workspace "${path}": empty`);
+              return;
+            }
+
+            listEl.innerHTML = "";
+            entries.forEach((entry) => {
+              const el = document.createElement("div");
+              el.className = `file-entry file-entry--${entry.type}`;
+              const icon = document.createElement("span");
+              icon.className = "file-entry-icon";
+              icon.textContent = entry.type === "directory" ? "📁" : "📄";
+              const name = document.createElement("span");
+              name.className = "file-entry-name";
+              name.textContent = entry.name;
+              el.appendChild(icon);
+              el.appendChild(name);
+              if (entry.size != null) {
+                const size = document.createElement("span");
+                size.className = "file-entry-size";
+                size.textContent = formatBytes(entry.size);
+                el.appendChild(size);
+              }
+              if (entry.type === "directory") {
+                const subPath = path === "." ? entry.name : `${path}/${entry.name}`;
+                el.addEventListener("click", () => loadFileBrowser(subPath));
+              }
+              listEl.appendChild(el);
+            });
+            appendLog("info", `Workspace "${path}": ${entries.length} item(s)`);
+          } catch (err) {
+            listEl.innerHTML = `<div class="file-browser-error">Error loading workspace: ${err.message}</div>`;
+            appendLog("error", `File browser error: ${err.message}`);
+          }
+        };
+
+        // ---- Builds: Build Pipelines -------------------------------------
+
+        const renderBuildsPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Build Pipelines</div>
+            <div class="panel-actions">
+              <input id="build-project" class="panel-input" placeholder="Project name" />
+              <button id="build-trigger-btn" class="action-btn">Trigger Build</button>
+            </div>
+            <div id="builds-list" class="item-list"><div class="item-list-empty">Loading runs…</div></div>
+          `;
+          document.getElementById("build-trigger-btn").addEventListener("click", async () => {
+            const project = document.getElementById("build-project").value.trim() || "default";
+            try {
+              const r = await fetchWithTimeout("/api/modules/builds/trigger", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ project }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Build triggered for "${project}" (id: ${payload?.data?.id})`);
+              loadBuildsRuns();
+            } catch (err) {
+              appendLog("error", `Build trigger failed: ${err.message}`);
+            }
+          });
+          loadBuildsRuns();
+        };
+
+        const loadBuildsRuns = async () => {
+          const listEl = document.getElementById("builds-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/builds/runs");
+            const payload = await r.json();
+            const runs = payload?.data || [];
+            if (!runs.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No builds yet. Trigger one above.</div>';
+              return;
+            }
+            listEl.innerHTML = runs.slice().reverse().map((run) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${run.status}">${run.status}</span>
+                <span class="item-name">${run.project}</span>
+                <span class="item-meta">#${run.id} &middot; ${new Date(run.triggered_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Research: Notes & Knowledge Search --------------------------
+
+        const renderResearchPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Research Notes</div>
+            <div class="panel-actions">
+              <input id="research-search" class="panel-input" placeholder="Search knowledge…" />
+              <button id="research-search-btn" class="action-btn">Search</button>
+            </div>
+            <div class="panel-actions panel-actions--col">
+              <input id="note-title" class="panel-input" placeholder="Note title" />
+              <textarea id="note-content" class="panel-textarea" placeholder="Note content…" rows="2"></textarea>
+              <button id="note-add-btn" class="action-btn">Add Note</button>
+            </div>
+            <div id="research-list" class="item-list"><div class="item-list-empty">Loading notes…</div></div>
+          `;
+          document.getElementById("research-search-btn").addEventListener("click", async () => {
+            const query = document.getElementById("research-search").value.trim();
+            if (!query) return;
+            const listEl = document.getElementById("research-list");
+            listEl.innerHTML = '<div class="item-list-empty">Searching…</div>';
+            try {
+              const r = await fetchWithTimeout("/api/modules/research/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query }),
+              });
+              const payload = await r.json();
+              const results = payload?.data || [];
+              if (!results.length) {
+                listEl.innerHTML = '<div class="item-list-empty">No results found.</div>';
+              } else {
+                listEl.innerHTML = results.map((res) => `
+                  <div class="item-row">
+                    <span class="item-name">${res.metadata?.title || "Result"}</span>
+                    <span class="item-meta">${(res.text || "").slice(0, 80)}</span>
+                  </div>
+                `).join("");
+              }
+              appendLog("info", `Research search "${query}": ${results.length} result(s)`);
+            } catch (err) {
+              listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+            }
+          });
+          document.getElementById("note-add-btn").addEventListener("click", async () => {
+            const title = document.getElementById("note-title").value.trim();
+            const content = document.getElementById("note-content").value.trim();
+            if (!content) return;
+            try {
+              await fetchWithTimeout("/api/modules/research/notes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: title || "Untitled", content }),
+              });
+              document.getElementById("note-title").value = "";
+              document.getElementById("note-content").value = "";
+              appendLog("info", `Research note added: "${title || "Untitled"}"`);
+              loadResearchNotes();
+            } catch (err) {
+              appendLog("error", `Note add failed: ${err.message}`);
+            }
+          });
+          loadResearchNotes();
+        };
+
+        const loadResearchNotes = async () => {
+          const listEl = document.getElementById("research-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/research/notes");
+            const payload = await r.json();
+            const notes = payload?.data || [];
+            if (!notes.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No notes yet.</div>';
+              return;
+            }
+            listEl.innerHTML = notes.slice().reverse().map((note) => `
+              <div class="item-row">
+                <span class="item-name">${note.title}</span>
+                <span class="item-meta">${(note.content || "").slice(0, 80)}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Assets: Asset Registry --------------------------------------
+
+        const renderAssetsPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Generated Assets</div>
+            <div id="assets-list" class="item-list"><div class="item-list-empty">Loading assets…</div></div>
+          `;
+          loadAssetsList();
+        };
+
+        const loadAssetsList = async () => {
+          const listEl = document.getElementById("assets-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/assets/list");
+            const payload = await r.json();
+            const assets = payload?.data || [];
+            if (!assets.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No assets registered yet.</div>';
+              return;
+            }
+            listEl.innerHTML = assets.slice().reverse().map((a) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${a.type}">${a.type}</span>
+                <span class="item-name">${a.path || "—"}</span>
+                <span class="item-meta">${a.source || ""}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Deployment: Deployment Manager ------------------------------
+
+        const renderDeploymentPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Deployments</div>
+            <div class="panel-actions">
+              <input id="deploy-project" class="panel-input" placeholder="Project name" />
+              <input id="deploy-version" class="panel-input" placeholder="Version (e.g. 1.0.0)" />
+              <select id="deploy-target" class="panel-input panel-select">
+                <option value="local">local</option>
+                <option value="staging">staging</option>
+                <option value="production">production</option>
+              </select>
+              <button id="deploy-btn" class="action-btn action-btn--danger">Deploy</button>
+            </div>
+            <div id="deployment-list" class="item-list"><div class="item-list-empty">Loading deployments…</div></div>
+          `;
+          document.getElementById("deploy-btn").addEventListener("click", async () => {
+            const project = document.getElementById("deploy-project").value.trim() || "default";
+            const version = document.getElementById("deploy-version").value.trim() || "0.0.1";
+            const target = document.getElementById("deploy-target").value;
+            try {
+              const r = await fetchWithTimeout("/api/modules/deployment/deploy", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ project, version, target }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Deployed "${project}" v${version} → ${target} (id: ${payload?.data?.id})`);
+              loadDeploymentList();
+            } catch (err) {
+              appendLog("error", `Deployment failed: ${err.message}`);
+            }
+          });
+          loadDeploymentList();
+        };
+
+        const loadDeploymentList = async () => {
+          const listEl = document.getElementById("deployment-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/deployment/list");
+            const payload = await r.json();
+            const deployments = payload?.data || [];
+            if (!deployments.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No deployments yet.</div>';
+              return;
+            }
+            listEl.innerHTML = deployments.slice().reverse().map((d) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${d.status}">${d.status}</span>
+                <span class="item-name">${d.project} → ${d.target}</span>
+                <span class="item-meta">v${d.version} &middot; ${new Date(d.initiated_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
       })();
     </script>
   </body>

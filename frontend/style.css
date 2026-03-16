@@ -299,3 +299,296 @@ body {
   gap: 6px;
   padding-top: 4px;
 }
+
+/* ---------------------------------------------------------------
+   Dynamic Module Panel
+--------------------------------------------------------------- */
+
+.module-panel {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.module-panel-placeholder {
+  color: #64748b;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+/* ---------------------------------------------------------------
+   Panel actions row
+--------------------------------------------------------------- */
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.panel-actions--col {
+  flex-direction: column;
+}
+
+.panel-input {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 13px;
+  padding: 6px 10px;
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.panel-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.panel-select {
+  cursor: pointer;
+}
+
+.panel-textarea {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 13px;
+  padding: 6px 10px;
+  width: 100%;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.panel-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.action-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #1d4ed8;
+}
+
+.action-btn--danger {
+  background: #dc2626;
+}
+
+.action-btn--danger:hover {
+  background: #b91c1c;
+}
+
+/* ---------------------------------------------------------------
+   File Browser
+--------------------------------------------------------------- */
+
+.file-browser {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
+  padding-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.crumb {
+  color: #60a5fa;
+  cursor: pointer;
+}
+
+.crumb:hover {
+  text-decoration: underline;
+}
+
+.crumb-sep {
+  color: #374151;
+}
+
+.file-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  font-size: 13px;
+}
+
+.file-entry--directory {
+  cursor: pointer;
+}
+
+.file-entry--directory:hover {
+  border-color: #2563eb;
+}
+
+.file-entry-icon {
+  flex-shrink: 0;
+}
+
+.file-entry-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-entry-size {
+  color: #64748b;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.file-browser-loading,
+.file-browser-empty,
+.file-browser-error {
+  color: #64748b;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.file-browser-error {
+  color: #f87171;
+}
+
+/* ---------------------------------------------------------------
+   Item lists (builds, research, assets, deployment)
+--------------------------------------------------------------- */
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.item-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #1f2937;
+  color: #94a3b8;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.item-badge--queued,
+.item-badge--pending  { background: #1e3a8a; color: #bfdbfe; }
+.item-badge--running  { background: #14532d; color: #86efac; }
+.item-badge--success,
+.item-badge--done     { background: #14532d; color: #86efac; }
+.item-badge--failed,
+.item-badge--error    { background: #7f1d1d; color: #fecaca; }
+.item-badge--image,
+.item-badge--audio,
+.item-badge--unknown  { background: #4c1d95; color: #ddd6fe; }
+
+.item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-meta {
+  color: #64748b;
+  font-size: 11px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.item-list-empty,
+.item-list-error {
+  color: #64748b;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.item-list-error {
+  color: #f87171;
+}
+
+/* ---------------------------------------------------------------
+   Output Log (Pipeline Monitor panel)
+--------------------------------------------------------------- */
+
+.output-log-title {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #1f2937;
+}
+
+.output-log {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 100px;
+  padding: 4px 0;
+}
+
+.log-entry {
+  display: flex;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1.4;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 11px;
+}
+
+.log-ts {
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.log-lvl {
+  color: #4b5563;
+  flex-shrink: 0;
+}
+
+.log-entry--info    .log-msg { color: #94a3b8; }
+.log-entry--error   .log-msg { color: #f87171; }
+.log-entry--warn    .log-msg { color: #fbbf24; }
+.log-entry--success .log-msg { color: #86efac; }

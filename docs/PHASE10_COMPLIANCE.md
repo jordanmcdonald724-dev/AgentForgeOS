@@ -24,7 +24,7 @@ This checklist confirms the build is exercised (not just audited) through tests 
 - [x] Phase 3 — Providers: All concrete adapters implemented (Ollama, OpenAI, Fal, ComfyUI, Piper, NoOp)
 - [x] Phase 4 — Services: All service scaffolds importable; `MongoMemoryManager` provides optional MongoDB persistence
 - [x] Phase 5 — Agents: All 12 agent classes implemented; `AGENT_CLASS_MAP` complete; supervisor dispatches to typed agents
-- [x] Phase 6 — Frontend: Interactive Agent Console + Pipeline Monitor; `/api/agent/run` endpoint wired
+- [x] Phase 6 — Frontend: Interactive Agent Console + Pipeline Monitor; dynamic module panels (Studio file browser, Builds, Research, Assets, Deployment); output log
 - [x] Phase 7 — Knowledge: All `knowledge/` modules importable without errors
 - [x] Phase 8 — Apps: All 5 module directories have `manifest.json`, `module.py`, and `backend/routes.py`
 - [x] Phase 9 — Integration: `test_phase_integration.py` passes; module backend routes registered
@@ -35,5 +35,7 @@ This checklist confirms the build is exercised (not just audited) through tests 
 - [x] AgentService memory persistence — `MongoMemoryManager` wired into `AgentService` and `/api/agent/run` route; supports `session_id`
 - [x] Bridge filesystem access — `BridgeServer` provides sandboxed read/write/list/delete; `BridgeSecurity` validates all paths
 - [ ] Remaining services persistence — VectorStore, KnowledgeGraph etc. still in-memory only
-- [ ] Frontend dynamic module panels — sidebar module loading not yet implemented
+- [x] Frontend dynamic module panels — dynamic panel system renders Studio (file browser), Builds, Research, Assets, Deployment
+- [x] Project file browser — Studio panel navigates workspace via `/api/modules/studio/workspace?path=`
+- [x] Terminal / output log — Pipeline Monitor panel now includes a live output log
 - [ ] Knowledge persistence — no real vector store or embedding model wired

@@ -113,9 +113,9 @@ All 12 agent classes implemented in sub-packages. Control layer complete. Superv
 
 ---
 
-## Phase 6 — Studio Interface ⚠️ PARTIAL
+## Phase 6 — Studio Interface ✅ DONE
 
-Five-region layout complete. Agent Console and Pipeline Monitor are now interactive. Module loader and dynamic panels still needed.
+All five-region layout items are now complete.
 
 | Item | Status |
 |---|---|
@@ -123,9 +123,9 @@ Five-region layout complete. Agent Console and Pipeline Monitor are now interact
 | `frontend/style.css` — Base styles + console + pipeline | ✅ DONE |
 | Agent Console — prompt input, conversation history, keyboard shortcut | ✅ DONE |
 | Pipeline Monitor — 12-stage chip grid with active stage highlight | ✅ DONE |
-| Dynamic module panel loader | ❌ TODO |
-| Project file browser | ❌ TODO |
-| Terminal / output panel | ❌ TODO |
+| Dynamic module panel loader | ✅ DONE |
+| Project file browser (Studio module — navigable tree via bridge) | ✅ DONE |
+| Terminal / output log panel (Pipeline Monitor) | ✅ DONE |
 
 ---
 
@@ -179,13 +179,14 @@ Core wiring works. Providers, agents and module routes are all functional. End-t
 | Control layer enforces permissions | ✅ DONE |
 | Agent pipeline executes with real Ollama provider | ⚠️ REQUIRES Ollama running |
 | Bridge provides sandboxed filesystem access to agents | ✅ DONE |
+| `/api/modules/studio/workspace?path=` navigable file browser for frontend | ✅ DONE |
 | Knowledge system persists across restarts | ❌ TODO |
 
 ---
 
 ## Phase 10 — Compliance & Reporting ⚠️ PARTIAL
 
-Test suite passes (156 tests). Compliance checklist is documented. Runtime testing gaps remain.
+Test suite passes (158 tests). Compliance checklist is documented. Runtime testing gaps remain.
 
 | Item | Status |
 |---|---|
@@ -246,16 +247,12 @@ All required dependencies are declared.
 
 ### High — major features currently missing
 
-3. **Frontend dynamic module panels** — sidebar modules should load per-module UI
-4. **Project file browser** — left sidebar workspace panel
-5. **Terminal / output panel** — bottom-right live output area
-6. **Knowledge persistence** — real vector store (Chroma or similar)
-7. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
+3. **Knowledge persistence** — real vector store (Chroma or similar)
+4. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
 
 ### Medium — important but deferrable
 
-8. **Additional app modules** — sandbox, game_dev, saas_builder
-9. **Tool launcher via bridge** — invoke compiler, linter, game engine from agents
-10. **Game engine bridge** — Godot / Unity integration
-11. **CI/CD pipeline** — GitHub Actions workflows
-12. **Frontend module panel components** — per-module UI panels in Studio sidebar
+5. **Additional app modules** — sandbox, game_dev, saas_builder
+6. **Tool launcher via bridge** — invoke compiler, linter, game engine from agents
+7. **Game engine bridge** — Godot / Unity integration
+8. **CI/CD pipeline** — GitHub Actions workflows

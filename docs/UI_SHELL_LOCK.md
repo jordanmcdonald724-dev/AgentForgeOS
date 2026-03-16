@@ -12,4 +12,4 @@ This document defines the permanent Studio interface shell. The layout below **m
 
 ## Stability Rule
 
-These shell regions are permanent and must not be removed or replaced. New UI components must render **inside these regions**, not overwrite or relocate them. Resize, theming, or content changes are allowed only when they preserve the shell structure above.***
+These shell regions are permanent and must not be removed or replaced. New UI components must render **inside these regions**, not overwrite or relocate them. Resize, theming, or content changes are allowed only when they preserve the shell structure above.

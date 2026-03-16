@@ -69,12 +69,20 @@
     </section>
     <script>
       (() => {
+        const MODULE_FETCH_TIMEOUT_MS = 8000;
         const moduleListEl = document.getElementById("module-list");
         const activeModuleName = document.getElementById("active-module-name");
         const activeModuleVersion = document.getElementById("active-module-version");
         const activeModuleDescription = document.getElementById("active-module-description");
 
         let activeModule = null;
+
+        const getModuleDisplayName = (module) => {
+          if (!module) return "No modules available";
+          if (module.name) return module.name;
+          if (module.id) return `Module ID: ${module.id}`;
+          return "Unnamed Module";
+        };
 
         const updateActiveHighlight = (moduleId) => {
           const items = moduleListEl.querySelectorAll(".nav-item[data-module-id]");
@@ -85,9 +93,7 @@
 
         const setActiveModule = (module) => {
           activeModule = module;
-          activeModuleName.textContent = module
-            ? module.name || (module.id ? `Module ID: ${module.id}` : "Unnamed Module")
-            : "No modules available";
+          activeModuleName.textContent = getModuleDisplayName(module);
           activeModuleVersion.textContent = module && module.version ? `v${module.version}` : "";
           activeModuleDescription.textContent =
             module && module.description ? module.description : "Modules are not currently available.";
@@ -110,7 +116,7 @@
             const item = document.createElement("div");
             item.className = "nav-item";
             item.dataset.moduleId = mod.id;
-            item.textContent = mod.name || mod.id;
+            item.textContent = getModuleDisplayName(mod);
             item.addEventListener("click", () => setActiveModule(mod));
             moduleListEl.appendChild(item);
           });
@@ -129,7 +135,7 @@
             message || "The module service is unavailable. Please try again later.";
         };
 
-        const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+        const fetchWithTimeout = (url, options = {}, timeoutMs = MODULE_FETCH_TIMEOUT_MS) => {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeoutMs);
           return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
@@ -143,11 +149,15 @@
               throw new Error(`Failed to fetch modules: ${response.status}${statusLabel}`);
             }
             const payload = await response.json();
-            if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+            let modules = [];
+            if (Array.isArray(payload)) {
+              modules = payload;
+            } else if (payload && typeof payload === "object") {
+              modules = Array.isArray(payload.data) ? payload.data : [];
+            } else {
               const typeLabel = payload === null ? "null" : typeof payload;
               throw new Error(`Invalid module response: expected object but received ${typeLabel}`);
             }
-            const modules = Array.isArray(payload.data) ? payload.data : [];
             renderModules(modules);
           } catch (error) {
             console.error(error);

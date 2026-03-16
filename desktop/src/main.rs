@@ -18,8 +18,8 @@ fn launch_backend() -> Result<(), String> {
     let mut cmd = Command::new("python");
     cmd.arg("-m")
         .arg("engine.main")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
         .spawn()
         .map_err(|e| format!("Failed to start backend: {e}"))?;
     // Process is left detached; the user is responsible for shutdown via OS.
@@ -31,7 +31,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![launch_backend])
         .setup(|_| {
             // Start backend automatically on app setup.
-            let _ = launch_backend();
+            if let Err(err) = launch_backend() {
+                eprintln!("AgentForgeOS backend failed to start: {err}");
+            }
             Ok(())
         })
         .run(tauri::generate_context!())

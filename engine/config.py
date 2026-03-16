@@ -40,8 +40,6 @@ def _load_env_file(env_path: Optional[Path] = None) -> None:
         if stripped_value is None or stripped_value == "":
             continue
         value = stripped_value
-        if not value:
-            continue
         if key not in os.environ:
             os.environ[key] = value
 

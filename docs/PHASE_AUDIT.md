@@ -1,4 +1,4 @@
-# Phase Audit — Phases 1–8
+# Phase Audit — Phases 1–9
 
 Snapshot to confirm the repository remains aligned with the bootstrap plan.
 
@@ -27,3 +27,10 @@ Snapshot to confirm the repository remains aligned with the bootstrap plan.
 
 ## Phase 8 — Applications
 - App module scaffold under `apps/` with placeholders for `studio/`, `builds/`, `research/`, `assets/`, and `deployment/`, each containing README stubs.
+
+## Phase 9 — Final Integration
+- Confirm the backend FastAPI server (`engine/server.py`) starts and serves `/api/health`.
+- Confirm the desktop wrapper (`desktop/`) launches the backend via `launch_backend`.
+- Open the frontend studio scaffold (`frontend/index.html`) to verify the five-region layout renders.
+- Ensure agent orchestration (`agents/pipeline.py`) and control layer (`control/`) modules import without errors.
+- Validate providers interfaces load (`providers/`) and are wired through services where applicable.

@@ -79,6 +79,11 @@ Follow layout in docs/UI_STUDIO_LAYOUT.md for the five-region studio scaffold.
 Implement learning system.
 
 knowledge/
+knowledge/knowledge_graph.py
+knowledge/vector_store.py
+knowledge/embedding_service.py
+knowledge/pattern_extractor.py
+knowledge/project_genome.py
 
 ---
 

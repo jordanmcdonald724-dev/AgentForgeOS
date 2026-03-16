@@ -139,6 +139,9 @@ knowledge_graph
 vector_store
 embedding_service
 pattern_extractor
+project_genome
+
+Phase 7 provides in-memory scaffolds for these components.
 
 ---
 

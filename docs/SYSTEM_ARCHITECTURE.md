@@ -118,6 +118,30 @@ knowledge/
 
 ---
 
+## Knowledge Layer
+
+Location:
+
+knowledge/
+
+Purpose:
+
+Provide persistent learning utilities for agents.
+
+Components:
+
+knowledge_graph.py
+vector_store.py
+embedding_service.py
+pattern_extractor.py
+project_genome.py
+
+Notes:
+
+Phase 7 scaffolding offers in-memory placeholders so services and apps can integrate without external databases or vector backends.
+
+---
+
 ## Apps Layer
 
 Location:

@@ -14,6 +14,7 @@ class MemoryManager:
 
     def get_recent(self, *, limit: Optional[int] = None) -> List[Dict]:
         """Return the most recent memory entries."""
+        data = list(self._memories)
         if limit is None:
-            return list(self._memories)
-        return list(self._memories)[-limit:]
+            return data
+        return data[-limit:]

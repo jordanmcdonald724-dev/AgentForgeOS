@@ -12,6 +12,15 @@ from control.module_registry import ModuleRegistry, module_registry
 logger = logging.getLogger(__name__)
 
 
+def _sanitize_identifier(value: str) -> Optional[str]:
+    cleaned = "".join(ch for ch in value if ch.isalnum())
+    if not cleaned:
+        return None
+    if cleaned[0].isdigit():
+        cleaned = f"_{cleaned}"
+    return cleaned
+
+
 def _load_manifest(manifest_path: Path) -> Optional[Dict]:
     try:
         with manifest_path.open() as fp:
@@ -35,14 +44,6 @@ def _import_module(entry_path: Path, module_name: str) -> Optional[ModuleType]:
 
 def _resolve_module_class(mod: ModuleType, manifest: Dict) -> Optional[type]:
     """Resolve the module class using manifest hint or common naming conventions."""
-    def _sanitize_identifier(value: str) -> Optional[str]:
-        cleaned = "".join(ch for ch in value if ch.isalnum())
-        if not cleaned:
-            return None
-        if cleaned[0].isdigit():
-            cleaned = f"_{cleaned}"
-        return cleaned
-
     preferred = manifest.get("class")
     candidates = []
     if preferred:

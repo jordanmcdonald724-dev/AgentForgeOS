@@ -41,16 +41,17 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - Project file browser: Studio module panel fetches from `/api/modules/studio/workspace?path=` and renders a navigable file tree with breadcrumbs.
 - Terminal / output log panel: added to the Pipeline Monitor panel; logs all system events, module loads, agent runs, and file browser operations.
 
-## Phase 7 — Knowledge System ⚠️ SCAFFOLDED
+## Phase 7 — Knowledge System ✅ COMPLETE
 - Knowledge system under `knowledge/`: `knowledge_graph.py`, `vector_store.py`, `embedding_service.py`, `pattern_extractor.py`, `project_genome.py`, with package exports in `__init__.py`.
-- All implementations are in-memory.
-- **Still needed:** real embedding model integration, persistent vector store (Chroma, Weaviate, or Pinecone).
+- `EmbeddingService` implements TF-IDF vectorisation and cosine-similarity search using Python's standard library only — no external packages required.
+- `KnowledgeVectorStore` and `KnowledgeGraph` both accept an optional `persist_path` and persist state to JSON files so data survives engine restarts.
+- **Future:** upgrade to a neural embedding model (sentence-transformers or OpenAI) for production-quality semantic search.
 
-## Phase 8 — Applications ⚠️ PARTIAL
-- App module scaffold under `apps/` with module directories for `studio/`, `builds/`, `research/`, `assets/`, and `deployment/`, each containing a `manifest.json`, `module.py`, `README.md`, and now `backend/routes.py`.
+## Phase 8 — Applications ✅ COMPLETE
+- All 8 module directories under `apps/`: `studio/`, `builds/`, `research/`, `assets/`, `deployment/`, `sandbox/`, `game_dev/`, `saas_builder/`, each containing a `manifest.json`, `module.py`, `README.md`, and `backend/routes.py`.
 - `engine/module_loader.collect_module_routers()` discovers all backend routers.
 - Engine server registers module routes at `/api/modules/<module>`.
-- **Still needed:** frontend panel components for each module; additional modules `sandbox/`, `game_dev/`, `saas_builder/`.
+- **Still needed:** rich frontend panel components for sandbox, game_dev, saas_builder.
 
 ## Phase 9 — Final Integration ⚠️ PARTIAL
 - Confirm the backend FastAPI server (`engine/server.py`) starts and serves `/api/health`. ✅
@@ -59,8 +60,11 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - Ensure agent orchestration (`agents/pipeline.py`) and control layer (`control/`) modules import without errors. ✅
 - Validate providers interfaces load (`providers/`) and are wired through services where applicable. ✅
 - Bridge filesystem access (`bridge/`) is fully functional: read, write, list, delete — bounded to a configurable root and protected by `BridgeSecurity`. ✅
+- First-run startup wizard (`frontend/wizard.html`) collects all API keys and provider selections; saves them to `config/.env` via `POST /api/setup/save`. ✅
+- Studio `index.html` checks `GET /api/setup` on load and redirects to the wizard when setup is incomplete. ✅
+- Knowledge system persists graph and vector data to JSON files across restarts. ✅
 - Smoke test wiring with `python -m unittest tests/test_phase_integration.py` (health endpoint, module imports, and runtime artifacts). ✅
-- **Still needed:** end-to-end agent pipeline execution, knowledge persistence.
+- **Still needed:** end-to-end agent pipeline execution (requires Ollama running).
 
 ## Phase 10 — Compliance & Reporting ✅ COMPLETE
 - Run full repository tests: `python -m unittest discover -s tests`.

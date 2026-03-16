@@ -64,6 +64,21 @@
     </section>
     <script>
       (() => {
+        // ── First-run wizard redirect ─────────────────────────────────────
+        // Check whether the setup wizard has been completed.  If not, redirect
+        // to wizard.html (skipped when the API is unreachable so the Studio
+        // still loads in offline/test environments).
+        fetch("/api/setup")
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && data.data && !data.data.setup_complete) {
+              window.location.href = "/wizard.html";
+            }
+          })
+          .catch(() => {
+            // Backend not running yet — show Studio anyway
+          });
+
         const MODULE_FETCH_TIMEOUT_MS = 8000;
         const VERSION_PREFIX = "v";
         const moduleListEl = document.getElementById("module-list");

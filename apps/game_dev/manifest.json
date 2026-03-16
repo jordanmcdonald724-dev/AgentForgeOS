@@ -1,0 +1,8 @@
+{
+  "name": "Game Dev",
+  "id": "game_dev",
+  "version": "1.0",
+  "description": "Game development assistant and asset pipeline",
+  "entry": "module.py",
+  "class": "GameDevModule"
+}

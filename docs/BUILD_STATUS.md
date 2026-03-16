@@ -129,26 +129,27 @@ All five-region layout items are now complete.
 
 ---
 
-## Phase 7 — Knowledge System ⚠️ SCAFFOLDED
+## Phase 7 — Knowledge System ✅ DONE
 
-All knowledge files exist with in-memory implementations. No real embeddings or persistence.
+TF-IDF embeddings and JSON file persistence are implemented. No external packages required.
 
 | Item | Status |
 |---|---|
-| `knowledge/knowledge_graph.py` | ⚠️ SCAFFOLD |
-| `knowledge/vector_store.py` | ⚠️ SCAFFOLD |
-| `knowledge/embedding_service.py` | ⚠️ SCAFFOLD |
-| `knowledge/pattern_extractor.py` | ⚠️ SCAFFOLD |
-| `knowledge/project_genome.py` | ⚠️ SCAFFOLD |
+| `knowledge/knowledge_graph.py` — JSON-persistent graph | ✅ DONE |
+| `knowledge/vector_store.py` — cosine-similarity vector store with JSON persistence | ✅ DONE |
+| `knowledge/embedding_service.py` — TF-IDF vectorizer with search | ✅ DONE |
+| `knowledge/pattern_extractor.py` | ✅ DONE |
+| `knowledge/project_genome.py` | ✅ DONE |
 | `knowledge/__init__.py` | ✅ DONE |
-| Real embedding model (sentence-transformers / OpenAI) | ❌ TODO |
-| Persistent vector database (Chroma, Weaviate, Pinecone) | ❌ TODO |
+| Embedding model (TF-IDF + cosine similarity — stdlib only) | ✅ DONE |
+| JSON file persistence for KnowledgeGraph and KnowledgeVectorStore | ✅ DONE |
+| Real neural embedding model (sentence-transformers / OpenAI) | ❌ FUTURE |
 
 ---
 
-## Phase 8 — Applications ⚠️ PARTIAL
+## Phase 8 — Applications ✅ DONE
 
-Module directories exist with manifests, module classes, and backend routes. Frontend panels not yet implemented.
+All 8 module directories exist with manifests, module classes, backend routes, and READMEs.
 
 | Item | Status |
 |---|---|
@@ -157,16 +158,16 @@ Module directories exist with manifests, module classes, and backend routes. Fro
 | `apps/research/` — manifest, module class, backend routes | ✅ DONE |
 | `apps/assets/` — manifest, module class, backend routes | ✅ DONE |
 | `apps/deployment/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/sandbox/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/game_dev/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/saas_builder/` — manifest, module class, backend routes | ✅ DONE |
 | Frontend panel components for each module | ❌ TODO |
-| `apps/sandbox/` module | ❌ TODO |
-| `apps/game_dev/` module | ❌ TODO |
-| `apps/saas_builder/` module | ❌ TODO |
 
 ---
 
 ## Phase 9 — Final Integration ⚠️ PARTIAL
 
-Core wiring works. Providers, agents and module routes are all functional. End-to-end pipeline requires running Ollama.
+Core wiring works. Providers, agents and module routes are all functional. First-run setup wizard is complete.
 
 | Item | Status |
 |---|---|
@@ -180,13 +181,16 @@ Core wiring works. Providers, agents and module routes are all functional. End-t
 | Agent pipeline executes with real Ollama provider | ⚠️ REQUIRES Ollama running |
 | Bridge provides sandboxed filesystem access to agents | ✅ DONE |
 | `/api/modules/studio/workspace?path=` navigable file browser for frontend | ✅ DONE |
-| Knowledge system persists across restarts | ❌ TODO |
+| Knowledge system persists across restarts (JSON file backend) | ✅ DONE |
+| First-run startup wizard (`frontend/wizard.html`) captures API keys | ✅ DONE |
+| `/api/setup` GET/POST/reset endpoints save to `config/.env` | ✅ DONE |
+| Studio redirects to wizard when setup is incomplete | ✅ DONE |
 
 ---
 
 ## Phase 10 — Compliance & Reporting ⚠️ PARTIAL
 
-Test suite passes (158 tests). Compliance checklist is documented. Runtime testing gaps remain.
+Test suite passes (173 tests). Compliance checklist is documented. Runtime testing gaps remain.
 
 | Item | Status |
 |---|---|
@@ -196,6 +200,7 @@ Test suite passes (158 tests). Compliance checklist is documented. Runtime testi
 | `tests/test_providers.py` — all 6 providers covered | ✅ DONE |
 | `tests/test_agents.py` — all 12 agent classes covered | ✅ DONE |
 | `tests/test_module_routes.py` — module routes and MongoMemoryManager | ✅ DONE |
+| `tests/test_setup_wizard.py` — setup API endpoints | ✅ DONE |
 | Full test suite passes (`python -m unittest discover -s tests`) | ✅ DONE |
 | End-to-end agent pipeline smoke test (requires Ollama) | ❌ TODO |
 
@@ -242,17 +247,15 @@ All required dependencies are declared.
 
 ### Critical — system cannot function without these
 
-1. **MongoDB persistence wired into remaining services** — VectorStore, KnowledgeGraph, EmbeddingService etc. still in-memory; data lost on restart (AgentService/MemoryManager are now wired ✅)
-2. **Real embedding model** — EmbeddingService uses placeholder; no actual vectors
+1. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
 
 ### High — major features currently missing
 
-3. **Knowledge persistence** — real vector store (Chroma or similar)
-4. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
+2. **Neural embedding model** — EmbeddingService currently uses TF-IDF (stdlib); a sentence-transformers or OpenAI embedding model would improve quality significantly
 
 ### Medium — important but deferrable
 
-5. **Additional app modules** — sandbox, game_dev, saas_builder
-6. **Tool launcher via bridge** — invoke compiler, linter, game engine from agents
-7. **Game engine bridge** — Godot / Unity integration
-8. **CI/CD pipeline** — GitHub Actions workflows
+3. **Frontend panel components** — rich module panels for sandbox, game_dev, saas_builder
+4. **Tool launcher via bridge** — invoke compiler, linter, game engine from agents
+5. **Game engine bridge** — Godot / Unity integration
+6. **CI/CD pipeline** — GitHub Actions workflows

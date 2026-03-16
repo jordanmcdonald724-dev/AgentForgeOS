@@ -114,3 +114,17 @@ class MongoMemoryManager:
             await collection.delete_many({"session_id": self.session_id})
         except Exception as exc:
             logger.warning("MongoMemoryManager.clear failed: %s", exc)
+
+    def get_local_cache(self) -> List[Dict[str, Any]]:
+        """Return a session-filtered view of the in-memory cache without the
+        internal ``session_id`` field.
+
+        This provides a synchronous, encapsulation-safe way for consumers such
+        as ``AgentService.history()`` to read the local cache without reaching
+        into private attributes.
+        """
+        return [
+            {k: v for k, v in entry.items() if k != "session_id"}
+            for entry in self._local
+            if entry.get("session_id") == self.session_id
+        ]

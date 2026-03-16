@@ -23,8 +23,9 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - Core services under `services/`: `agent_service.py`, `memory_manager.py`, `mongo_memory.py`, `vector_store.py`, `knowledge_graph.py`, `embedding_service.py`, `pattern_extractor.py`, `project_genome_service.py`, `autopsy_service.py`.
 - Pipeline definition and shared context in `services/agent_pipeline.py` (`AGENT_PIPELINE`, `PipelineContext`).
 - Authoritative role-to-class registry in `services/agent_registry.py` (`AGENT_REGISTRY`).
-- All services use in-memory storage only.
-- **Still needed:** MongoDB persistence wired into each service.
+- `AgentService` now accepts `MongoMemoryManager`; conversation turns are persisted to MongoDB (with in-memory fallback) when the engine is running.
+- The `/api/agent/run` route wires `MongoMemoryManager` into `AgentService` using the engine's database handle.  Accepts an optional `session_id` to group turns into named sessions.
+- **Still needed:** MongoDB persistence wired into VectorStore, KnowledgeGraph, and other scaffold services.
 
 ## Phase 5 — Agent System ✅ COMPLETE
 - Agent orchestration under `agents/` with `base_agent.py`, `__init__.py` (with `AGENT_CLASS_MAP`), and `pipeline.py`.
@@ -55,8 +56,9 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - Open the frontend studio scaffold (`frontend/index.html`) to verify the five-region layout renders. ✅
 - Ensure agent orchestration (`agents/pipeline.py`) and control layer (`control/`) modules import without errors. ✅
 - Validate providers interfaces load (`providers/`) and are wired through services where applicable. ✅
+- Bridge filesystem access (`bridge/`) is fully functional: read, write, list, delete — bounded to a configurable root and protected by `BridgeSecurity`. ✅
 - Smoke test wiring with `python -m unittest tests/test_phase_integration.py` (health endpoint, module imports, and runtime artifacts). ✅
-- **Still needed:** end-to-end agent pipeline execution, knowledge persistence, functional bridge filesystem access.
+- **Still needed:** end-to-end agent pipeline execution, knowledge persistence.
 
 ## Phase 10 — Compliance & Reporting ✅ COMPLETE
 - Run full repository tests: `python -m unittest discover -s tests`.

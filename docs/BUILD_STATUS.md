@@ -79,7 +79,8 @@ All service files exist but use in-memory storage only. MongoDB persistence is n
 | `services/autopsy_service.py` — Build failure analyzer | ⚠️ SCAFFOLD |
 | `services/agent_pipeline.py` — 12-agent pipeline + PipelineContext | ✅ DONE |
 | `services/agent_registry.py` — Role-to-class registry (AGENT_REGISTRY) | ✅ DONE |
-| MongoDB persistence wired into all services | ❌ TODO |
+| MongoDB memory wired into AgentService via agent route | ✅ DONE |
+| MongoDB persistence wired into VectorStore and other services | ❌ TODO |
 
 ---
 
@@ -177,14 +178,14 @@ Core wiring works. Providers, agents and module routes are all functional. End-t
 | `/api/agent/run` endpoint (single-shot + full pipeline) | ✅ DONE |
 | Control layer enforces permissions | ✅ DONE |
 | Agent pipeline executes with real Ollama provider | ⚠️ REQUIRES Ollama running |
+| Bridge provides sandboxed filesystem access to agents | ✅ DONE |
 | Knowledge system persists across restarts | ❌ TODO |
-| Bridge provides filesystem access to agents | ❌ TODO |
 
 ---
 
 ## Phase 10 — Compliance & Reporting ⚠️ PARTIAL
 
-Test suite passes (112 tests). Compliance checklist is documented. Runtime testing gaps remain.
+Test suite passes (156 tests). Compliance checklist is documented. Runtime testing gaps remain.
 
 | Item | Status |
 |---|---|
@@ -199,16 +200,16 @@ Test suite passes (112 tests). Compliance checklist is documented. Runtime testi
 
 ---
 
-## Bridge Layer ❌ SCAFFOLDED
+## Bridge Layer ✅ DONE
 
-Bridge directory exists. Server and security scaffolds are in place.
+Sandboxed filesystem access for agents is fully implemented.
 
 | Item | Status |
 |---|---|
 | `bridge/__init__.py` | ✅ DONE |
-| `bridge/bridge_server.py` — Filesystem access scaffold | ✅ DONE |
-| `bridge/bridge_security.py` — Sandboxing rules scaffold | ✅ DONE |
-| Real filesystem read/write via bridge | ❌ TODO |
+| `bridge/bridge_server.py` — Read, write, list, delete within bridge root | ✅ DONE |
+| `bridge/bridge_security.py` — Path validation, extension allow-list, traversal protection | ✅ DONE |
+| `/api/modules/studio/workspace` exposes bridge listing to the frontend | ✅ DONE |
 | Tool launcher (compiler, linter invocation) | ❌ TODO |
 | Game engine bridge (Godot, Unity) | ❌ TODO |
 
@@ -240,21 +241,21 @@ All required dependencies are declared.
 
 ### Critical — system cannot function without these
 
-1. **MongoDB persistence wired into all services** — MemoryManager, VectorStore etc. still in-memory only; data lost on restart
-2. **Real bridge filesystem access** — bridge reads/writes to local disk
-3. **Real embedding model** — EmbeddingService uses placeholder; no actual vectors
+1. **MongoDB persistence wired into remaining services** — VectorStore, KnowledgeGraph, EmbeddingService etc. still in-memory; data lost on restart (AgentService/MemoryManager are now wired ✅)
+2. **Real embedding model** — EmbeddingService uses placeholder; no actual vectors
 
 ### High — major features currently missing
 
-4. **Frontend dynamic module panels** — sidebar modules should load per-module UI
-5. **Project file browser** — left sidebar workspace panel
-6. **Terminal / output panel** — bottom-right live output area
-7. **Knowledge persistence** — real vector store (Chroma or similar)
-8. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
+3. **Frontend dynamic module panels** — sidebar modules should load per-module UI
+4. **Project file browser** — left sidebar workspace panel
+5. **Terminal / output panel** — bottom-right live output area
+6. **Knowledge persistence** — real vector store (Chroma or similar)
+7. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
 
 ### Medium — important but deferrable
 
-9. **Additional app modules** — sandbox, game_dev, saas_builder
+8. **Additional app modules** — sandbox, game_dev, saas_builder
+9. **Tool launcher via bridge** — invoke compiler, linter, game engine from agents
 10. **Game engine bridge** — Godot / Unity integration
 11. **CI/CD pipeline** — GitHub Actions workflows
 12. **Frontend module panel components** — per-module UI panels in Studio sidebar

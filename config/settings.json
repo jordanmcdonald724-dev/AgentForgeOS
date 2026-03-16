@@ -1,0 +1,41 @@
+{
+  "_comment": "AgentForgeOS system settings. Values here are overridden by environment variables in config/.env.",
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000
+  },
+  "database": {
+    "uri": "mongodb://localhost:27017",
+    "db_name": "agentforgeos"
+  },
+  "providers": {
+    "llm": "ollama",
+    "image": "comfyui",
+    "tts": "piper"
+  },
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "model": "llama3"
+  },
+  "comfyui": {
+    "base_url": "http://localhost:8188"
+  },
+  "bridge": {
+    "root": "./workspace",
+    "allowed_extensions": [
+      ".py", ".js", ".ts", ".tsx", ".jsx",
+      ".json", ".yaml", ".yml", ".toml",
+      ".md", ".txt", ".html", ".css",
+      ".rs", ".go", ".sh"
+    ],
+    "denied_paths": [
+      ".git",
+      "node_modules",
+      "__pycache__",
+      ".env"
+    ]
+  },
+  "logging": {
+    "level": "INFO"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Deployment",
+  "id": "deployment",
+  "version": "1.0",
+  "description": "Release manager",
+  "entry": "module.py",
+  "class": "DeploymentModule"
+}

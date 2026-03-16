@@ -73,6 +73,10 @@ agent_service.py
 memory_manager.py
 vector_store.py
 embedding_service.py
+knowledge_graph.py
+pattern_extractor.py
+project_genome_service.py
+autopsy_service.py
 
 ---
 

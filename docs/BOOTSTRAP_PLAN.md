@@ -46,6 +46,11 @@ Implement core services.
 services/agent_service.py
 services/memory_manager.py
 services/vector_store.py
+services/knowledge_graph.py
+services/embedding_service.py
+services/pattern_extractor.py
+services/project_genome_service.py
+services/autopsy_service.py
 
 ---
 

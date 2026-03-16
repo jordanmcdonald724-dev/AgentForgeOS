@@ -108,6 +108,8 @@ Responsibilities:
 • embeddings and vector search
 • pattern analysis
 
+Phase 4 scaffolding provides lightweight, in-memory implementations of these services so downstream layers can integrate without external dependencies.
+
 Services may depend on:
 
 engine/

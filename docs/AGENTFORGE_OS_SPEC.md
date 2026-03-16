@@ -218,6 +218,8 @@ Responsibilities:
 • detect development patterns
 • analyze projects and failures
 
+Phase 4 scaffolding includes lightweight, in-memory versions of these services so later phases can integrate against stable interfaces before full persistence is introduced.
+
 Services may depend on:
 
 ```

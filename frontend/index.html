@@ -341,11 +341,14 @@
           }
           const id = (module.id || "").toLowerCase();
           switch (id) {
-            case "studio":     renderStudioPanel(); break;
-            case "builds":     renderBuildsPanel(); break;
-            case "research":   renderResearchPanel(); break;
-            case "assets":     renderAssetsPanel(); break;
-            case "deployment": renderDeploymentPanel(); break;
+            case "studio":       renderStudioPanel(); break;
+            case "builds":       renderBuildsPanel(); break;
+            case "research":     renderResearchPanel(); break;
+            case "assets":       renderAssetsPanel(); break;
+            case "deployment":   renderDeploymentPanel(); break;
+            case "sandbox":      renderSandboxPanel(); break;
+            case "game_dev":     renderGameDevPanel(); break;
+            case "saas_builder": renderSaasBuilderPanel(); break;
             default:
               modulePanelEl.innerHTML = `<div class="module-panel-placeholder">No dedicated panel for "${module.id}".</div>`;
           }
@@ -654,6 +657,190 @@
                 <span class="item-badge item-badge--${d.status}">${d.status}</span>
                 <span class="item-name">${d.project} → ${d.target}</span>
                 <span class="item-meta">v${d.version} &middot; ${new Date(d.initiated_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Sandbox: Agent Experimentation Sandbox ----------------------
+
+        const renderSandboxPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Agent Sandbox</div>
+            <div class="panel-actions">
+              <textarea id="sandbox-prompt" class="panel-textarea" placeholder="Enter an agent experiment prompt…" rows="2"></textarea>
+              <select id="sandbox-provider" class="panel-input panel-select">
+                <option value="ollama">ollama</option>
+                <option value="openai">openai</option>
+                <option value="noop">noop</option>
+              </select>
+              <button id="sandbox-run-btn" class="action-btn">Run Experiment</button>
+            </div>
+            <div id="sandbox-list" class="item-list"><div class="item-list-empty">Loading experiments…</div></div>
+          `;
+          document.getElementById("sandbox-run-btn").addEventListener("click", async () => {
+            const prompt = document.getElementById("sandbox-prompt").value.trim();
+            const provider = document.getElementById("sandbox-provider").value;
+            if (!prompt) return;
+            try {
+              const r = await fetchWithTimeout("/api/modules/sandbox/run", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt, provider }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Sandbox experiment queued (id: ${payload?.data?.id})`);
+              loadSandboxExperiments();
+            } catch (err) {
+              appendLog("error", `Sandbox run failed: ${err.message}`);
+            }
+          });
+          loadSandboxExperiments();
+        };
+
+        const loadSandboxExperiments = async () => {
+          const listEl = document.getElementById("sandbox-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/sandbox/experiments");
+            const payload = await r.json();
+            const experiments = payload?.data || [];
+            if (!experiments.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No experiments yet. Run one above.</div>';
+              return;
+            }
+            listEl.innerHTML = experiments.slice().reverse().map((e) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${e.status}">${e.status}</span>
+                <span class="item-name">${(e.prompt || "").slice(0, 60)}</span>
+                <span class="item-meta">#${e.id} &middot; ${e.provider} &middot; ${new Date(e.created_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Game Dev: Game Development Assistant ------------------------
+
+        const renderGameDevPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Game Development</div>
+            <div class="panel-actions">
+              <input id="game-title" class="panel-input" placeholder="Game title" />
+              <input id="game-genre" class="panel-input" placeholder="Genre (e.g. platformer)" />
+              <select id="game-platform" class="panel-input panel-select">
+                <option value="cross-platform">cross-platform</option>
+                <option value="pc">PC</option>
+                <option value="mobile">mobile</option>
+                <option value="web">web</option>
+              </select>
+              <button id="game-design-btn" class="action-btn">Create Design Doc</button>
+            </div>
+            <div id="game-projects-list" class="item-list"><div class="item-list-empty">Loading projects…</div></div>
+          `;
+          document.getElementById("game-design-btn").addEventListener("click", async () => {
+            const title = document.getElementById("game-title").value.trim() || "Untitled Game";
+            const genre = document.getElementById("game-genre").value.trim() || "unknown";
+            const platform = document.getElementById("game-platform").value;
+            try {
+              const r = await fetchWithTimeout("/api/modules/game_dev/design", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, genre, platform }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Game design doc created: "${title}" (id: ${payload?.data?.id})`);
+              loadGameProjects();
+            } catch (err) {
+              appendLog("error", `Game design failed: ${err.message}`);
+            }
+          });
+          loadGameProjects();
+        };
+
+        const loadGameProjects = async () => {
+          const listEl = document.getElementById("game-projects-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/game_dev/projects");
+            const payload = await r.json();
+            const projects = payload?.data || [];
+            if (!projects.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No projects yet. Create a design doc above.</div>';
+              return;
+            }
+            listEl.innerHTML = projects.slice().reverse().map((p) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${p.status}">${p.status}</span>
+                <span class="item-name">${p.title}</span>
+                <span class="item-meta">${p.genre} &middot; ${p.platform} &middot; ${new Date(p.created_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- SaaS Builder: End-to-End SaaS Scaffolding -------------------
+
+        const renderSaasBuilderPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">SaaS Builder</div>
+            <div class="panel-actions">
+              <input id="saas-name" class="panel-input" placeholder="Project name" />
+              <select id="saas-stack-frontend" class="panel-input panel-select" aria-label="Frontend stack">
+                <option value="react">React</option>
+                <option value="vue">Vue</option>
+                <option value="svelte">Svelte</option>
+              </select>
+              <select id="saas-stack-backend" class="panel-input panel-select" aria-label="Backend stack">
+                <option value="fastapi">FastAPI</option>
+                <option value="express">Express</option>
+                <option value="django">Django</option>
+              </select>
+              <button id="saas-scaffold-btn" class="action-btn">Scaffold Project</button>
+            </div>
+            <div id="saas-projects-list" class="item-list"><div class="item-list-empty">Loading projects…</div></div>
+          `;
+          document.getElementById("saas-scaffold-btn").addEventListener("click", async () => {
+            const name = document.getElementById("saas-name").value.trim() || "Untitled SaaS";
+            const frontend = document.getElementById("saas-stack-frontend").value;
+            const backend = document.getElementById("saas-stack-backend").value;
+            try {
+              const r = await fetchWithTimeout("/api/modules/saas_builder/scaffold", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, stack: { frontend, backend, db: "postgres" } }),
+              });
+              const payload = await r.json();
+              appendLog("info", `SaaS project scaffolded: "${name}" (id: ${payload?.data?.id})`);
+              loadSaasProjects();
+            } catch (err) {
+              appendLog("error", `SaaS scaffold failed: ${err.message}`);
+            }
+          });
+          loadSaasProjects();
+        };
+
+        const loadSaasProjects = async () => {
+          const listEl = document.getElementById("saas-projects-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/saas_builder/projects");
+            const payload = await r.json();
+            const projects = payload?.data || [];
+            if (!projects.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No projects yet. Scaffold one above.</div>';
+              return;
+            }
+            listEl.innerHTML = projects.slice().reverse().map((p) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${p.status}">${p.status}</span>
+                <span class="item-name">${p.name}</span>
+                <span class="item-meta">${p.stack?.frontend || ""} + ${p.stack?.backend || ""} &middot; ${new Date(p.created_at).toLocaleString()}</span>
               </div>
             `).join("");
           } catch (err) {

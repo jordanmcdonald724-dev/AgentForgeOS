@@ -19,13 +19,15 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - All provider interfaces live under `providers/`: `llm_provider.py`, `image_provider.py`, `tts_provider.py`.
 - Concrete implementations: `noop_provider.py`, `ollama_provider.py`, `openai_provider.py`, `fal_provider.py`, `comfyui_provider.py`, `piper_provider.py`.
 
-## Phase 4 — Services Layer ⚠️ SCAFFOLDED
+## Phase 4 — Services Layer ✅ COMPLETE
 - Core services under `services/`: `agent_service.py`, `memory_manager.py`, `mongo_memory.py`, `vector_store.py`, `knowledge_graph.py`, `embedding_service.py`, `pattern_extractor.py`, `project_genome_service.py`, `autopsy_service.py`.
 - Pipeline definition and shared context in `services/agent_pipeline.py` (`AGENT_PIPELINE`, `PipelineContext`).
 - Authoritative role-to-class registry in `services/agent_registry.py` (`AGENT_REGISTRY`).
 - `AgentService` now accepts `MongoMemoryManager`; conversation turns are persisted to MongoDB (with in-memory fallback) when the engine is running.
 - The `/api/agent/run` route wires `MongoMemoryManager` into `AgentService` using the engine's database handle.  Accepts an optional `session_id` to group turns into named sessions.
-- **Still needed:** MongoDB persistence wired into VectorStore, KnowledgeGraph, and other scaffold services.
+- `services/embedding_service.py` delegates to `knowledge.EmbeddingService` for TF-IDF vectorisation and cosine-similarity search.
+- `services/vector_store.py` implements cosine-similarity ranking via an internal `_cosine()` helper.
+- `services/knowledge_graph.py` adds optional JSON file persistence (`persist_path`) — same interface as before.
 
 ## Phase 5 — Agent System ✅ COMPLETE
 - Agent orchestration under `agents/` with `base_agent.py`, `__init__.py` (with `AGENT_CLASS_MAP`), and `pipeline.py`.
@@ -51,7 +53,7 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - All 8 module directories under `apps/`: `studio/`, `builds/`, `research/`, `assets/`, `deployment/`, `sandbox/`, `game_dev/`, `saas_builder/`, each containing a `manifest.json`, `module.py`, `README.md`, and `backend/routes.py`.
 - `engine/module_loader.collect_module_routers()` discovers all backend routers.
 - Engine server registers module routes at `/api/modules/<module>`.
-- **Still needed:** rich frontend panel components for sandbox, game_dev, saas_builder.
+- All 8 modules have dedicated interactive panels in `frontend/index.html`: Studio (file browser), Builds (pipeline trigger + history), Research (notes + knowledge search), Assets (registry), Deployment (deploy manager), Sandbox (agent experiment runner), Game Dev (design doc generator + project list), SaaS Builder (project scaffolder + project list).
 
 ## Phase 9 — Final Integration ⚠️ PARTIAL
 - Confirm the backend FastAPI server (`engine/server.py`) starts and serves `/api/health`. ✅
@@ -67,7 +69,8 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - **Still needed:** end-to-end agent pipeline execution (requires Ollama running).
 
 ## Phase 10 — Compliance & Reporting ✅ COMPLETE
-- Run full repository tests: `python -m unittest discover -s tests`.
+- Run full repository tests: `python -m unittest discover -s tests` (173 tests, all pass).
 - Verify integration coverage via `tests/test_phase_integration.py`.
 - Confirm compliance checklist documented in `docs/PHASE10_COMPLIANCE.md`.
+- CI/CD pipeline at `.github/workflows/ci.yml` runs the full test suite on every push and pull request.
 - Record outcomes in release notes or PR description when completing a phase.

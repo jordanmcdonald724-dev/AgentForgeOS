@@ -35,14 +35,24 @@ def _import_module(entry_path: Path, module_name: str) -> Optional[ModuleType]:
 
 def _resolve_module_class(mod: ModuleType, manifest: Dict) -> Optional[type]:
     """Resolve the module class using manifest hint or common naming conventions."""
+    def _sanitize_identifier(value: str) -> str:
+        cleaned = "".join(ch for ch in value if ch.isalnum())
+        if cleaned and cleaned[0].isdigit():
+            cleaned = f"_{cleaned}"
+        return cleaned
+
     preferred = manifest.get("class")
     candidates = []
     if preferred:
         candidates.append(preferred)
     if "name" in manifest:
-        candidates.append(f"{manifest['name'].replace(' ', '')}Module")
+        cleaned_name = _sanitize_identifier(manifest["name"])
+        if cleaned_name:
+            candidates.append(f"{cleaned_name}Module")
     if "id" in manifest:
-        candidates.append(f"{manifest['id'].title()}Module")
+        cleaned_id = _sanitize_identifier(manifest["id"].title())
+        if cleaned_id:
+            candidates.append(f"{cleaned_id}Module")
     candidates.append("Module")
 
     for candidate in candidates:

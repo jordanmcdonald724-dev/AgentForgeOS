@@ -37,7 +37,7 @@ def _load_env_file(env_path: Optional[Path] = None) -> None:
         if not key:
             continue
         stripped_value = _strip_quotes(value)
-        if not stripped_value:
+        if stripped_value is None:
             continue
         value = stripped_value
         if key not in os.environ:

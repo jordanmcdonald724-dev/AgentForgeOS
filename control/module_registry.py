@@ -31,11 +31,13 @@ class ModuleRegistry:
             self._modules[module_id] = {"instance": module_instance, "manifest": manifest}
 
     def get_module(self, module_id: str) -> Optional[Dict[str, Any]]:
-        return self._modules.get(module_id)
+        with self._lock:
+            return self._modules.get(module_id)
 
     def get_all_modules(self) -> Mapping[str, Dict[str, Any]]:
         """Expose all registered module entries as a read-only view."""
-        return MappingProxyType(self._modules)
+        with self._lock:
+            return MappingProxyType(dict(self._modules))
 
     def clear(self) -> None:
         """Reset registry contents (primarily for testing)."""
@@ -53,11 +55,13 @@ class ModuleRegistry:
 
     def list_manifests(self) -> Dict[str, Dict[str, Any]]:
         """Expose manifest data for all registered modules."""
-        return {module_id: data["manifest"] for module_id, data in self._modules.items()}
+        modules = self.get_all_modules()
+        return {module_id: data["manifest"] for module_id, data in modules.items()}
 
     def instances(self) -> Dict[str, Any]:
         """Expose the live module instances."""
-        return {module_id: data["instance"] for module_id, data in self._modules.items()}
+        modules = self.get_all_modules()
+        return {module_id: data["instance"] for module_id, data in modules.items()}
 
 
 module_registry = ModuleRegistry()

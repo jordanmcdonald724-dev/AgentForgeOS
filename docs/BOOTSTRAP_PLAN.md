@@ -68,6 +68,9 @@ control/
 Implement frontend workspace.
 
 frontend/
+frontend/index.html
+frontend/style.css
+Follow layout in docs/UI_STUDIO_LAYOUT.md for the five-region studio scaffold.
 
 ---
 

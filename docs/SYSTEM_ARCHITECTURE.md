@@ -148,6 +148,23 @@ Apps must not depend on engine internals.
 
 ---
 
+## Frontend / Studio Interface
+
+Location:
+
+frontend/
+
+Purpose:
+
+Render the Studio UI following the five-region layout defined in docs/UI_STUDIO_LAYOUT.md.
+
+Notes:
+
+• Phase 6 scaffold lives in frontend/index.html and frontend/style.css as a static mock of the required layout.  
+• Interactive behavior can layer on top of this scaffold using the recommended frontend stack (e.g., React + Vite).
+
+---
+
 ## Architecture Rules
 
 1. Engine is the stable kernel.

@@ -166,6 +166,7 @@ Responsibilities:
 • Studio UI
 • pipeline monitoring
 • project management
+• static scaffold lives at frontend/index.html + frontend/style.css following docs/UI_STUDIO_LAYOUT.md
 
 ---
 

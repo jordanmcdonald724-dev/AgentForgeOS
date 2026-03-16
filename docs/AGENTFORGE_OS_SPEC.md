@@ -441,6 +441,10 @@ Features:
 • research dashboard
 • module management
 
+Bootstrap status:
+
+• Phase 6 provides a static Studio scaffold in frontend/index.html and frontend/style.css that follows docs/UI_STUDIO_LAYOUT.md so downstream work can attach interactive components without breaking the required five-region layout.
+
 ---
 
 # 14. Multi-Agent Development System

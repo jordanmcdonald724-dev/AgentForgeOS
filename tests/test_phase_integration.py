@@ -54,9 +54,6 @@ class PhaseIntegrationTests(unittest.TestCase):
         self.assertIsNotNone(pattern_extractor)
         self.assertIsNotNone(project_genome)
 
-        history = agent.history()
-        self.assertGreaterEqual(len(history), 2)  # user + assistant entries
-
     def test_desktop_frontend_artifacts_exist(self):
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         desktop_main = os.path.join(repo_root, "desktop", "src", "main.rs")

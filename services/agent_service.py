@@ -23,7 +23,9 @@ class AgentService:
             data = response.get("data")
             if data is not None:
                 if isinstance(data, dict):
-                    content = data.get("text", data)
+                    content = data.get("text")
+                    if content is None:
+                        content = str(data)
                 else:
                     content = data
                 self.memory.add_memory({"role": "assistant", "content": str(content)})

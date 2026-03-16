@@ -16,7 +16,7 @@ def _strip_quotes(value: str) -> Optional[str]:
         and value[0] in {"'", '"'}
     ):
         inner = value[1:-1]
-        return inner or None
+        return None if inner == "" else inner
     return value
 
 
@@ -37,7 +37,7 @@ def _load_env_file(env_path: Optional[Path] = None) -> None:
         if not key:
             continue
         stripped_value = _strip_quotes(value)
-        if stripped_value is None or stripped_value == "":
+        if not stripped_value:
             continue
         value = stripped_value
         if key not in os.environ:

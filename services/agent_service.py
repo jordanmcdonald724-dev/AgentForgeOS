@@ -22,7 +22,10 @@ class AgentService:
         if response.get("success"):
             data = response.get("data")
             if data is not None:
-                content = data.get("text") if isinstance(data, dict) and "text" in data else data
+                if isinstance(data, dict):
+                    content = data.get("text", data)
+                else:
+                    content = data
                 self.memory.add_memory({"role": "assistant", "content": str(content)})
         return response
 

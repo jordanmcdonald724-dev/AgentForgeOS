@@ -6,6 +6,20 @@ from typing import Optional
 MIN_QUOTED_VALUE_LENGTH = 3
 
 
+def _strip_quotes(value: str) -> Optional[str]:
+    """Remove matching leading/trailing quotes when they wrap content."""
+    if not value:
+        return value
+    if (
+        len(value) >= MIN_QUOTED_VALUE_LENGTH
+        and value[0] == value[-1]
+        and value[0] in {"'", '"'}
+    ):
+        inner = value[1:-1]
+        return inner or None
+    return value
+
+
 def _load_env_file(env_path: Optional[Path] = None) -> None:
     """
     Lightweight .env loader to keep the engine dependency-free beyond FastAPI.
@@ -22,17 +36,10 @@ def _load_env_file(env_path: Optional[Path] = None) -> None:
         key, value = (part.strip() for part in stripped.split("=", 1))
         if not key:
             continue
-        if (
-            value
-            and len(value) >= MIN_QUOTED_VALUE_LENGTH
-            and value[0] == value[-1]
-            and value[0] in {"'", '"'}
-        ):
-            inner = value[1:-1]
-            if inner:
-                value = inner
-            else:
-                continue
+        stripped_value = _strip_quotes(value)
+        if stripped_value is None or stripped_value == "":
+            continue
+        value = stripped_value
         if not value:
             continue
         if key not in os.environ:

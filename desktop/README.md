@@ -1,4 +1,4 @@
-# AgentForgeOS Desktop Runtime (Phase 2)
+# AgentForgeOS Desktop Runtime
 
 This Tauri scaffold launches the backend server and hosts the Studio frontend.
 

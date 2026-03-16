@@ -17,6 +17,7 @@ class ImageProvider(ABC):
             "data": <provider-specific payload>,
             "error": Optional[str]
         }
-        The "error" field is None when successful.
+        The "error" field is None when successful and should contain a descriptive
+        message when success is False.
         """
         raise NotImplementedError

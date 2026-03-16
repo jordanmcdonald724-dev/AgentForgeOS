@@ -65,6 +65,24 @@ class PhaseIntegrationTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(desktop_main), "Desktop runtime entrypoint missing")
         self.assertTrue(os.path.isfile(frontend_index), "Frontend studio scaffold missing")
 
+    def test_agent_service_history_records_interactions(self):
+        from providers import llm_provider
+        from services.agent_service import AgentService
+
+        class DummyLLM(llm_provider.LLMProvider):
+            async def chat(self, prompt: str, *, context=None):
+                return {"success": True, "data": {"text": f"echo:{prompt}"}, "error": None}
+
+        agent = AgentService(DummyLLM())
+        asyncio.run(agent.run_agent("hello"))
+        history = agent.history()
+
+        self.assertGreaterEqual(len(history), 2)
+        self.assertEqual(history[0].get("role"), "user")
+        self.assertEqual(history[0].get("content"), "hello")
+        self.assertEqual(history[1].get("role"), "assistant")
+        self.assertIn("echo:hello", history[1].get("content"))
+
 
 if __name__ == "__main__":
     unittest.main()

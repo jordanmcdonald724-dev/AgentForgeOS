@@ -20,7 +20,9 @@ class AgentService:
         self.memory.add_memory({"role": "user", "content": prompt})
         response = await self.llm_provider.chat(prompt, context=context)
         if response.get("success"):
-            self.memory.add_memory({"role": "assistant", "content": response.get("data")})
+            data = response.get("data")
+            if data is not None:
+                self.memory.add_memory({"role": "assistant", "content": data})
         return response
 
     def history(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:

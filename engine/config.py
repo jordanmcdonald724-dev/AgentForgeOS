@@ -20,7 +20,7 @@ def _load_env_file(env_path: Optional[Path] = None) -> None:
         key, value = (part.strip() for part in stripped.split("=", 1))
         if not key:
             continue
-        if value and value[0] == value[-1] and value[0] in {"'", '"'}:
+        if value and len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
             value = value[1:-1]
         if not value:
             continue

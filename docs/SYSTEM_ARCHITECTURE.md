@@ -108,11 +108,37 @@ Responsibilities:
 • embeddings and vector search
 • pattern analysis
 
+Phase 4 scaffolding provides lightweight, in-memory implementations of these services so downstream layers can integrate without external dependencies.
+
 Services may depend on:
 
 engine/
 providers/
 knowledge/
+
+---
+
+## Knowledge Layer
+
+Location:
+
+knowledge/
+
+Purpose:
+
+Provide persistent learning utilities for agents.
+
+Components:
+
+knowledge_graph.py
+vector_store.py
+embedding_service.py
+pattern_extractor.py
+project_genome.py
+
+Notes:
+
+Phase 7 scaffolding offers in-memory placeholders so services and apps can integrate without external databases or vector backends.
 
 ---
 
@@ -143,6 +169,23 @@ services/
 providers/
 
 Apps must not depend on engine internals.
+
+---
+
+## Frontend / Studio Interface
+
+Location:
+
+frontend/
+
+Purpose:
+
+Render the Studio UI following the five-region layout defined in docs/UI_STUDIO_LAYOUT.md.
+
+Notes:
+
+• Phase 6 scaffold lives in frontend/index.html and frontend/style.css as a static mock of the required layout.  
+• Interactive behavior can layer on top of this scaffold using the recommended frontend stack (e.g., React + Vite).
 
 ---
 

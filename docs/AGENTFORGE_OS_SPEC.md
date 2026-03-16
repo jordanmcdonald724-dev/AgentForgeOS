@@ -218,6 +218,8 @@ Responsibilities:
 • detect development patterns
 • analyze projects and failures
 
+Phase 4 scaffolding includes lightweight, in-memory versions of these services so later phases can integrate against stable interfaces before full persistence is introduced.
+
 Services may depend on:
 
 ```
@@ -381,6 +383,10 @@ Capabilities:
 • build long-term memory
 • assist agent decision-making
 
+Bootstrap status:
+
+• Phase 7 adds in-memory scaffolds for the knowledge components (knowledge_graph, vector_store, embedding_service, pattern_extractor, project_genome) to keep downstream integrations unblocked while persistent storage is designed.
+
 ---
 
 # 12. Configuration Layer
@@ -438,6 +444,10 @@ Features:
 • pipeline monitoring
 • research dashboard
 • module management
+
+Bootstrap status:
+
+• Phase 6 provides a static Studio scaffold in frontend/index.html and frontend/style.css that follows docs/UI_STUDIO_LAYOUT.md so downstream work can attach interactive components without breaking the required five-region layout.
 
 ---
 

@@ -73,6 +73,10 @@ agent_service.py
 memory_manager.py
 vector_store.py
 embedding_service.py
+knowledge_graph.py
+pattern_extractor.py
+project_genome_service.py
+autopsy_service.py
 
 ---
 
@@ -106,6 +110,8 @@ research/
 assets/
 deployment/
 
+Phase 8 scaffold creates these directories as placeholders for future implementation.
+
 ---
 
 ### bridge/
@@ -135,6 +141,9 @@ knowledge_graph
 vector_store
 embedding_service
 pattern_extractor
+project_genome
+
+Phase 7 provides in-memory scaffolds for these components.
 
 ---
 
@@ -162,6 +171,7 @@ Responsibilities:
 • Studio UI
 • pipeline monitoring
 • project management
+• static scaffold lives at frontend/index.html + frontend/style.css following docs/UI_STUDIO_LAYOUT.md
 
 ---
 

@@ -325,6 +325,8 @@ vector_store
 embedding_service
 memory_manager
 
+Phase 4 scaffolding provides in-memory implementations of these services within services/ so the pipeline can reference stable interfaces prior to deeper knowledge-layer work.
+
 Agents may query previous development patterns before generating new code.
 
 Example:

@@ -6,4 +6,4 @@ class StudioModule:
 
     def initialize(self):
         """Perform any startup initialization for the Studio module."""
-        return {"status": "initialized"}
+        return None

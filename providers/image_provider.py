@@ -15,7 +15,8 @@ class ImageProvider(ABC):
         {
             "success": bool,
             "data": <provider-specific payload>,
-            "error": "string or null" (null when successful),
+            "error": "string or null"
         }
+        The "error" field is null when successful.
         """
         raise NotImplementedError

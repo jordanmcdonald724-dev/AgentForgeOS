@@ -22,7 +22,8 @@ class AgentService:
         if response.get("success"):
             data = response.get("data")
             if data is not None:
-                self.memory.add_memory({"role": "assistant", "content": data})
+                content = data.get("text") if isinstance(data, dict) and "text" in data else data
+                self.memory.add_memory({"role": "assistant", "content": str(content)})
         return response
 
     def history(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:

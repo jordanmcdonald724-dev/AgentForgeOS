@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+MIN_QUOTED_VALUE_LENGTH = 3
+
 
 def _load_env_file(env_path: Optional[Path] = None) -> None:
     """
@@ -20,7 +22,12 @@ def _load_env_file(env_path: Optional[Path] = None) -> None:
         key, value = (part.strip() for part in stripped.split("=", 1))
         if not key:
             continue
-        if value and len(value) >= 3 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        if (
+            value
+            and len(value) >= MIN_QUOTED_VALUE_LENGTH
+            and value[0] == value[-1]
+            and value[0] in {"'", '"'}
+        ):
             inner = value[1:-1]
             if inner:
                 value = inner

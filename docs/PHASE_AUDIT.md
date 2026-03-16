@@ -34,3 +34,4 @@ Snapshot to confirm the repository remains aligned with the bootstrap plan.
 - Open the frontend studio scaffold (`frontend/index.html`) to verify the five-region layout renders.
 - Ensure agent orchestration (`agents/pipeline.py`) and control layer (`control/`) modules import without errors.
 - Validate providers interfaces load (`providers/`) and are wired through services where applicable.
+- Smoke test wiring with `python -m unittest tests/test_phase_integration.py` (health endpoint, module imports, and runtime artifacts).

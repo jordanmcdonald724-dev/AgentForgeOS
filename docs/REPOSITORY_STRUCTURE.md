@@ -47,6 +47,9 @@ server.py
 database.py
 config.py
 worker_system.py
+module_loader.py
+routes/modules.py
+routes/agent.py
 
 ---
 
@@ -71,12 +74,15 @@ Examples:
 
 agent_service.py
 memory_manager.py
+mongo_memory.py
 vector_store.py
-embedding_service.py
 knowledge_graph.py
+embedding_service.py
 pattern_extractor.py
 project_genome_service.py
 autopsy_service.py
+agent_pipeline.py
+agent_registry.py
 
 ---
 
@@ -153,7 +159,7 @@ System configuration.
 
 Contains:
 
-.env
+.env.example
 settings.json
 
 ---

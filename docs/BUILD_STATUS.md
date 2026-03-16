@@ -77,24 +77,26 @@ All service files exist but use in-memory storage only. MongoDB persistence is n
 | `services/pattern_extractor.py` — Code pattern analysis | ⚠️ SCAFFOLD |
 | `services/project_genome_service.py` — Project tracker | ⚠️ SCAFFOLD |
 | `services/autopsy_service.py` — Build failure analyzer | ⚠️ SCAFFOLD |
-| `services/agent_pipeline.py` — 12-agent pipeline definition | ✅ DONE |
+| `services/agent_pipeline.py` — 12-agent pipeline + PipelineContext | ✅ DONE |
+| `services/agent_registry.py` — Role-to-class registry (AGENT_REGISTRY) | ✅ DONE |
 | MongoDB persistence wired into all services | ❌ TODO |
 
 ---
 
 ## Phase 5 — Agent System ✅ DONE
 
-All 12 agent classes implemented in sub-packages. Control layer complete. Supervisor dispatches to typed agent classes.
+All 12 agent classes implemented in sub-packages. Control layer complete. Supervisor dispatches to typed agent classes via `services/agent_registry.py`.
 
 | Item | Status |
 |---|---|
 | `control/ai_router.py` — Task classifier | ✅ DONE |
 | `control/file_guard.py` — Path protection | ✅ DONE |
-| `control/agent_supervisor.py` — Pipeline coordinator (typed dispatch) | ✅ DONE |
+| `control/agent_supervisor.py` — Pipeline coordinator (typed dispatch, fault-tolerant) | ✅ DONE |
 | `control/permission_matrix.yaml` — Role permissions | ✅ DONE |
 | `agents/__init__.py` — Package with AGENT_CLASS_MAP | ✅ DONE |
 | `agents/base_agent.py` — Abstract BaseAgent | ✅ DONE |
 | `agents/pipeline.py` — Pipeline runner entry-point | ✅ DONE |
+| `services/agent_registry.py` — Authoritative role-to-class registry | ✅ DONE |
 | `agents/strategic/planner_agent.py` — Project Planner | ✅ DONE |
 | `agents/strategic/architect_agent.py` — System Architect | ✅ DONE |
 | `agents/strategic/router_agent.py` — Task Router | ✅ DONE |
@@ -182,7 +184,7 @@ Core wiring works. Providers, agents and module routes are all functional. End-t
 
 ## Phase 10 — Compliance & Reporting ⚠️ PARTIAL
 
-Test suite passes (94 tests). Compliance checklist is documented. Runtime testing gaps remain.
+Test suite passes (112 tests). Compliance checklist is documented. Runtime testing gaps remain.
 
 | Item | Status |
 |---|---|

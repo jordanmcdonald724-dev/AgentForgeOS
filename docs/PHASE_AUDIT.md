@@ -20,14 +20,17 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 - Concrete implementations: `noop_provider.py`, `ollama_provider.py`, `openai_provider.py`, `fal_provider.py`, `comfyui_provider.py`, `piper_provider.py`.
 
 ## Phase 4 — Services Layer ⚠️ SCAFFOLDED
-- Core services under `services/`: `agent_service.py`, `memory_manager.py`, `vector_store.py`, `knowledge_graph.py`, `embedding_service.py`, `pattern_extractor.py`, `project_genome_service.py`, `autopsy_service.py`.
+- Core services under `services/`: `agent_service.py`, `memory_manager.py`, `mongo_memory.py`, `vector_store.py`, `knowledge_graph.py`, `embedding_service.py`, `pattern_extractor.py`, `project_genome_service.py`, `autopsy_service.py`.
+- Pipeline definition and shared context in `services/agent_pipeline.py` (`AGENT_PIPELINE`, `PipelineContext`).
+- Authoritative role-to-class registry in `services/agent_registry.py` (`AGENT_REGISTRY`).
 - All services use in-memory storage only.
 - **Still needed:** MongoDB persistence wired into each service.
 
 ## Phase 5 — Agent System ✅ COMPLETE
 - Agent orchestration under `agents/` with `base_agent.py`, `__init__.py` (with `AGENT_CLASS_MAP`), and `pipeline.py`.
 - 12 concrete agent classes in sub-packages: `strategic/` (PlannerAgent, ArchitectAgent, RouterAgent), `architecture/` (BuilderAgent, APIArchitectAgent, DataArchitectAgent), `production/` (BackendEngineerAgent, FrontendEngineerAgent, AIIntegrationEngineerAgent), `validation/` (IntegrationTesterAgent, SecurityAuditorAgent, SystemStabilizerAgent).
-- Control layer present under `control/` with `ai_router.py`, `file_guard.py`, `agent_supervisor.py` (typed dispatch), and `permission_matrix.yaml`.
+- Control layer present under `control/` with `ai_router.py`, `file_guard.py`, `agent_supervisor.py` (typed dispatch, fault-tolerant pipeline), and `permission_matrix.yaml`.
+- `services/agent_registry.py` provides `AGENT_REGISTRY` as the authoritative role-to-class mapping used by `AgentSupervisor`.
 
 ## Phase 6 — Studio Interface ⚠️ PARTIAL
 - Frontend studio under `frontend/` (`index.html`, `style.css`) following `docs/UI_STUDIO_LAYOUT.md`.

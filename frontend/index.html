@@ -85,7 +85,9 @@
 
         const setActiveModule = (module) => {
           activeModule = module;
-          activeModuleName.textContent = module ? module.name || "Unnamed Module" : "No modules available";
+          activeModuleName.textContent = module
+            ? module.name || (module.id ? `Module ID: ${module.id}` : "Unnamed Module")
+            : "No modules available";
           activeModuleVersion.textContent = module && module.version ? `v${module.version}` : "";
           activeModuleDescription.textContent =
             module && module.description ? module.description : "Modules are not currently available.";
@@ -116,25 +118,32 @@
           setActiveModule(modules[0]);
         };
 
-        const showError = () => {
+        const showError = (message) => {
           moduleListEl.innerHTML = "";
           const error = document.createElement("div");
           error.className = "nav-item nav-item--error";
           error.textContent = "Unable to load modules";
           moduleListEl.appendChild(error);
           setActiveModule(null);
-          activeModuleDescription.textContent = "The module service is unavailable. Please try again later.";
+          activeModuleDescription.textContent =
+            message || "The module service is unavailable. Please try again later.";
+        };
+
+        const fetchWithTimeout = (url, options = {}, timeoutMs = 8000) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeoutMs);
+          return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
         };
 
         const fetchModules = async () => {
           try {
-            const response = await fetch("/api/modules");
+            const response = await fetchWithTimeout("/api/modules");
             if (!response.ok) {
               const statusLabel = response.statusText ? ` ${response.statusText}` : "";
               throw new Error(`Failed to fetch modules: ${response.status}${statusLabel}`);
             }
             const payload = await response.json();
-            if (!payload || typeof payload !== "object") {
+            if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
               const typeLabel = payload === null ? "null" : typeof payload;
               throw new Error(`Invalid module response: expected object but received ${typeLabel}`);
             }
@@ -142,6 +151,10 @@
             renderModules(modules);
           } catch (error) {
             console.error(error);
+            if (error.name === "AbortError") {
+              showError("Module request timed out. Please try again.");
+              return;
+            }
             showError();
           }
         };

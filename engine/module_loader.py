@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _sanitize_identifier(value: str) -> Optional[str]:
-    cleaned = "".join(ch for ch in value if ch.isalnum())
+    cleaned = "".join(ch for ch in value if ch.isalnum() or ch == "_")
     if not cleaned:
         return None
     if cleaned[0].isdigit():

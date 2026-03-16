@@ -37,7 +37,8 @@ class PatternExtractorTests(unittest.TestCase):
         extractor = PatternExtractor()
         frequencies = extractor.extract_patterns("Code code test!")
         self.assertEqual(frequencies["code"], 2)
-        self.assertEqual(extractor.top_patterns("one two two three three three", limit=2), ["three", "two"])
+        top_tokens = extractor.top_patterns("one two two three three three", limit=2)
+        self.assertEqual(top_tokens, ["three", "two"])
 
 
 class ProjectGenomeServiceTests(unittest.TestCase):

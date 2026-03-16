@@ -32,7 +32,6 @@ class AutopsyService:
 
     def history(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """Return recorded failure reports, optionally limited to the most recent items."""
-        data = list(self._reports)
         if limit is None:
-            return data
-        return data[-limit:]
+            return self._reports
+        return self._reports[-limit:]

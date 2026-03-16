@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 
-from providers import LLMProvider
+from providers.llm_provider import LLMProvider
+from providers.noop_provider import NoOpLLMProvider
 from .memory_manager import MemoryManager
 
 
@@ -9,10 +10,10 @@ class AgentService:
 
     def __init__(
         self,
-        llm_provider: LLMProvider,
+        llm_provider: Optional[LLMProvider] = None,
         memory_manager: Optional[MemoryManager] = None,
     ):
-        self.llm_provider = llm_provider
+        self.llm_provider: LLMProvider = llm_provider if llm_provider is not None else NoOpLLMProvider()
         self.memory = memory_manager or MemoryManager()
 
     async def run_agent(self, prompt: str, *, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

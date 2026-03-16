@@ -6,9 +6,9 @@ from fastapi import APIRouter, FastAPI
 
 from .config import get_settings
 from .database import db
-from .module_loader import load_modules
+from .module_loader import load_modules, collect_module_routers
 from .worker_system import worker_system
-from .routes import modules_router
+from .routes import modules_router, agent_router
 from control.module_registry import module_registry
 
 logger = logging.getLogger(__name__)
@@ -51,5 +51,15 @@ def register_routers(
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
-    register_routers(app, [_health_router(), modules_router], prefix="/api")
+
+    # Core engine routes
+    register_routers(
+        app, [_health_router(), modules_router, agent_router], prefix="/api"
+    )
+
+    # Module-specific backend routes (discovered from apps/*/backend/routes.py)
+    module_routers = collect_module_routers()
+    for mod_router in module_routers:
+        app.include_router(mod_router, prefix="/api/modules")
+
     return app

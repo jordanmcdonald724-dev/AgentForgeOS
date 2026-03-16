@@ -5,7 +5,7 @@ import json
 import logging
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from control.module_registry import ModuleRegistry, module_registry
 
@@ -110,6 +110,31 @@ def _resolve_module_class(mod: ModuleType, manifest: Dict) -> Optional[type]:
     return None
 
 
+def _discover_module_router(module_dir: Path):
+    """
+    Look for a ``backend/routes.py`` file inside the module directory and
+    import it.  Returns the ``router`` attribute if present, otherwise None.
+    """
+    routes_path = module_dir / "backend" / "routes.py"
+    if not routes_path.exists():
+        return None
+    try:
+        module_name = f"apps.{module_dir.name}.backend.routes"
+        spec = importlib.util.spec_from_file_location(module_name, routes_path)
+        if spec and spec.loader:
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            router = getattr(mod, "router", None)
+            if router is not None:
+                logger.info("Discovered backend router for module %s", module_dir.name)
+                return router
+    except Exception as exc:  # pragma: no cover - defensive log path
+        logger.warning(
+            "Failed to import backend routes for %s: %s", module_dir.name, exc
+        )
+    return None
+
+
 def load_modules(
     apps_path: Optional[Path] = None, registry: Optional[ModuleRegistry] = None
 ) -> Dict[str, object]:
@@ -178,10 +203,40 @@ def load_modules(
                 except Exception as exc:  # pragma: no cover - defensive log path
                     logger.warning("Module %s initialize() failed: %s", module_id, exc)
                     continue
+
+            # Attach backend router if present.
+            router = _discover_module_router(module_dir)
             active_registry.register_module(module_id, instance, manifest)
+            if router is not None:
+                active_registry.register_module(
+                    module_id,
+                    instance,
+                    {**manifest, "_router": router},
+                )
             loaded[module_id] = instance
             logger.info("Loaded module %s", module_id)
         except Exception as exc:  # pragma: no cover - defensive log path
             logger.warning("Failed to instantiate module %s: %s", module_id, exc)
 
     return loaded
+
+
+def collect_module_routers(
+    apps_path: Optional[Path] = None,
+) -> List:
+    """
+    Return a list of FastAPI routers discovered from all app module
+    ``backend/routes.py`` files.  Used by the engine server to mount
+    module-specific API routes under ``/api/modules``.
+    """
+    apps_dir = apps_path or Path(__file__).resolve().parent.parent / "apps"
+    routers = []
+    if not apps_dir.exists():
+        return routers
+    for module_dir in sorted(apps_dir.iterdir()):
+        if not module_dir.is_dir():
+            continue
+        router = _discover_module_router(module_dir)
+        if router is not None:
+            routers.append(router)
+    return routers

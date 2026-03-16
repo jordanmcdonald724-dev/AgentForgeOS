@@ -2,6 +2,7 @@
 
 from .agent_service import AgentService
 from .memory_manager import MemoryManager
+from .mongo_memory import MongoMemoryManager
 from .vector_store import VectorStore
 from .knowledge_graph import KnowledgeGraph
 from .embedding_service import EmbeddingService
@@ -12,6 +13,7 @@ from .autopsy_service import AutopsyService
 __all__ = [
     "AgentService",
     "MemoryManager",
+    "MongoMemoryManager",
     "VectorStore",
     "KnowledgeGraph",
     "EmbeddingService",

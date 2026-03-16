@@ -15,7 +15,7 @@ class TTSProvider(ABC):
         {
             "success": bool,
             "data": <provider-specific payload>,
-            "error": Optional[str] (None when successful)
+            "error": \"string or null\" (null when successful)
         }
         """
         raise NotImplementedError

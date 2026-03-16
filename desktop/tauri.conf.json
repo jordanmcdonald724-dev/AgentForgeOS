@@ -20,7 +20,8 @@
     ],
     "allowlist": {
       "shell": {
-        "all": true
+        "open": false,
+        "scope": []
       }
     },
     "security": {

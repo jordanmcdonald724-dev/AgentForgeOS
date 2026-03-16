@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+from types import MappingProxyType
 from typing import Any, Dict, Optional
 
 
@@ -32,8 +33,8 @@ class ModuleRegistry:
         return self._modules.get(module_id)
 
     def get_all_modules(self) -> Dict[str, Dict[str, Any]]:
-        """Expose all registered module entries."""
-        return dict(self._modules)
+        """Expose all registered module entries as a read-only view."""
+        return MappingProxyType(self._modules)
 
     def clear(self) -> None:
         """Reset registry contents (primarily for testing)."""
@@ -50,11 +51,11 @@ class ModuleRegistry:
 
     def list_manifests(self) -> Dict[str, Dict[str, Any]]:
         """Expose manifest data for all registered modules."""
-        return {module_id: data["manifest"] for module_id, data in self.get_all_modules().items()}
+        return {module_id: data["manifest"] for module_id, data in self._modules.items()}
 
     def instances(self) -> Dict[str, Any]:
         """Expose the live module instances."""
-        return {module_id: data["instance"] for module_id, data in self.get_all_modules().items()}
+        return {module_id: data["instance"] for module_id, data in self._modules.items()}
 
 
 module_registry = ModuleRegistry()

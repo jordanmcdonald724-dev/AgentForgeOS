@@ -32,6 +32,14 @@ class ModuleRegistrySingletonTests(unittest.TestCase):
         self.assertEqual(registry.get_instance("demo"), instance)
         self.assertEqual(registry.get_manifest("demo"), manifest)
 
+    def test_clear_removes_all_modules(self):
+        registry = ModuleRegistry()
+        registry.register_module("demo", object(), {"id": "demo"})
+        self.assertIn("demo", registry.get_all_modules())
+
+        registry.clear()
+        self.assertEqual(dict(registry.get_all_modules()), {})
+
 
 if __name__ == "__main__":
     unittest.main()

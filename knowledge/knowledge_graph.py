@@ -24,7 +24,7 @@ class KnowledgeGraph:
         self._edges.add((source, target))
 
     def get_node(self, node_id: str) -> Dict[str, Any]:
-        """Return node metadata if it exists."""
+        """Return node metadata if it exists, or an empty dict if missing."""
         return self._nodes.get(node_id, {})
 
     def neighbors(self, node_id: str) -> List[str]:

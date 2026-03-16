@@ -58,13 +58,23 @@
     </main>
 
     <section class="bottom">
-      <div class="panel">
+      <div class="panel panel--console">
         <div class="title">Agent Console</div>
-        <p>Prompt input, history, and responses render here.</p>
+        <div id="console-messages" class="console-messages" aria-live="polite" aria-label="Agent conversation history"></div>
+        <form id="console-form" class="console-form" autocomplete="off">
+          <textarea
+            id="console-input"
+            class="console-input"
+            placeholder="Type a prompt and press Enter (Shift+Enter for newline)…"
+            rows="2"
+            aria-label="Agent prompt input"
+          ></textarea>
+          <button type="submit" id="console-send" class="console-send" aria-label="Send prompt">Send</button>
+        </form>
       </div>
-      <div class="panel">
+      <div class="panel panel--pipeline">
         <div class="title">Pipeline / System Monitor</div>
-        <p>Track active agents, task queue, and pipeline stages.</p>
+        <div id="pipeline-stages" class="pipeline-stages" aria-label="Pipeline stages"></div>
       </div>
     </section>
     <script>
@@ -179,6 +189,106 @@
         };
 
         fetchModules();
+
+        // ----------------------------------------------------------------
+        // Agent Console
+        // ----------------------------------------------------------------
+
+        const AGENT_RUN_URL = "/api/agent/run";
+        const consoleMessages = document.getElementById("console-messages");
+        const consoleForm = document.getElementById("console-form");
+        const consoleInput = document.getElementById("console-input");
+        const consoleSend = document.getElementById("console-send");
+
+        const appendMessage = (role, content) => {
+          const msg = document.createElement("div");
+          msg.className = `console-msg console-msg--${role}`;
+          const label = document.createElement("span");
+          label.className = "console-msg-role";
+          label.textContent = role === "user" ? "You" : "Agent";
+          const text = document.createElement("p");
+          text.className = "console-msg-text";
+          text.textContent = content;
+          msg.appendChild(label);
+          msg.appendChild(text);
+          consoleMessages.appendChild(msg);
+          consoleMessages.scrollTop = consoleMessages.scrollHeight;
+        };
+
+        const setConsoleLoading = (loading) => {
+          consoleSend.disabled = loading;
+          consoleSend.textContent = loading ? "…" : "Send";
+          consoleInput.disabled = loading;
+        };
+
+        const sendPrompt = async (prompt) => {
+          if (!prompt.trim()) return;
+          appendMessage("user", prompt);
+          setConsoleLoading(true);
+          try {
+            const response = await fetchWithTimeout(
+              AGENT_RUN_URL,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt }),
+              },
+              30000
+            );
+            const payload = await response.json();
+            const text =
+              payload?.data?.data?.text ||
+              payload?.data?.error ||
+              (payload?.error) ||
+              "No response received.";
+            appendMessage("agent", text);
+          } catch (err) {
+            appendMessage("agent", `Error: ${err.message || "request failed"}`);
+          } finally {
+            setConsoleLoading(false);
+            consoleInput.focus();
+          }
+        };
+
+        consoleForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const prompt = consoleInput.value;
+          consoleInput.value = "";
+          sendPrompt(prompt);
+        });
+
+        consoleInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            consoleForm.dispatchEvent(new Event("submit"));
+          }
+        });
+
+        // ----------------------------------------------------------------
+        // Pipeline Monitor
+        // ----------------------------------------------------------------
+
+        const PIPELINE_STAGES_URL = "/api/modules";
+        const pipelineStages = document.getElementById("pipeline-stages");
+
+        const PIPELINE_ROLES = [
+          "Project Planner", "System Architect", "Task Router",
+          "Module Builder", "API Architect", "Data Architect",
+          "Backend Engineer", "Frontend Engineer", "AI Integration Engineer",
+          "Integration Tester", "Security Auditor", "System Stabilizer",
+        ];
+
+        const renderPipelineStages = (activeStage) => {
+          pipelineStages.innerHTML = "";
+          PIPELINE_ROLES.forEach((role) => {
+            const chip = document.createElement("div");
+            chip.className = "chip" + (role === activeStage ? " chip--active" : "");
+            chip.textContent = role;
+            pipelineStages.appendChild(chip);
+          });
+        };
+
+        renderPipelineStages(null);
       })();
     </script>
   </body>

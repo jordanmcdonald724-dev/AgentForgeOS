@@ -12,6 +12,7 @@ so it remains stable while the agent implementations evolve.
 
 from typing import Iterable, Optional
 
+from providers.llm_provider import LLMProvider
 from control.agent_supervisor import AgentSupervisor
 from services import AgentService
 from services.agent_pipeline import AGENT_PIPELINE
@@ -22,7 +23,11 @@ def get_pipeline_stages() -> list:
     return list(AGENT_PIPELINE)
 
 
-async def run(user_request: str, context: Optional[dict] = None) -> Iterable[dict]:
+async def run(
+    user_request: str,
+    context: Optional[dict] = None,
+    llm_provider: Optional[LLMProvider] = None,
+) -> Iterable[dict]:
     """
     Execute the full agent pipeline for *user_request*.
 
@@ -30,12 +35,14 @@ async def run(user_request: str, context: Optional[dict] = None) -> Iterable[dic
     execution to the supervisor's run_pipeline method.
 
     Args:
-        user_request: The natural-language task description.
-        context:      Optional dict of additional context passed to each agent.
+        user_request:  The natural-language task description.
+        context:       Optional dict of additional context passed to each agent.
+        llm_provider:  Optional LLM provider to use. Falls back to NoOpLLMProvider
+                       when omitted, which returns a clear misconfiguration error.
 
     Returns:
         An iterable of response dicts, one per pipeline stage.
     """
-    agent_service = AgentService()
+    agent_service = AgentService(llm_provider=llm_provider)
     supervisor = AgentSupervisor(agent_service=agent_service)
     return await supervisor.run_pipeline(user_request, context=context)

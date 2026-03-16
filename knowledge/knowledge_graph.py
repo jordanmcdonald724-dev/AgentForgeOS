@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Set, Tuple
 class KnowledgeGraph:
     """Lightweight in-memory knowledge graph scaffold for Phase 7."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._nodes: Dict[str, Dict[str, Any]] = {}
         self._edges: Set[Tuple[str, str]] = set()
 

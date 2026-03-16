@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 class ProjectGenome:
     """Tracks project traits and lessons learned."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._traits: List[Dict[str, Any]] = []
 
     def add_trait(self, trait: Dict[str, Any]) -> None:

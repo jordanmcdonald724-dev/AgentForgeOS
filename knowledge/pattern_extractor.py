@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 class PatternExtractor:
     """Simple pattern collector scaffold for Phase 7."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._patterns: List[Dict[str, Any]] = []
 
     def record(self, pattern: Dict[str, Any]) -> None:

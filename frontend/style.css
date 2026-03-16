@@ -1,0 +1,122 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.studio {
+  display: grid;
+  grid-template-rows: 64px 1fr 260px;
+  height: 100vh;
+  width: 100vw;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  background: #111827;
+  border-bottom: 1px solid #1f2937;
+}
+
+.nav .badge {
+  background: #2563eb;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.nav .pill {
+  background: #1f2937;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+}
+
+.layout-main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  overflow: hidden;
+}
+
+.sidebar {
+  background: #0b1220;
+  border-right: 1px solid #1f2937;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar h2 {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #111827;
+  border: 1px solid #1f2937;
+}
+
+.workspace {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: auto;
+}
+
+.workspace-card {
+  background: #0b1220;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #1f2937;
+}
+
+.panel {
+  background: #0b1220;
+  border-right: 1px solid #1f2937;
+  padding: 16px;
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+.title {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 10px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+}

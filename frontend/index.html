@@ -85,7 +85,7 @@
 
         const setActiveModule = (module) => {
           activeModule = module;
-          activeModuleName.textContent = module ? module.name || module.id || "Module" : "No module selected";
+          activeModuleName.textContent = module ? module.name || "Module" : "No module selected";
           activeModuleVersion.textContent = module && module.version ? `v${module.version}` : "";
           activeModuleDescription.textContent =
             module && module.description ? module.description : "Select a module to begin.";
@@ -130,10 +130,13 @@
           try {
             const response = await fetch("/api/modules");
             if (!response.ok) {
-              throw new Error("Failed to fetch modules");
+              throw new Error(`Failed to fetch modules (status ${response.status})`);
             }
             const payload = await response.json();
-            const modules = Array.isArray(payload?.data) ? payload.data : [];
+            if (!payload || typeof payload !== "object") {
+              throw new Error("Invalid module response");
+            }
+            const modules = Array.isArray(payload.data) ? payload.data : [];
             renderModules(modules);
           } catch (error) {
             console.error(error);

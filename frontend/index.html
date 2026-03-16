@@ -130,13 +130,15 @@
           try {
             const response = await fetch("/api/modules");
             if (!response.ok) {
+              const statusLabel = response.statusText ? ` ${response.statusText}` : "";
               throw new Error(
-                `Failed to fetch modules: ${response.status} ${response.statusText || ""}. Please try again or check connectivity.`
+                `Failed to fetch modules: ${response.status}${statusLabel}. Please try again or check connectivity.`
               );
             }
             const payload = await response.json();
             if (!payload || typeof payload !== "object") {
-              throw new Error("Invalid module response");
+              const typeLabel = payload === null ? "null" : typeof payload;
+              throw new Error(`Invalid module response: expected object but received ${typeLabel}`);
             }
             const modules = Array.isArray(payload.data) ? payload.data : [];
             renderModules(modules);

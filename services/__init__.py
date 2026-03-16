@@ -9,6 +9,8 @@ from .embedding_service import EmbeddingService
 from .pattern_extractor import PatternExtractor
 from .project_genome_service import ProjectGenomeService
 from .autopsy_service import AutopsyService
+from .agent_pipeline import PipelineContext
+from .agent_registry import AGENT_REGISTRY
 
 __all__ = [
     "AgentService",
@@ -20,4 +22,6 @@ __all__ = [
     "PatternExtractor",
     "ProjectGenomeService",
     "AutopsyService",
+    "PipelineContext",
+    "AGENT_REGISTRY",
 ]

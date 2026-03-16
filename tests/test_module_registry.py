@@ -6,10 +6,10 @@ from control.module_registry import ModuleRegistry, module_registry
 class ModuleRegistrySingletonTests(unittest.TestCase):
     def setUp(self):
         # Ensure clean state for each test since registry is a singleton
-        ModuleRegistry()._modules.clear()
+        ModuleRegistry().clear()
 
     def tearDown(self):
-        ModuleRegistry()._modules.clear()
+        ModuleRegistry().clear()
 
     def test_module_registry_is_singleton(self):
         first = ModuleRegistry()

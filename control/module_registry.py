@@ -25,12 +25,15 @@ class ModuleRegistry:
         self._modules[module_id] = {"instance": module_instance, "manifest": manifest}
 
     def get_module(self, module_id: str) -> Optional[Dict[str, Any]]:
-        entry = self._modules.get(module_id)
-        return entry if entry else None
+        return self._modules.get(module_id)
 
     def get_all_modules(self) -> Dict[str, Dict[str, Any]]:
         """Expose all registered module entries."""
         return dict(self._modules)
+
+    def clear(self) -> None:
+        """Reset registry contents (primarily for testing)."""
+        self._modules.clear()
 
     # Backwards-compatible helpers
     def get_instance(self, module_id: str) -> Optional[Any]:

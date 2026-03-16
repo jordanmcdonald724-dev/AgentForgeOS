@@ -39,6 +39,19 @@ def _load_manifest(manifest_path: Path) -> Optional[Dict]:
         return None
 
 
+def _validate_manifest(manifest: Dict, module_dir: Path) -> bool:
+    required = ["id", "name", "version", "entry"]
+    missing = [field for field in required if not manifest.get(field)]
+    if missing:
+        logger.warning(
+            "Skipping %s: manifest missing required fields: %s",
+            module_dir.name,
+            ", ".join(missing),
+        )
+        return False
+    return True
+
+
 def _import_module(entry_path: Path, module_name: str) -> Optional[ModuleType]:
     try:
         spec = importlib.util.spec_from_file_location(module_name, entry_path)
@@ -119,8 +132,15 @@ def load_modules(
         if not manifest:
             continue
 
-        module_id = manifest.get("id") or module_dir.name
-        entry_name = manifest.get("entry", "module.py")
+        if not isinstance(manifest, dict):
+            logger.warning("Skipping %s: manifest is not a JSON object", module_dir.name)
+            continue
+
+        if not _validate_manifest(manifest, module_dir):
+            continue
+
+        module_id = manifest["id"]
+        entry_name = manifest["entry"]
         entry_path = module_dir / entry_name
         if not entry_path.exists():
             logger.warning("Entry file %s missing for module %s", entry_path, module_id)

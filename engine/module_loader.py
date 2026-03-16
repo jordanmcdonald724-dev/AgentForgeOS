@@ -40,6 +40,12 @@ def _load_manifest(manifest_path: Path) -> Optional[Dict]:
 
 
 def _validate_manifest(manifest: Dict, module_dir: Path) -> bool:
+    """
+    Validate that a module manifest contains required non-empty string fields.
+
+    Required fields: id, name, version, entry.
+    Returns True when valid; otherwise logs a warning and returns False.
+    """
     required = {"id": str, "name": str, "version": str, "entry": str}
     missing = []
     for field, expected_type in required.items():

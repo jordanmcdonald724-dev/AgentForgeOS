@@ -21,7 +21,7 @@ class PhaseIntegrationTests(unittest.TestCase):
         self.assertEqual(body.get("data", {}).get("status"), "ok")
 
     def test_core_modules_import_and_run(self):
-        from agents import pipeline
+        from services import agent_pipeline as pipeline
         from control import ai_router, agent_supervisor, file_guard
         from knowledge import (
             embedding_service,

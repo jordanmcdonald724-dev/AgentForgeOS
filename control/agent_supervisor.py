@@ -2,7 +2,7 @@
 
 from typing import Iterable, List, Optional
 
-from agents import AGENT_PIPELINE
+from services.agent_pipeline import AGENT_PIPELINE
 from control.ai_router import AIRouter
 from control.file_guard import FileGuard
 from services import AgentService

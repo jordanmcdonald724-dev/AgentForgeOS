@@ -13,8 +13,13 @@ class ModuleRegistry:
         """Store a module instance and its manifest."""
         self._modules[module_id] = {"instance": module_instance, "manifest": manifest}
 
-    def get_module(self, module_id: str) -> Optional[Dict[str, Any]]:
-        return self._modules.get(module_id)
+    def get_instance(self, module_id: str) -> Optional[Any]:
+        entry = self._modules.get(module_id)
+        return entry["instance"] if entry else None
+
+    def get_manifest(self, module_id: str) -> Optional[Dict[str, Any]]:
+        entry = self._modules.get(module_id)
+        return entry["manifest"] if entry else None
 
     def list_manifests(self) -> Dict[str, Dict[str, Any]]:
         """Expose manifest data for all registered modules."""

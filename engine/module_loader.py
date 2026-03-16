@@ -25,6 +25,8 @@ def _sanitize_identifier(value: str) -> Optional[str]:
         return None
     if cleaned[0].isdigit():
         cleaned = f"_{cleaned}"
+    if not cleaned.isidentifier():
+        return None
     return cleaned
 
 
@@ -142,6 +144,7 @@ def load_modules(
                     initializer()
                 except Exception as exc:  # pragma: no cover - defensive log path
                     logger.warning("Module %s initialize() failed: %s", module_id, exc)
+                    continue
             active_registry.register_module(module_id, instance, manifest)
             loaded[module_id] = instance
             logger.info("Loaded module %s", module_id)

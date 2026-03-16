@@ -45,6 +45,7 @@ class ModuleLoaderManifestTests(unittest.TestCase):
                 "name": "Valid",
                 "version": "1.0.0",
                 "entry": "module.py",
+                "class": "Module",
             }
             self._create_module(apps_path, "valid", manifest)
 
@@ -64,12 +65,14 @@ class ModuleLoaderManifestTests(unittest.TestCase):
                 "name": "Valid",
                 "version": "1.0.0",
                 "entry": "module.py",
+                "class": "Module",
             }
             invalid_manifest = {
                 "id": "incomplete-module",
                 "name": "Incomplete",
-                # version missing on purpose
+                "version": "1.0.0",
                 "entry": "module.py",
+                # class missing on purpose
             }
 
             self._create_module(apps_path, "valid", valid_manifest)
@@ -94,6 +97,7 @@ class ModuleLoaderManifestTests(unittest.TestCase):
                 "name": "Valid",
                 "version": "1.0.0",
                 "entry": "module.py",
+                "class": "Module",
             }
             self._create_module(apps_path, "valid", valid_manifest)
 

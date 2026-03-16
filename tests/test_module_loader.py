@@ -1,4 +1,5 @@
 import json
+import textwrap
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,7 +9,18 @@ from engine.module_loader import load_modules
 
 
 class ModuleLoaderManifestTests(unittest.TestCase):
-    def _create_module(self, base: Path, name: str, manifest: dict, body: str = "class Module:\n    pass\n"):
+    def setUp(self):
+        ModuleRegistry().clear()
+
+    def tearDown(self):
+        ModuleRegistry().clear()
+
+    def _create_module(
+        self, base: Path, name: str, manifest: dict, body: str = textwrap.dedent("""\
+        class Module:
+            pass
+        """),
+    ):
         module_dir = base / name
         module_dir.mkdir(parents=True, exist_ok=True)
         (module_dir / "manifest.json").write_text(json.dumps(manifest))

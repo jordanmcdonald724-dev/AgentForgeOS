@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import threading
 from types import MappingProxyType
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Mapping, Optional
 
 
 class ModuleRegistry:
@@ -12,6 +12,9 @@ class ModuleRegistry:
     _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
+        # Ensure subclasses get their own synchronization primitive
+        if not hasattr(cls, "_lock"):
+            cls._lock = threading.Lock()
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
@@ -32,7 +35,7 @@ class ModuleRegistry:
     def get_module(self, module_id: str) -> Optional[Dict[str, Any]]:
         return self._modules.get(module_id)
 
-    def get_all_modules(self) -> Dict[str, Dict[str, Any]]:
+    def get_all_modules(self) -> Mapping[str, Dict[str, Any]]:
         """Expose all registered module entries as a read-only view."""
         return MappingProxyType(self._modules)
 

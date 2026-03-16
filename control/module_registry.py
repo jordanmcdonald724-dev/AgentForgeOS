@@ -12,9 +12,6 @@ class ModuleRegistry:
     _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
-        # Ensure subclasses get their own synchronization primitive
-        if not hasattr(cls, "_lock"):
-            cls._lock = threading.Lock()
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
@@ -30,7 +27,8 @@ class ModuleRegistry:
 
     def register_module(self, module_id: str, module_instance: Any, manifest: Dict[str, Any]) -> None:
         """Store a module instance and its manifest."""
-        self._modules[module_id] = {"instance": module_instance, "manifest": manifest}
+        with self._lock:
+            self._modules[module_id] = {"instance": module_instance, "manifest": manifest}
 
     def get_module(self, module_id: str) -> Optional[Dict[str, Any]]:
         return self._modules.get(module_id)
@@ -41,7 +39,8 @@ class ModuleRegistry:
 
     def clear(self) -> None:
         """Reset registry contents (primarily for testing)."""
-        self._modules.clear()
+        with self._lock:
+            self._modules.clear()
 
     # Backwards-compatible helpers
     def get_instance(self, module_id: str) -> Optional[Any]:

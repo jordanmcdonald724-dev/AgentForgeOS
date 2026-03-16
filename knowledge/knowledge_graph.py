@@ -13,9 +13,15 @@ class KnowledgeGraph:
         self._nodes[node_id] = payload
 
     def add_edge(self, source: str, target: str) -> None:
-        """Create a directed edge between two nodes."""
-        if source in self._nodes and target in self._nodes:
-            self._edges.add((source, target))
+        """
+        Create a directed edge between two nodes.
+
+        Raises:
+            ValueError: if either node is missing.
+        """
+        if source not in self._nodes or target not in self._nodes:
+            raise ValueError("Both source and target nodes must exist before adding an edge.")
+        self._edges.add((source, target))
 
     def get_node(self, node_id: str) -> Dict[str, Any]:
         """Return node metadata if it exists."""

@@ -97,6 +97,10 @@ apps/research
 apps/assets
 apps/deployment
 
+Phase 8 scaffolding:
+
+- created apps/ with placeholder subdirectories for each module.
+
 ---
 
 ## Phase 9 — Final Integration

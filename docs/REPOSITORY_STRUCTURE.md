@@ -110,6 +110,8 @@ research/
 assets/
 deployment/
 
+Phase 8 scaffold creates these directories as placeholders for future implementation.
+
 ---
 
 ### bridge/

@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 
 class KnowledgeGraph:
-    """Simple in-memory knowledge graph placeholder for Phase 4 scaffolding."""
+    """Simple in-memory knowledge graph placeholder for the services layer scaffolding."""
 
     def __init__(self) -> None:
         self._entities: Dict[str, Dict[str, Any]] = {}

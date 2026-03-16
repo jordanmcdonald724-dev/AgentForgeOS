@@ -15,7 +15,7 @@ class ImageProvider(ABC):
         {
             "success": bool,
             "data": <provider-specific payload>,
-            "error": str | None
+            "error": Optional[str]
         }
         The "error" field is None when successful.
         """

@@ -55,6 +55,12 @@ body {
   gap: 10px;
 }
 
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .sidebar h2 {
   font-size: 14px;
   letter-spacing: 0.04em;
@@ -67,6 +73,30 @@ body {
   border-radius: 10px;
   background: #111827;
   border: 1px solid #1f2937;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.nav-item:hover {
+  border-color: #2563eb;
+}
+
+.nav-item.active {
+  border-color: #2563eb;
+  background: #1e293b;
+  box-shadow: 0 0 0 1px #1e3a8a inset;
+}
+
+.nav-item--muted {
+  color: #94a3b8;
+  cursor: default;
+}
+
+.nav-item--error {
+  border-color: #ef4444;
+  color: #fecdd3;
+  background: #1f2937;
+  cursor: default;
 }
 
 .workspace {
@@ -75,6 +105,28 @@ body {
   flex-direction: column;
   gap: 12px;
   overflow: auto;
+}
+
+.module-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.module-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.module-version {
+  color: #94a3b8;
+  font-size: 12px;
+  padding: 2px 8px;
+  background: #1f2937;
+  border: 1px solid #1f2937;
+  border-radius: 999px;
 }
 
 .workspace-card {

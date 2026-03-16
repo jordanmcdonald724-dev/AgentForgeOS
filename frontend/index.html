@@ -20,21 +20,24 @@
     <main class="layout-main">
       <aside class="sidebar">
         <h2>Modules</h2>
-        <div class="nav-item">Studio</div>
-        <div class="nav-item">Build Pipelines</div>
-        <div class="nav-item">Research</div>
-        <div class="nav-item">Assets</div>
-        <div class="nav-item">Deployment</div>
-        <div class="nav-item">Sandbox</div>
-        <div class="nav-item">System Logs</div>
+        <div id="module-list" class="nav-list">
+          <div class="nav-item nav-item--muted">Loading modules...</div>
+        </div>
       </aside>
 
       <section class="workspace">
         <div class="workspace-card">
           <div class="title">Main Workspace</div>
+          <div class="module-header">
+            <div id="active-module-name" class="module-name">Loading modules...</div>
+            <div id="active-module-version" class="module-version"></div>
+          </div>
+          <p id="active-module-description">Modules are loading from the backend.</p>
+        </div>
+        <div class="workspace-card">
+          <div class="title">Module Workspace</div>
           <p>
-            Tabbed, multi-pane workspace for active module content. Replace this scaffold with live components during
-            implementation.
+            Render module-specific workspaces here. Content will update as you select a module from the sidebar.
           </p>
         </div>
         <div class="grid">
@@ -64,5 +67,82 @@
         <p>Track active agents, task queue, and pipeline stages.</p>
       </div>
     </section>
+    <script>
+      (() => {
+        const moduleListEl = document.getElementById("module-list");
+        const activeModuleName = document.getElementById("active-module-name");
+        const activeModuleVersion = document.getElementById("active-module-version");
+        const activeModuleDescription = document.getElementById("active-module-description");
+
+        let activeModule = null;
+
+        const updateActiveHighlight = (moduleId) => {
+          const items = moduleListEl.querySelectorAll(".nav-item[data-module-id]");
+          items.forEach((item) => {
+            item.classList.toggle("active", item.dataset.moduleId === moduleId);
+          });
+        };
+
+        const setActiveModule = (module) => {
+          activeModule = module;
+          activeModuleName.textContent = module ? module.name || module.id || "Module" : "No module selected";
+          activeModuleVersion.textContent = module && module.version ? `v${module.version}` : "";
+          activeModuleDescription.textContent =
+            module && module.description ? module.description : "Select a module to begin.";
+          updateActiveHighlight(module?.id || null);
+        };
+
+        const renderModules = (modules) => {
+          moduleListEl.innerHTML = "";
+
+          if (!modules.length) {
+            const empty = document.createElement("div");
+            empty.className = "nav-item nav-item--muted";
+            empty.textContent = "No modules available";
+            moduleListEl.appendChild(empty);
+            setActiveModule(null);
+            return;
+          }
+
+          modules.forEach((mod) => {
+            const item = document.createElement("div");
+            item.className = "nav-item";
+            item.dataset.moduleId = mod.id;
+            item.textContent = mod.name || mod.id;
+            item.addEventListener("click", () => setActiveModule(mod));
+            moduleListEl.appendChild(item);
+          });
+
+          setActiveModule(modules[0]);
+        };
+
+        const showError = () => {
+          moduleListEl.innerHTML = "";
+          const error = document.createElement("div");
+          error.className = "nav-item nav-item--error";
+          error.textContent = "Unable to load modules";
+          moduleListEl.appendChild(error);
+          setActiveModule(null);
+          activeModuleDescription.textContent = "The module service is unavailable. Please try again later.";
+        };
+
+        const fetchModules = async () => {
+          try {
+            const response = await fetch("/api/modules");
+            if (!response.ok) {
+              throw new Error("Failed to fetch modules");
+            }
+            const payload = await response.json();
+            const modules = Array.isArray(payload?.data) ? payload.data : [];
+            renderModules(modules);
+          } catch (error) {
+            console.error(error);
+            showError();
+          }
+        };
+
+        fetchModules();
+      })();
+    </script>
   </body>
 </html>

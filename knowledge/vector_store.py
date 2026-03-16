@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Sequence, Tuple
 
 
 class KnowledgeVectorStore:
-    """Minimal placeholder vector store for Phase 7 knowledge layer."""
+    """Minimal placeholder vector store for Phase 7 knowledge layer that pairs embeddings with metadata."""
 
     def __init__(self) -> None:
         self._documents: List[Tuple[str, Dict[str, Any], Sequence[float]]] = []

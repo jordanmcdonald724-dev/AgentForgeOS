@@ -35,6 +35,8 @@ class WorkerSystem:
                 logger.exception(
                     "Background task error in %s", task.get_name(), exc_info=exception
                 )
+            else:
+                logger.debug("Background task '%s' completed", task.get_name())
 
         for task_fn in self._tasks:
             task_name = getattr(task_fn, "__name__", repr(task_fn))

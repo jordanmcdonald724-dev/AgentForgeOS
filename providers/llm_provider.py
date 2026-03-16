@@ -15,8 +15,8 @@ class LLMProvider(ABC):
         {
             "success": bool,
             "data": <provider-specific payload>,
-            "error": "string or null"
+            "error": str | None
         }
-        The "error" field is null when successful.
+        The "error" field is None when successful.
         """
         raise NotImplementedError

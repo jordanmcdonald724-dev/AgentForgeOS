@@ -35,3 +35,9 @@ Snapshot to confirm the repository remains aligned with the bootstrap plan.
 - Ensure agent orchestration (`agents/pipeline.py`) and control layer (`control/`) modules import without errors.
 - Validate providers interfaces load (`providers/`) and are wired through services where applicable.
 - Smoke test wiring with `python -m unittest tests/test_phase_integration.py` (health endpoint, module imports, and runtime artifacts).
+
+## Phase 10 — Compliance & Reporting
+- Run full repository tests: `python -m unittest discover -s tests`.
+- Verify integration coverage via `tests/test_phase_integration.py`.
+- Confirm compliance checklist documented in `docs/PHASE10_COMPLIANCE.md`.
+- Record outcomes in release notes or PR description when completing a phase.

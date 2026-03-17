@@ -7,7 +7,7 @@ The following Python snippet generates a full icon pack from a 512×512 base ima
 from PIL import Image, ImageFilter, ImageEnhance
 import os
 
-# Replace this with the path to your 512×512 base icon image
+# Replace <your_icon_path> with the actual path to your 512×512 base icon image
 base_path = "<your_icon_path>/agentforge_icon_512.png"
 img = Image.open(base_path).convert("RGBA")
 

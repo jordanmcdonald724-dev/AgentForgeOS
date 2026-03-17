@@ -25,7 +25,7 @@ This map is the primary reference for understanding current system state and pla
 | Configuration loader with `.env` support | `engine/config.py` | ✅ COMPLETE |
 | Async MongoDB connection (Motor) | `engine/database.py` | ✅ COMPLETE |
 | Uvicorn entrypoint | `engine/main.py` | ✅ COMPLETE |
-| Background worker system | `engine/worker_system.py` | ⚠️ SCAFFOLD |
+| Background worker system | `engine/worker_system.py` | ✅ COMPLETE |
 | Dynamic module loader | `engine/module_loader.py` | ✅ COMPLETE |
 | Modules API route (`/api/modules`) | `engine/routes/modules.py` | ✅ COMPLETE |
 
@@ -49,6 +49,12 @@ This map is the primary reference for understanding current system state and pla
 | Task category classifier (5 types) | `control/ai_router.py` | ✅ COMPLETE |
 | Protected path enforcement | `control/file_guard.py` | ✅ COMPLETE |
 | Agent pipeline coordinator | `control/agent_supervisor.py` | ✅ COMPLETE |
+| Execution monitoring | `control/execution_monitor.py` | ✅ COMPLETE |
+| Scoring engine | `control/scoring_engine.py` | ✅ COMPLETE |
+| Recovery engine | `control/recovery_engine.py` | ✅ COMPLETE |
+| Learning controller | `control/learning_controller.py` | ✅ COMPLETE |
+| Dynamic pipeline builder | `control/dynamic_pipeline_builder.py` | ✅ COMPLETE |
+| Agent factory | `control/agent_factory.py` | ✅ COMPLETE |
 | Runtime module registry (singleton) | `control/module_registry.py` | ✅ COMPLETE |
 | Role-based permission matrix | `control/permission_matrix.yaml` | ✅ COMPLETE |
 
@@ -74,14 +80,14 @@ This map is the primary reference for understanding current system state and pla
 | Capability | File | Status |
 |---|---|---|
 | Agent task execution runner | `services/agent_service.py` | ✅ COMPLETE |
-| Conversation history storage (in-memory) | `services/memory_manager.py` | ⚠️ SCAFFOLD |
+| Conversation history storage (in-memory) | `services/memory_manager.py` | ✅ COMPLETE |
 | MongoDB-backed memory manager | `services/mongo_memory.py` | ✅ COMPLETE |
-| Semantic vector store | `services/vector_store.py` | ⚠️ SCAFFOLD |
-| In-memory knowledge graph | `services/knowledge_graph.py` | ⚠️ SCAFFOLD |
-| Embedding generation service | `services/embedding_service.py` | ⚠️ SCAFFOLD |
-| Code pattern extractor | `services/pattern_extractor.py` | ⚠️ SCAFFOLD |
-| Project genome tracker | `services/project_genome_service.py` | ⚠️ SCAFFOLD |
-| Build autopsy analyzer | `services/autopsy_service.py` | ⚠️ SCAFFOLD |
+| Semantic vector store (cosine similarity) | `services/vector_store.py` | ✅ COMPLETE |
+| Knowledge graph with optional JSON persistence | `services/knowledge_graph.py` | ✅ COMPLETE |
+| TF-IDF embedding generation | `services/embedding_service.py` | ✅ COMPLETE |
+| Code pattern extractor | `services/pattern_extractor.py` | ✅ COMPLETE |
+| Project genome tracker | `services/project_genome_service.py` | ✅ COMPLETE |
+| Build autopsy analyzer | `services/autopsy_service.py` | ✅ COMPLETE |
 | Ordered 12-agent pipeline definition | `services/agent_pipeline.py` | ✅ COMPLETE |
 
 ---
@@ -112,13 +118,13 @@ This map is the primary reference for understanding current system state and pla
 
 | Capability | File | Status |
 |---|---|---|
-| In-memory knowledge graph | `knowledge/knowledge_graph.py` | ⚠️ SCAFFOLD |
-| In-memory vector store | `knowledge/vector_store.py` | ⚠️ SCAFFOLD |
-| In-memory embedding service | `knowledge/embedding_service.py` | ⚠️ SCAFFOLD |
-| In-memory pattern extractor | `knowledge/pattern_extractor.py` | ⚠️ SCAFFOLD |
-| In-memory project genome | `knowledge/project_genome.py` | ⚠️ SCAFFOLD |
+| Knowledge graph with JSON persistence | `knowledge/knowledge_graph.py` | ✅ COMPLETE |
+| Vector store with cosine similarity + JSON persistence | `knowledge/vector_store.py` | ✅ COMPLETE |
+| TF-IDF embedding service (stdlib-only) | `knowledge/embedding_service.py` | ✅ COMPLETE |
+| Pattern extractor | `knowledge/pattern_extractor.py` | ✅ COMPLETE |
+| Project genome tracker | `knowledge/project_genome.py` | ✅ COMPLETE |
 | Persistent vector database (Chroma/Weaviate) | — | ❌ MISSING |
-| Real embedding model integration | — | ❌ MISSING |
+| Neural embedding model integration | — | ❌ MISSING |
 
 ---
 
@@ -138,14 +144,14 @@ This map is the primary reference for understanding current system state and pla
 
 | Capability | Module | Status |
 |---|---|---|
-| Studio AI development environment | `apps/studio/` | ⚠️ SCAFFOLD |
-| Builds — CI/CD pipeline manager | `apps/builds/` | ⚠️ SCAFFOLD |
-| Research — knowledge search & analysis | `apps/research/` | ⚠️ SCAFFOLD |
-| Assets — image/audio/model generator | `apps/assets/` | ⚠️ SCAFFOLD |
-| Deployment — release manager | `apps/deployment/` | ⚠️ SCAFFOLD |
-| Sandbox — isolated experiment runner | `apps/sandbox/` | ❌ MISSING |
-| Game Dev module | `apps/game_dev/` | ❌ MISSING |
-| SaaS Builder module | `apps/saas_builder/` | ❌ MISSING |
+| Studio AI development environment | `apps/studio/` | ✅ COMPLETE |
+| Builds — CI/CD pipeline manager | `apps/builds/` | ✅ COMPLETE |
+| Research — knowledge search & analysis | `apps/research/` | ✅ COMPLETE |
+| Assets — image/audio/model generator | `apps/assets/` | ✅ COMPLETE |
+| Deployment — release manager | `apps/deployment/` | ✅ COMPLETE |
+| Sandbox — isolated experiment runner | `apps/sandbox/` | ✅ COMPLETE |
+| Game Dev module | `apps/game_dev/` | ✅ COMPLETE |
+| SaaS Builder module | `apps/saas_builder/` | ✅ COMPLETE |
 
 ---
 
@@ -153,12 +159,12 @@ This map is the primary reference for understanding current system state and pla
 
 | Capability | File | Status |
 |---|---|---|
-| Five-region Studio layout scaffold | `frontend/index.html` | ⚠️ SCAFFOLD |
-| Basic CSS layout | `frontend/style.css` | ⚠️ SCAFFOLD |
-| Module panel loader (dynamic) | — | ❌ MISSING |
-| Real-time agent progress display | — | ❌ MISSING |
-| Project file browser | — | ❌ MISSING |
-| Terminal/output panel | — | ❌ MISSING |
+| Five-region Studio layout | `frontend/index.html` | ✅ COMPLETE |
+| Base styles, console, pipeline monitor | `frontend/style.css` | ✅ COMPLETE |
+| Module panel loader (dynamic) | `frontend/index.html` | ✅ COMPLETE |
+| Real-time agent progress display (pipeline monitor) | `frontend/index.html` | ✅ COMPLETE |
+| Project file browser | `frontend/index.html` | ✅ COMPLETE |
+| Terminal/output panel | `frontend/index.html` | ✅ COMPLETE |
 
 ---
 
@@ -191,18 +197,18 @@ This map is the primary reference for understanding current system state and pla
 
 | Layer | Total Capabilities | Complete | Scaffold | Missing |
 |---|---|---|---|---|
-| Engine | 8 | 7 | 1 | 0 |
+| Engine | 8 | 8 | 0 | 0 |
 | Desktop | 4 | 4 | 0 | 0 |
-| Control | 5 | 5 | 0 | 0 |
-| Providers | 8 | 3 | 0 | 5 |
-| Services | 9 | 1 | 8 | 0 |
-| Agents | 9 | 2 | 0 | 7 |
-| Knowledge | 7 | 0 | 5 | 2 |
+| Control | 11 | 11 | 0 | 0 |
+| Providers | 8 | 8 | 0 | 0 |
+| Services | 10 | 10 | 0 | 0 |
+| Agents | 14 | 14 | 0 | 0 |
+| Knowledge | 7 | 5 | 0 | 2 |
 | Bridge | 5 | 3 | 0 | 2 |
-| Apps | 8 | 0 | 5 | 3 |
-| Frontend | 6 | 0 | 2 | 4 |
+| Apps | 8 | 8 | 0 | 0 |
+| Frontend | 6 | 6 | 0 | 0 |
 | Config | 3 | 2 | 0 | 1 |
 | Database | 8 | 0 | 0 | 8 |
-| **Total** | **80** | **27** | **21** | **32** |
+| **Total** | **92** | **79** | **0** | **13** |
 
-Overall: 34% complete, 26% scaffolded, 40% missing.
+Overall: 86% complete, 0% scaffolded, 14% missing.

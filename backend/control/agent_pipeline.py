@@ -10,6 +10,7 @@ from control.agent_supervisor import AgentSupervisor
 from control.execution_monitor import ExecutionMonitor
 from control.scoring_engine import ScoringEngine, ScoreResult
 from control.recovery_engine import RecoveryEngine
+from control.learning_controller import LearningController
 from services.execution_history import ExecutionHistory
 
 
@@ -48,6 +49,7 @@ class AgentPipeline:
         scoring_engine: Optional[ScoringEngine] = None,
         history: Optional[ExecutionHistory] = None,
         recovery_engine: Optional[RecoveryEngine] = None,
+        learning_controller: Optional[LearningController] = None,
     ) -> None:
         if not isinstance(supervisor, AgentSupervisor):
             raise TypeError("AgentPipeline requires an AgentSupervisor instance.")
@@ -56,6 +58,7 @@ class AgentPipeline:
         self.scoring_engine = scoring_engine or ScoringEngine()
         self.history = history or ExecutionHistory()
         self.recovery_engine = recovery_engine or RecoveryEngine()
+        self.learning_controller = learning_controller
 
     def run_pipeline(
         self,
@@ -70,6 +73,19 @@ class AgentPipeline:
         steps: List[PipelineStepResult] = []
         current_input: Dict[str, object] = dict(initial_input) if isinstance(initial_input, dict) else {}
         output_data: Dict[str, object] = {}
+        request_text = ""
+        if isinstance(initial_input, dict):
+            request_value = initial_input.get("request")
+            if isinstance(request_value, str):
+                request_text = request_value
+        context_insights = self._get_context_insights(request_text)
+        similar_runs_count = len(context_insights.get("similar_runs", [])) if isinstance(context_insights, dict) else 0
+        recommended_agents = context_insights.get("recommended_agents") if isinstance(context_insights, dict) else []
+        recommended_agents_used = bool(recommended_agents and isinstance(recommended_agents, list) and recommended_agents == agent_names)
+        extra_metadata = {
+            "similar_runs_count": similar_runs_count,
+            "recommended_agents_used": recommended_agents_used,
+        }
 
         self._safe_monitor("start_pipeline", pipeline_id, {"route_context": route_context or {}, "total_steps": total_steps})
 
@@ -84,7 +100,9 @@ class AgentPipeline:
                 completed_steps=0,
                 step_scores=step_scores,
                 pipeline_score=pipeline_score,
+                extra_metadata=extra_metadata,
             )
+            self._store_learning(request_text, agent_names, False, pipeline_score.score, result.metadata)
             self._finalize_pipeline(result, step_scores)
             return result
 
@@ -99,7 +117,9 @@ class AgentPipeline:
                 completed_steps=0,
                 step_scores=step_scores,
                 pipeline_score=pipeline_score,
+                extra_metadata=extra_metadata,
             )
+            self._store_learning(request_text, agent_names, False, pipeline_score.score, result.metadata)
             self._finalize_pipeline(result, step_scores)
             return result
 
@@ -147,7 +167,9 @@ class AgentPipeline:
                         completed_steps=index,
                         step_scores=step_scores,
                         pipeline_score=pipeline_score,
+                        extra_metadata=extra_metadata,
                     )
+                    self._store_learning(request_text, agent_names, False, pipeline_score.score, result_pipeline.metadata)
                     self._finalize_pipeline(result_pipeline, step_scores)
                     return result_pipeline
 
@@ -196,7 +218,9 @@ class AgentPipeline:
                         completed_steps=index,
                         step_scores=step_scores,
                         pipeline_score=pipeline_score,
+                        extra_metadata=extra_metadata,
                     )
+                    self._store_learning(request_text, agent_names, False, pipeline_score.score, result_pipeline.metadata)
                     self._finalize_pipeline(result_pipeline, step_scores)
                     return result_pipeline
 
@@ -229,13 +253,43 @@ class AgentPipeline:
             total_steps=len(agent_names),
             step_scores=step_scores,
             pipeline_score=pipeline_score,
+            extra_metadata=extra_metadata,
         )
+        self._store_learning(request_text, agent_names, True, pipeline_score.score, result_pipeline.metadata)
         self._finalize_pipeline(result_pipeline, step_scores)
         return result_pipeline
 
     # ------------------------------------------------------------------ #
     # Helpers
     # ------------------------------------------------------------------ #
+    def _get_context_insights(self, request_text: str) -> Dict[str, object]:
+        try:
+            if self.learning_controller and isinstance(request_text, str) and request_text.strip():
+                return self.learning_controller.query_context(request_text) or {}
+            return {}
+        except Exception:
+            return {}
+
+    def _store_learning(
+        self,
+        request_text: str,
+        agent_names: List[str],
+        success: bool,
+        pipeline_score: float,
+        metadata: Dict[str, object],
+    ) -> None:
+        try:
+            if not self.learning_controller:
+                return
+            self.learning_controller.store_execution(
+                request=request_text or "",
+                agent_sequence=list(agent_names) if isinstance(agent_names, list) else [],
+                success=bool(success),
+                score=float(pipeline_score) if pipeline_score is not None else 0.0,
+                metadata=metadata if isinstance(metadata, dict) else {},
+            )
+        except Exception:
+            return
 
     def _build_step_result(
         self,
@@ -269,7 +323,9 @@ class AgentPipeline:
         total_steps: int,
         step_scores: List[ScoreResult],
         pipeline_score: ScoreResult,
+        extra_metadata: Optional[Dict[str, object]] = None,
     ) -> PipelineResult:
+        extra = extra_metadata if isinstance(extra_metadata, dict) else {}
         return PipelineResult(
             pipeline_id=pipeline_id,
             status="success",
@@ -281,6 +337,7 @@ class AgentPipeline:
                 "completed_steps": len(steps),
                 "step_scores": [self._score_to_dict(score) for score in step_scores],
                 "pipeline_score": self._score_to_dict(pipeline_score),
+                **extra,
             },
         )
 
@@ -294,7 +351,9 @@ class AgentPipeline:
         completed_steps: int,
         step_scores: List[ScoreResult],
         pipeline_score: ScoreResult,
+        extra_metadata: Optional[Dict[str, object]] = None,
     ) -> PipelineResult:
+        extra = extra_metadata if isinstance(extra_metadata, dict) else {}
         return PipelineResult(
             pipeline_id=pipeline_id,
             status="failed",
@@ -307,6 +366,7 @@ class AgentPipeline:
                 "completed_steps": completed_steps,
                 "step_scores": [self._score_to_dict(score) for score in step_scores],
                 "pipeline_score": self._score_to_dict(pipeline_score),
+                **extra,
             },
         )
 

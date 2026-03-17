@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from control.learning_controller import LearningController
+
 
 @dataclass
 class RouteDecision:
@@ -46,7 +48,7 @@ class AIRouter:
     This is intentionally simple for Gate 1.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, learning_controller: Optional[LearningController] = None) -> None:
         self._page_keywords = {
             "assets": ["asset", "3d", "model", "mesh", "texture", "material", "fbx", "obj"],
             "builds": ["build", "app", "system", "backend", "firmware", "os", "desktop", "mobile", "web"],
@@ -65,6 +67,7 @@ class AIRouter:
             "deployment": ["deployment_planner_agent"],
             "general": ["planner_agent"],
         }
+        self.learning_controller = learning_controller
 
     def route_request(
         self,
@@ -95,12 +98,22 @@ class AIRouter:
         build_type = self._resolve_build_type(lower_request, page)
         agents = self._resolve_agents(page, lower_request)
 
+        context_insights: Dict[str, Any] = {}
+        if self.learning_controller:
+            context_insights = self.learning_controller.query_context(clean_request) or {}
+            recommended = context_insights.get("recommended_agents") or []
+            if isinstance(recommended, list) and recommended:
+                agents = list(recommended)
+
         meta.update(
             {
                 "original_request": clean_request,
                 "page_hint": page_hint,
                 "keyword_page_match": page,
                 "gate": 1,
+                "context_insights": context_insights,
+                "similar_runs_count": len(context_insights.get("similar_runs", [])) if isinstance(context_insights, dict) else 0,
+                "recommended_agents_used": bool(context_insights.get("recommended_agents")) if isinstance(context_insights, dict) else False,
             }
         )
 

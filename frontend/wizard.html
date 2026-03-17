@@ -254,6 +254,7 @@
     <script>
       (() => {
         const TOTAL_STEPS = 5;
+        const SAVE_TIMEOUT_MS = 15000;
         let currentStep = 1;
 
         const stepNav = document.getElementById("step-nav");
@@ -348,7 +349,7 @@
           btnNext.disabled = true;
 
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 15000);
+          const timeoutId = setTimeout(() => controller.abort(), SAVE_TIMEOUT_MS);
           try {
             const cfg = collect();
             const resp = await fetch("/api/setup/save", {

@@ -32,7 +32,7 @@ class ContextIndex:
 
     def query_similar(self, request: str, top_k: int = 3) -> List[ContextEntry]:
         try:
-            if not isinstance(request, str) or not request.strip():
+            if not isinstance(request, str) or not request.strip() or (isinstance(top_k, int) and top_k <= 0):
                 return []
             clean = request.strip().lower()
             tokens = set(clean.split())
@@ -51,6 +51,6 @@ class ContextIndex:
                 scored.append((similarity, float(entry.score), entry))
 
             scored.sort(key=lambda item: (-item[0], -item[1]))
-            return [entry for _, _, entry in scored[: max(1, int(top_k))]]
+            return [entry for _, _, entry in scored[: int(top_k)]]
         except Exception:
             return []

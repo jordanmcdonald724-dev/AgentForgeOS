@@ -121,6 +121,7 @@ AgentForgeOS/
 | `docs/PROVIDER_IMPLEMENTATION_GUIDE.md` | How to add a new provider |
 | `docs/UI_STUDIO_LAYOUT.md` | Five-region Studio UI spec |
 | `docs/CONTROL_LAYER.md` | AI safety system description |
+| `docs/SETUP_WIZARD_WINDOWS.md` | Local Windows 10 setup wizard flow |
 
 ---
 

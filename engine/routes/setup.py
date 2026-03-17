@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import logging
 import os
+import subprocess
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -82,6 +83,12 @@ class SaveConfigRequest(BaseModel):
     config: Dict[str, Any]
 
 
+class BootstrapRequest(BaseModel):
+    """Request payload for dependency bootstrap."""
+
+    install_desktop: bool = False
+
+
 @router.get("/setup", tags=["setup"])
 async def get_setup_state():
     """Return the current configuration state.
@@ -141,3 +148,68 @@ async def reset_setup():
     os.environ.pop(_SETUP_COMPLETE_KEY, None)
     _write_env_file(path, existing)
     return {"success": True, "data": {"reset": True}, "error": None}
+
+
+def _run_command(cmd: List[str], cwd: Path) -> Dict[str, Any]:
+    """Run a command and capture stdout/stderr."""
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=str(cwd),
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        return {
+            "cmd": " ".join(cmd),
+            "returncode": proc.returncode,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+        }
+    except FileNotFoundError as exc:
+        return {
+            "cmd": " ".join(cmd),
+            "returncode": -1,
+            "stdout": "",
+            "stderr": f"Executable not found: {exc}",
+        }
+    except subprocess.TimeoutExpired as exc:
+        return {
+            "cmd": " ".join(cmd),
+            "returncode": -1,
+            "stdout": exc.stdout or "",
+            "stderr": f"Command timed out after {exc.timeout} seconds\n{exc.stderr or ''}",
+        }
+
+
+@router.post("/setup/bootstrap", tags=["setup"])
+async def bootstrap(body: BootstrapRequest):
+    """Run dependency installation for the host environment.
+
+    This is a best-effort helper so the wizard can install required
+    dependencies without leaving the UI. Commands are executed from the repo
+    root and their output is returned to the caller.
+    """
+
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    commands: List[Dict[str, Any]] = [
+        {"cmd": ["python", "-m", "pip", "install", "--upgrade", "pip"], "cwd": repo_root},
+        {"cmd": ["pip", "install", "-r", "requirements.txt"], "cwd": repo_root},
+    ]
+    if body.install_desktop:
+        commands.append({"cmd": ["npm", "install"], "cwd": repo_root / "desktop"})
+
+    results = []
+    success = True
+    for entry in commands:
+        result = _run_command(entry["cmd"], entry["cwd"])
+        results.append(result)
+        if result["returncode"] != 0:
+            success = False
+            break
+
+    return {
+        "success": success,
+        "data": {"commands": results},
+        "error": None if success else "One or more install commands failed",
+    }

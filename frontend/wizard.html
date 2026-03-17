@@ -225,6 +225,21 @@
           <div id="review-table" class="review-table" role="table" aria-label="Configuration review">
             <!-- populated by JS -->
           </div>
+          <div class="install-box">
+            <h2 class="install-title">Bootstrap dependencies</h2>
+            <p class="install-desc">
+              Run backend dependency installation directly from the wizard. You can optionally install the desktop shell (npm) as well.
+            </p>
+            <label class="checkbox-label">
+              <input type="checkbox" id="install-desktop" />
+              <span>Also install desktop shell dependencies (npm install)</span>
+            </label>
+            <div class="install-actions">
+              <button class="nav-btn nav-btn--secondary" id="btn-install">Run install</button>
+              <span id="install-status" class="install-status"></span>
+            </div>
+            <pre id="install-log" class="install-log" aria-live="polite"></pre>
+          </div>
           <div id="save-status" class="save-status hidden" aria-live="polite"></div>
         </section>
 
@@ -348,6 +363,43 @@
             statusEl.className = "save-status save-status--error";
           }
         };
+
+        const btnInstall = document.getElementById("btn-install");
+        const installLog = document.getElementById("install-log");
+        const installStatus = document.getElementById("install-status");
+        const installDesktop = document.getElementById("install-desktop");
+
+        btnInstall?.addEventListener("click", async () => {
+          installStatus.textContent = "Running install…";
+          installLog.textContent = "";
+          btnInstall.disabled = true;
+          try {
+            const resp = await fetch("/api/setup/bootstrap", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ install_desktop: installDesktop.checked }),
+            });
+            const payload = await resp.json();
+            const logs = (payload.data?.commands || [])
+              .map(
+                (c) =>
+                  `$ ${c.cmd}\n(exit ${c.returncode})\n[stdout]\n${c.stdout || ""}\n[stderr]\n${c.stderr || ""}`
+              )
+              .join("\n----------------------\n");
+            installLog.textContent = logs || "No output.";
+            installStatus.textContent = payload.success
+              ? "Install completed"
+              : "Install failed — check logs";
+            installStatus.className = payload.success
+              ? "install-status install-status--success"
+              : "install-status install-status--error";
+          } catch (err) {
+            installStatus.textContent = `Error: ${err.message}`;
+            installStatus.className = "install-status install-status--error";
+          } finally {
+            btnInstall.disabled = false;
+          }
+        });
 
         // ── Init ─────────────────────────────────────────────────────────
         showStep(1);

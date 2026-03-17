@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Dict, List
 import traceback
 
@@ -65,7 +65,7 @@ class BaseAgent(ABC):
         """
         Controlled orchestration entry point.
         """
-        started_at = datetime.now(timezone.utc)
+        started_at = datetime.now(UTC)
 
         try:
             self._validate_input(input_data)
@@ -89,7 +89,7 @@ class BaseAgent(ABC):
                 confidence = self._clamp_confidence(reevaluation.get("confidence", confidence))
                 feedback = reevaluation
 
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
             metadata = {
                 "started_at": started_at.isoformat(),
                 "completed_at": completed_at.isoformat(),
@@ -98,7 +98,7 @@ class BaseAgent(ABC):
             return self._build_success_result(final_output, confidence, feedback, metadata)
 
         except Exception as exc:  # pylint: disable=broad-except
-            completed_at = datetime.now(timezone.utc)
+            completed_at = datetime.now(UTC)
             metadata = {
                 "started_at": started_at.isoformat(),
                 "completed_at": completed_at.isoformat(),

@@ -60,6 +60,7 @@ class UnrealPlannerAgent(BaseAgent):
         if not required.intersection(normalized):
             modules.extend(["Gameplay Logic", "Blueprint/C++"])
 
+        # dedupe while preserving order
         repaired["modules"] = list(dict.fromkeys(modules))
 
         if not repaired.get("suggested_steps"):

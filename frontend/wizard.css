@@ -338,6 +338,61 @@ html, body {
 .save-status--success { background: rgba(62,207,142,.12); color: var(--success); border: 1px solid rgba(62,207,142,.3); }
 .save-status--error   { background: rgba(232, 64, 64,.12); color: var(--error); border: 1px solid rgba(232,64,64,.3); }
 
+/* ── Install box ───────────────────────────────────────────────────────── */
+.install-box {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.install-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.install-desc {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.install-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.install-status {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.install-status--success { color: var(--success); }
+.install-status--error   { color: var(--error); }
+
+.install-log {
+  max-height: 180px;
+  overflow: auto;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
 /* ── Navigation ───────────────────────────────────────────────────────── */
 
 .wizard-nav {

@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import logging
 import os
+import subprocess
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -82,6 +83,12 @@ class SaveConfigRequest(BaseModel):
     config: Dict[str, Any]
 
 
+class BootstrapRequest(BaseModel):
+    """Request payload for dependency bootstrap."""
+
+    install_desktop: bool = False
+
+
 @router.get("/setup", tags=["setup"])
 async def get_setup_state():
     """Return the current configuration state.
@@ -141,3 +148,52 @@ async def reset_setup():
     os.environ.pop(_SETUP_COMPLETE_KEY, None)
     _write_env_file(path, existing)
     return {"success": True, "data": {"reset": True}, "error": None}
+
+
+def _run_command(cmd: List[str], cwd: Path) -> Dict[str, Any]:
+    """Run a command and capture stdout/stderr."""
+    proc = subprocess.run(
+        cmd,
+        cwd=str(cwd),
+        capture_output=True,
+        text=True,
+    )
+    return {
+        "cmd": " ".join(cmd),
+        "returncode": proc.returncode,
+        "stdout": proc.stdout,
+        "stderr": proc.stderr,
+    }
+
+
+@router.post("/setup/bootstrap", tags=["setup"])
+async def bootstrap(body: BootstrapRequest):
+    """Run dependency installation for the host environment.
+
+    This is a best-effort helper so the wizard can install required
+    dependencies without leaving the UI. Commands are executed from the repo
+    root and their output is returned to the caller.
+    """
+
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    commands: List[List[str]] = [
+        ["python", "-m", "pip", "install", "--upgrade", "pip"],
+        ["pip", "install", "-r", "requirements.txt"],
+    ]
+    if body.install_desktop:
+        commands.append(["npm", "install"])
+
+    results = []
+    success = True
+    for cmd in commands:
+        result = _run_command(cmd, repo_root if cmd[0] != "npm" else repo_root / "desktop")
+        results.append(result)
+        if result["returncode"] != 0:
+            success = False
+            break
+
+    return {
+        "success": success,
+        "data": {"commands": results},
+        "error": None if success else "One or more install commands failed",
+    }

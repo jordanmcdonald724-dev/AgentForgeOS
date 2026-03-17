@@ -10,11 +10,11 @@ class ScoringEngine:
 
     def score(self, step: str, result: Dict[str, Any], context: Any = None) -> Dict[str, float]:
         success = bool(result.get("success"))
-        # Basic heuristic scoring scaffold; real metrics can replace these defaults.
+        # Basic heuristic scoring scaffold; all metrics are placeholders until real telemetry is wired.
         base = 1.0 if success else 0.0
         return {
-            "quality": base,
-            "correctness": base,
-            "speed": 1.0,  # placeholder; no timing captured yet
-            "stability": base,
+            "quality": base,        # placeholder
+            "correctness": base,    # placeholder
+            "speed": 1.0,           # placeholder; no timing captured yet
+            "stability": base,      # placeholder
         }

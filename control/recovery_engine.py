@@ -25,5 +25,5 @@ class RecoveryEngine:
         # Placeholder recovery hook — simply annotate the response.
         recovered = dict(response)
         recovered.setdefault("metadata", {})
-        recovered["metadata"]["recovered"] = False
+        recovered["metadata"]["recovery_attempted"] = True
         return recovered

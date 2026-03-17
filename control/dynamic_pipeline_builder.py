@@ -17,5 +17,5 @@ class DynamicPipelineBuilder:
     def modify_during_execution(
         self, current_pipeline: List[str], context: PipelineContext
     ) -> List[str]:
-        """Hook for mid-execution adjustments (not yet implemented)."""
+        """Placeholder for mid-execution adjustments; currently returns the pipeline unchanged."""
         return current_pipeline

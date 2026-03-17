@@ -8,7 +8,11 @@ from services.agent_pipeline import PipelineContext
 
 
 class LearningController:
-    """Coordinates memory usage before and after pipeline execution."""
+    """Coordinates memory usage before and after pipeline execution.
+
+    TODO: fetch contextual embeddings/graph facts before execution and persist
+    step outputs, scores, and patterns back to the memory layer afterward.
+    """
 
     def before_execution(self, context: PipelineContext) -> None:
         """Hook to enrich context before the pipeline runs."""

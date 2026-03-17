@@ -6,7 +6,11 @@ from typing import Any, Dict
 
 
 class ScoringEngine:
-    """Assigns simple heuristic scores to each pipeline step."""
+    """Assigns simple heuristic scores to each pipeline step.
+
+    TODO: Replace placeholders with real telemetry (latency, quality signals,
+    correctness validations, and stability metrics) once instrumentation exists.
+    """
 
     def score(self, step: str, result: Dict[str, Any], context: Any = None) -> Dict[str, float]:
         success = bool(result.get("success"))

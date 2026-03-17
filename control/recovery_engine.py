@@ -22,7 +22,8 @@ class RecoveryEngine:
         if attempt > 1:
             return response
 
-        # Placeholder recovery hook — simply annotate the response.
+        # Placeholder recovery hook — real strategies may retry the agent, fall back
+        # to an alternate agent, or inject a corrective step before resuming.
         recovered = dict(response)
         recovered.setdefault("metadata", {})
         recovered["metadata"]["recovery_attempted"] = True

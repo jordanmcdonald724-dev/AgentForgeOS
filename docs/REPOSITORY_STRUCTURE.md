@@ -50,6 +50,7 @@ worker_system.py
 module_loader.py
 routes/modules.py
 routes/agent.py
+routes/setup.py
 
 ---
 

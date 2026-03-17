@@ -1,8 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Iterable, Optional
 
 from fastapi import APIRouter, FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
 from .database import db
@@ -61,5 +63,12 @@ def create_app() -> FastAPI:
     module_routers = collect_module_routers()
     for mod_router in module_routers:
         app.include_router(mod_router, prefix="/api/modules")
+
+    # Serve the frontend (wizard, Studio, CSS, etc.) as static files.
+    # Mounted last so /api routes take priority.  ``html=True`` makes "/"
+    # serve ``index.html`` and "/wizard.html" resolve correctly.
+    frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
+    if frontend_dir.is_dir():
+        app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
 
     return app

@@ -1,25 +1,36 @@
+"""Service-layer embedding wrapper — delegates to the Phase 7 knowledge engine.
+
+Uses TF-IDF vectorisation and cosine-similarity search implemented in
+``knowledge.EmbeddingService``.  No external packages are required.
+"""
+
+from __future__ import annotations
+
 from typing import Any, Dict, List, Optional
 
-from .vector_store import VectorStore
+from knowledge.embedding_service import EmbeddingService as _KnowledgeEmbeddingService
 
 
 class EmbeddingService:
-    """Generates vector embeddings for knowledge and memory systems."""
+    """Thin wrapper around the knowledge-layer TF-IDF embedding engine."""
 
-    def __init__(self, vector_store: Optional[VectorStore] = None) -> None:
-        self.vector_store = vector_store or VectorStore()
+    def __init__(self) -> None:
+        self._engine = _KnowledgeEmbeddingService()
 
     def embed_text(self, text: str) -> List[float]:
-        """Generate a trivial embedding based on text length for scaffolding purposes."""
-        return [float(len(text))]
+        """Return a TF-IDF vector for *text* using the current corpus vocabulary."""
+        return self._engine.embed(text)
 
-    def add_text(self, doc_id: str, text: str, *, metadata: Optional[Dict[str, Any]] = None) -> None:
-        """Embed text and persist it to the vector store."""
-        embedding = self.embed_text(text)
-        payload = {"text": text, "metadata": metadata or {}, "embedding": embedding}
-        self.vector_store.add_document(doc_id, payload)
+    def add_text(
+        self, doc_id: str, text: str, *, metadata: Optional[Dict[str, Any]] = None
+    ) -> None:
+        """Index *text* under *doc_id* and persist its TF-IDF embedding."""
+        self._engine.add_text(doc_id, text, metadata=metadata)
 
     def search(self, query: str, *, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Return stored entries ordered by insertion (similarity is mocked)."""
-        embedding = self.embed_text(query)
-        return self.vector_store.query(embedding, top_k=top_k)
+        """Return up to *top_k* documents ranked by cosine similarity to *query*.
+
+        Each result dict contains ``doc_id``, ``score``, ``text``, and
+        ``metadata`` keys.
+        """
+        return self._engine.search(query, top_k=top_k)

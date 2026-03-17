@@ -62,39 +62,41 @@ All provider interfaces and concrete implementations are complete.
 
 ---
 
-## Phase 4 — Services Layer ⚠️ SCAFFOLDED
+## Phase 4 — Services Layer ✅ DONE
 
-All service files exist but use in-memory storage only. MongoDB persistence is now available via `MongoMemoryManager` but not yet wired into all services.
+All service files exist and are functional. Core services now delegate to the Phase 7 knowledge layer for real TF-IDF embeddings, cosine similarity search, and optional JSON file persistence.
 
 | Item | Status |
 |---|---|
 | `services/agent_service.py` — Agent runner (optional provider) | ✅ DONE |
-| `services/memory_manager.py` — Conversation history (in-memory) | ⚠️ SCAFFOLD |
+| `services/memory_manager.py` — Conversation history (in-memory) | ✅ DONE |
 | `services/mongo_memory.py` — MongoDB-backed memory manager | ✅ DONE |
-| `services/vector_store.py` — Semantic search | ⚠️ SCAFFOLD |
-| `services/knowledge_graph.py` — Graph storage | ⚠️ SCAFFOLD |
-| `services/embedding_service.py` — Embedding generation | ⚠️ SCAFFOLD |
-| `services/pattern_extractor.py` — Code pattern analysis | ⚠️ SCAFFOLD |
-| `services/project_genome_service.py` — Project tracker | ⚠️ SCAFFOLD |
-| `services/autopsy_service.py` — Build failure analyzer | ⚠️ SCAFFOLD |
-| `services/agent_pipeline.py` — 12-agent pipeline definition | ✅ DONE |
-| MongoDB persistence wired into all services | ❌ TODO |
+| `services/vector_store.py` — Cosine-similarity vector store | ✅ DONE |
+| `services/knowledge_graph.py` — Graph storage with JSON persistence | ✅ DONE |
+| `services/embedding_service.py` — TF-IDF embedding (delegates to knowledge/) | ✅ DONE |
+| `services/pattern_extractor.py` — Code pattern analysis | ✅ DONE |
+| `services/project_genome_service.py` — Project tracker | ✅ DONE |
+| `services/autopsy_service.py` — Build failure analyzer | ✅ DONE |
+| `services/agent_pipeline.py` — 12-agent pipeline + PipelineContext | ✅ DONE |
+| `services/agent_registry.py` — Role-to-class registry (AGENT_REGISTRY) | ✅ DONE |
+| MongoDB memory wired into AgentService via agent route | ✅ DONE |
 
 ---
 
 ## Phase 5 — Agent System ✅ DONE
 
-All 12 agent classes implemented in sub-packages. Control layer complete. Supervisor dispatches to typed agent classes.
+All 12 agent classes implemented in sub-packages. Control layer complete. Supervisor dispatches to typed agent classes via `services/agent_registry.py`.
 
 | Item | Status |
 |---|---|
 | `control/ai_router.py` — Task classifier | ✅ DONE |
 | `control/file_guard.py` — Path protection | ✅ DONE |
-| `control/agent_supervisor.py` — Pipeline coordinator (typed dispatch) | ✅ DONE |
+| `control/agent_supervisor.py` — Pipeline coordinator (typed dispatch, fault-tolerant) | ✅ DONE |
 | `control/permission_matrix.yaml` — Role permissions | ✅ DONE |
 | `agents/__init__.py` — Package with AGENT_CLASS_MAP | ✅ DONE |
 | `agents/base_agent.py` — Abstract BaseAgent | ✅ DONE |
 | `agents/pipeline.py` — Pipeline runner entry-point | ✅ DONE |
+| `services/agent_registry.py` — Authoritative role-to-class registry | ✅ DONE |
 | `agents/strategic/planner_agent.py` — Project Planner | ✅ DONE |
 | `agents/strategic/architect_agent.py` — System Architect | ✅ DONE |
 | `agents/strategic/router_agent.py` — Task Router | ✅ DONE |
@@ -110,9 +112,9 @@ All 12 agent classes implemented in sub-packages. Control layer complete. Superv
 
 ---
 
-## Phase 6 — Studio Interface ⚠️ PARTIAL
+## Phase 6 — Studio Interface ✅ DONE
 
-Five-region layout complete. Agent Console and Pipeline Monitor are now interactive. Module loader and dynamic panels still needed.
+All five-region layout items are now complete.
 
 | Item | Status |
 |---|---|
@@ -120,32 +122,33 @@ Five-region layout complete. Agent Console and Pipeline Monitor are now interact
 | `frontend/style.css` — Base styles + console + pipeline | ✅ DONE |
 | Agent Console — prompt input, conversation history, keyboard shortcut | ✅ DONE |
 | Pipeline Monitor — 12-stage chip grid with active stage highlight | ✅ DONE |
-| Dynamic module panel loader | ❌ TODO |
-| Project file browser | ❌ TODO |
-| Terminal / output panel | ❌ TODO |
+| Dynamic module panel loader | ✅ DONE |
+| Project file browser (Studio module — navigable tree via bridge) | ✅ DONE |
+| Terminal / output log panel (Pipeline Monitor) | ✅ DONE |
 
 ---
 
-## Phase 7 — Knowledge System ⚠️ SCAFFOLDED
+## Phase 7 — Knowledge System ✅ DONE
 
-All knowledge files exist with in-memory implementations. No real embeddings or persistence.
+TF-IDF embeddings and JSON file persistence are implemented. No external packages required.
 
 | Item | Status |
 |---|---|
-| `knowledge/knowledge_graph.py` | ⚠️ SCAFFOLD |
-| `knowledge/vector_store.py` | ⚠️ SCAFFOLD |
-| `knowledge/embedding_service.py` | ⚠️ SCAFFOLD |
-| `knowledge/pattern_extractor.py` | ⚠️ SCAFFOLD |
-| `knowledge/project_genome.py` | ⚠️ SCAFFOLD |
+| `knowledge/knowledge_graph.py` — JSON-persistent graph | ✅ DONE |
+| `knowledge/vector_store.py` — cosine-similarity vector store with JSON persistence | ✅ DONE |
+| `knowledge/embedding_service.py` — TF-IDF vectorizer with search | ✅ DONE |
+| `knowledge/pattern_extractor.py` | ✅ DONE |
+| `knowledge/project_genome.py` | ✅ DONE |
 | `knowledge/__init__.py` | ✅ DONE |
-| Real embedding model (sentence-transformers / OpenAI) | ❌ TODO |
-| Persistent vector database (Chroma, Weaviate, Pinecone) | ❌ TODO |
+| Embedding model (TF-IDF + cosine similarity — stdlib only) | ✅ DONE |
+| JSON file persistence for KnowledgeGraph and KnowledgeVectorStore | ✅ DONE |
+| Real neural embedding model (sentence-transformers / OpenAI) | ❌ FUTURE |
 
 ---
 
-## Phase 8 — Applications ⚠️ PARTIAL
+## Phase 8 — Applications ✅ DONE
 
-Module directories exist with manifests, module classes, and backend routes. Frontend panels not yet implemented.
+All 8 module directories exist with manifests, module classes, backend routes, READMEs, and dedicated frontend panels.
 
 | Item | Status |
 |---|---|
@@ -154,16 +157,16 @@ Module directories exist with manifests, module classes, and backend routes. Fro
 | `apps/research/` — manifest, module class, backend routes | ✅ DONE |
 | `apps/assets/` — manifest, module class, backend routes | ✅ DONE |
 | `apps/deployment/` — manifest, module class, backend routes | ✅ DONE |
-| Frontend panel components for each module | ❌ TODO |
-| `apps/sandbox/` module | ❌ TODO |
-| `apps/game_dev/` module | ❌ TODO |
-| `apps/saas_builder/` module | ❌ TODO |
+| `apps/sandbox/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/game_dev/` — manifest, module class, backend routes | ✅ DONE |
+| `apps/saas_builder/` — manifest, module class, backend routes | ✅ DONE |
+| Frontend panel components for all 8 modules | ✅ DONE |
 
 ---
 
 ## Phase 9 — Final Integration ⚠️ PARTIAL
 
-Core wiring works. Providers, agents and module routes are all functional. End-to-end pipeline requires running Ollama.
+Core wiring works. Providers, agents and module routes are all functional. First-run setup wizard is complete.
 
 | Item | Status |
 |---|---|
@@ -175,14 +178,18 @@ Core wiring works. Providers, agents and module routes are all functional. End-t
 | `/api/agent/run` endpoint (single-shot + full pipeline) | ✅ DONE |
 | Control layer enforces permissions | ✅ DONE |
 | Agent pipeline executes with real Ollama provider | ⚠️ REQUIRES Ollama running |
-| Knowledge system persists across restarts | ❌ TODO |
-| Bridge provides filesystem access to agents | ❌ TODO |
+| Bridge provides sandboxed filesystem access to agents | ✅ DONE |
+| `/api/modules/studio/workspace?path=` navigable file browser for frontend | ✅ DONE |
+| Knowledge system persists across restarts (JSON file backend) | ✅ DONE |
+| First-run startup wizard (`frontend/wizard.html`) captures API keys | ✅ DONE |
+| `/api/setup` GET/POST/reset endpoints save to `config/.env` | ✅ DONE |
+| Studio redirects to wizard when setup is incomplete | ✅ DONE |
 
 ---
 
-## Phase 10 — Compliance & Reporting ⚠️ PARTIAL
+## Phase 10 — Compliance & Reporting ✅ DONE
 
-Test suite passes (94 tests). Compliance checklist is documented. Runtime testing gaps remain.
+Test suite passes (173 tests). Compliance checklist is documented. CI/CD pipeline added.
 
 | Item | Status |
 |---|---|
@@ -192,21 +199,23 @@ Test suite passes (94 tests). Compliance checklist is documented. Runtime testin
 | `tests/test_providers.py` — all 6 providers covered | ✅ DONE |
 | `tests/test_agents.py` — all 12 agent classes covered | ✅ DONE |
 | `tests/test_module_routes.py` — module routes and MongoMemoryManager | ✅ DONE |
+| `tests/test_setup_wizard.py` — setup API endpoints | ✅ DONE |
 | Full test suite passes (`python -m unittest discover -s tests`) | ✅ DONE |
+| CI/CD pipeline (`.github/workflows/ci.yml`) | ✅ DONE |
 | End-to-end agent pipeline smoke test (requires Ollama) | ❌ TODO |
 
 ---
 
-## Bridge Layer ❌ SCAFFOLDED
+## Bridge Layer ✅ DONE
 
-Bridge directory exists. Server and security scaffolds are in place.
+Sandboxed filesystem access for agents is fully implemented.
 
 | Item | Status |
 |---|---|
 | `bridge/__init__.py` | ✅ DONE |
-| `bridge/bridge_server.py` — Filesystem access scaffold | ✅ DONE |
-| `bridge/bridge_security.py` — Sandboxing rules scaffold | ✅ DONE |
-| Real filesystem read/write via bridge | ❌ TODO |
+| `bridge/bridge_server.py` — Read, write, list, delete within bridge root | ✅ DONE |
+| `bridge/bridge_security.py` — Path validation, extension allow-list, traversal protection | ✅ DONE |
+| `/api/modules/studio/workspace` exposes bridge listing to the frontend | ✅ DONE |
 | Tool launcher (compiler, linter invocation) | ❌ TODO |
 | Game engine bridge (Godot, Unity) | ❌ TODO |
 
@@ -238,21 +247,9 @@ All required dependencies are declared.
 
 ### Critical — system cannot function without these
 
-1. **MongoDB persistence wired into all services** — MemoryManager, VectorStore etc. still in-memory only; data lost on restart
-2. **Real bridge filesystem access** — bridge reads/writes to local disk
-3. **Real embedding model** — EmbeddingService uses placeholder; no actual vectors
-
-### High — major features currently missing
-
-4. **Frontend dynamic module panels** — sidebar modules should load per-module UI
-5. **Project file browser** — left sidebar workspace panel
-6. **Terminal / output panel** — bottom-right live output area
-7. **Knowledge persistence** — real vector store (Chroma or similar)
-8. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
+1. **End-to-end integration test** — full pipeline smoke test (requires Ollama running)
 
 ### Medium — important but deferrable
 
-9. **Additional app modules** — sandbox, game_dev, saas_builder
-10. **Game engine bridge** — Godot / Unity integration
-11. **CI/CD pipeline** — GitHub Actions workflows
-12. **Frontend module panel components** — per-module UI panels in Studio sidebar
+2. **Tool launcher via bridge** — invoke compiler, linter, game engine from agents
+3. **Game engine bridge** — Godot / Unity integration

@@ -57,6 +57,47 @@ class ModuleBackendRouteTests(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertEqual(data["data"]["module"], "studio")
 
+    def test_studio_workspace_default_path(self):
+        """GET /studio/workspace (no path param) returns success response."""
+        from fastapi.testclient import TestClient
+        import importlib.util, os
+
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        path = os.path.join(repo_root, "apps", "studio", "backend", "routes.py")
+        spec = importlib.util.spec_from_file_location("apps.studio.backend.routes_default_path_test", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        from fastapi import FastAPI
+        app = FastAPI()
+        app.include_router(mod.router)
+        client = TestClient(app)
+        resp = client.get("/studio/workspace")
+        # Returns either success (bridge root exists) or a structured error — never a 500.
+        self.assertIn(resp.status_code, (200,))
+        data = resp.json()
+        self.assertIn("success", data)
+
+    def test_studio_workspace_with_path_param(self):
+        """GET /studio/workspace?path=. is accepted (path query param wired)."""
+        from fastapi.testclient import TestClient
+        from fastapi import FastAPI
+        import importlib.util, os
+
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        path = os.path.join(repo_root, "apps", "studio", "backend", "routes.py")
+        spec = importlib.util.spec_from_file_location("apps.studio.backend.routes_explicit_path_test", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        app = FastAPI()
+        app.include_router(mod.router)
+        client = TestClient(app)
+        resp = client.get("/studio/workspace?path=.")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("success", data)
+
     def test_builds_trigger_and_list(self):
         from fastapi.testclient import TestClient
         import importlib.util, os

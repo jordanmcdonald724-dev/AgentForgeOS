@@ -35,12 +35,13 @@ class LearningController:
     ) -> None:
         try:
             signature = self.build_request_signature(request)
+            meta = metadata if isinstance(metadata, dict) else {}
             entry = ContextEntry(
                 request_signature=signature,
                 pipeline_agents=list(agent_sequence) if isinstance(agent_sequence, list) else [],
                 success=bool(success),
                 score=float(score) if score is not None else 0.0,
-                metadata=metadata if isinstance(metadata, dict) else {},
+                metadata=meta,
             )
             self.context_index.add_entry(entry)
         except Exception:
@@ -91,6 +92,22 @@ class LearningController:
                 "recommended_agents": recommended_agents,
                 "warnings": warnings,
                 "adaptive_patterns": adaptive_patterns,
+                "optimization_patterns": self._optimization_patterns(similar_entries),
             }
         except Exception:
             return {"similar_runs": [], "recommended_agents": [], "warnings": ["learning_controller_error"], "adaptive_patterns": {}}
+
+    def _optimization_patterns(self, entries: List[ContextEntry]) -> Dict[str, object]:
+        patterns: Dict[str, object] = {"iteration_counts": [], "final_agent_sequences": []}
+        try:
+            for entry in entries:
+                meta = entry.metadata if isinstance(entry.metadata, dict) else {}
+                iteration_count = meta.get("iteration_count")
+                final_agents = meta.get("final_agent_sequence")
+                if iteration_count is not None:
+                    patterns["iteration_counts"].append(iteration_count)
+                if isinstance(final_agents, list):
+                    patterns["final_agent_sequences"].append(list(final_agents))
+            return patterns
+        except Exception:
+            return patterns

@@ -106,6 +106,15 @@ class ExecutionMonitor:
             data={"role": role},
         )
 
+    def loop_iteration(self, pipeline_id: str, iteration: int, metadata: Optional[Dict[str, object]] = None) -> None:
+        self._record_event(
+            event_type="loop_iteration",
+            pipeline_id=pipeline_id,
+            step_index=None,
+            agent_name=None,
+            data={"iteration": int(iteration), "metadata": metadata or {}},
+        )
+
     def get_events(self, pipeline_id: Optional[str] = None) -> List[ExecutionEvent]:
         if pipeline_id is None:
             return list(self._events)

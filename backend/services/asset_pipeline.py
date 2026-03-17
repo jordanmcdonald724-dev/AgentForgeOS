@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+REFINEMENT_POLYCOUNT_BUFFER = 2000
+
 from control.agent_pipeline import AgentPipeline
 from services.asset_planner import AssetPlanner
 from knowledge.reference_analyzer import ReferenceAnalyzer
@@ -79,7 +81,7 @@ class AssetPipeline:
         constraints = refined_plan.get("constraints", {})
         if isinstance(constraints, dict) and "polycount" in constraints and isinstance(constraints["polycount"], int):
             # Loosen constraint slightly to allow refinement to pass validation.
-            constraints["polycount"] = max(constraints["polycount"], 0) + 2000
+            constraints["polycount"] = max(constraints["polycount"], 0) + REFINEMENT_POLYCOUNT_BUFFER
         refined_plan["constraints"] = constraints
 
         model = self.model_generator.generate(refined_plan, ref_data)

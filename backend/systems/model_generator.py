@@ -4,6 +4,8 @@ from typing import Dict
 
 
 DEFAULT_POLYCOUNT_CONSTRAINT = 8000
+LOW_POLY_THRESHOLD = 10_000
+POLYCOUNT_INFLATION = 1000
 
 
 class ModelGenerator:
@@ -19,8 +21,8 @@ class ModelGenerator:
         # Deliberately sit near the constraint; slightly above for possible refinement.
         if safe_constraint <= 0:
             polycount = 0
-        elif safe_constraint <= 10_000:
-            polycount = safe_constraint + 1000
+        elif safe_constraint <= LOW_POLY_THRESHOLD:
+            polycount = safe_constraint + POLYCOUNT_INFLATION
         else:
             polycount = safe_constraint
 

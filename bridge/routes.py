@@ -34,6 +34,12 @@ def _get_bridge() -> BridgeServer:
     return _bridge
 
 
+def reset_bridge() -> None:
+    """Clear the cached BridgeServer singleton (used by tests)."""
+    global _bridge
+    _bridge = None
+
+
 # ------------------------------------------------------------------ #
 # GET /bridge/health                                                   #
 # ------------------------------------------------------------------ #

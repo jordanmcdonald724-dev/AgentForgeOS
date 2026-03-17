@@ -12,10 +12,7 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from bridge.routes import _get_bridge, router as bridge_router
-
-# Reset the module-level singleton before every test.
-import bridge.routes as _bridge_routes
+from bridge.routes import reset_bridge, router as bridge_router
 
 
 def _build_test_app():
@@ -32,14 +29,14 @@ class BridgeHealthRouteTests(unittest.TestCase):
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
-        _bridge_routes._bridge = None
+        reset_bridge()
         self.env_patch = patch.dict(os.environ, {"BRIDGE_ROOT": self.tmpdir})
         self.env_patch.start()
         self.client = TestClient(_build_test_app())
 
     def tearDown(self):
         self.env_patch.stop()
-        _bridge_routes._bridge = None
+        reset_bridge()
 
     def test_health_returns_ok(self):
         resp = self.client.get("/api/bridge/health")
@@ -60,14 +57,14 @@ class BridgeListRouteTests(unittest.TestCase):
         (root / "src").mkdir()
         (root / "src" / "main.py").write_text("pass")
 
-        _bridge_routes._bridge = None
+        reset_bridge()
         self.env_patch = patch.dict(os.environ, {"BRIDGE_ROOT": self.tmpdir})
         self.env_patch.start()
         self.client = TestClient(_build_test_app())
 
     def tearDown(self):
         self.env_patch.stop()
-        _bridge_routes._bridge = None
+        reset_bridge()
 
     def test_list_root_returns_entries(self):
         resp = self.client.get("/api/bridge/list")
@@ -97,14 +94,14 @@ class BridgeReadRouteTests(unittest.TestCase):
         self.tmpdir = tempfile.mkdtemp()
         (Path(self.tmpdir) / "hello.txt").write_text("world")
 
-        _bridge_routes._bridge = None
+        reset_bridge()
         self.env_patch = patch.dict(os.environ, {"BRIDGE_ROOT": self.tmpdir})
         self.env_patch.start()
         self.client = TestClient(_build_test_app())
 
     def tearDown(self):
         self.env_patch.stop()
-        _bridge_routes._bridge = None
+        reset_bridge()
 
     def test_read_file_returns_content(self):
         resp = self.client.get("/api/bridge/read", params={"path": "hello.txt"})
@@ -133,14 +130,14 @@ class BridgeSyncRouteTests(unittest.TestCase):
         (root / "lib").mkdir()
         (root / "lib" / "utils.py").write_text("pass")
 
-        _bridge_routes._bridge = None
+        reset_bridge()
         self.env_patch = patch.dict(os.environ, {"BRIDGE_ROOT": self.tmpdir})
         self.env_patch.start()
         self.client = TestClient(_build_test_app())
 
     def tearDown(self):
         self.env_patch.stop()
-        _bridge_routes._bridge = None
+        reset_bridge()
 
     def test_sync_returns_full_tree(self):
         resp = self.client.post("/api/bridge/sync")

@@ -121,16 +121,17 @@ class AIRouter:
             if normalized in self._default_agents:
                 return normalized
 
-        # Fast path: strong engine keywords should force game_dev
-        if "unity" in request or "unreal" in request:
-            return "game_dev"
-
         scores: Dict[str, int] = {page: 0 for page in self._page_keywords}
 
         for page, keywords in self._page_keywords.items():
             for keyword in keywords:
                 if keyword in request:
                     scores[page] += 1
+
+        if "unity" in request:
+            scores["game_dev"] += 2
+        if "unreal" in request:
+            scores["game_dev"] += 2
 
         best_page = max(scores, key=lambda page: scores[page])
         if scores[best_page] == 0:

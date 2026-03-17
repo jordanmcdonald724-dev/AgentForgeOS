@@ -254,6 +254,7 @@
     <script>
       (() => {
         const TOTAL_STEPS = 5;
+        const SAVE_TIMEOUT_MS = 15000;
         let currentStep = 1;
 
         const stepNav = document.getElementById("step-nav");
@@ -280,7 +281,7 @@
 
         const collect = () => {
           const result = {};
-          document.querySelectorAll("[name]").forEach((el) => {
+          document.querySelectorAll("input[name], select[name], textarea[name]").forEach((el) => {
             if (el.type === "radio") {
               if (el.checked) result[el.name] = el.value;
             } else if (el.type === "checkbox") {
@@ -345,22 +346,35 @@
           const statusEl = document.getElementById("save-status");
           statusEl.textContent = "Saving…";
           statusEl.className = "save-status save-status--info";
+          btnNext.disabled = true;
 
-          const cfg = collect();
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), SAVE_TIMEOUT_MS);
           try {
+            const cfg = collect();
             const resp = await fetch("/api/setup/save", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ config: cfg }),
+              signal: controller.signal,
             });
+            clearTimeout(timeoutId);
+            if (!resp.ok) {
+              throw new Error(`Server error (${resp.status})`);
+            }
             const payload = await resp.json();
             if (!payload.success) throw new Error(payload.error || "Unknown error");
             statusEl.textContent = "✓ Configuration saved! Redirecting to Studio…";
             statusEl.className = "save-status save-status--success";
             setTimeout(() => { window.location.href = "/"; }, 1800);
           } catch (err) {
-            statusEl.textContent = `Error: ${err.message}`;
+            clearTimeout(timeoutId);
+            const msg = err.name === "AbortError"
+              ? "Request timed out — is the server busy? Try again."
+              : err.message;
+            statusEl.textContent = `Error: ${msg}`;
             statusEl.className = "save-status save-status--error";
+            btnNext.disabled = false;
           }
         };
 

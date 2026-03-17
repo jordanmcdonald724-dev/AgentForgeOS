@@ -69,6 +69,7 @@ class AgentPipeline:
         step_scores: List[ScoreResult] = []
         steps: List[PipelineStepResult] = []
         current_input: Dict[str, object] = dict(initial_input) if isinstance(initial_input, dict) else {}
+        output_data: Dict[str, object] = {}
 
         self._safe_monitor("start_pipeline", pipeline_id, {"route_context": route_context or {}, "total_steps": total_steps})
 

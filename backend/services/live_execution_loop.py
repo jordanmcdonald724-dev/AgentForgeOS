@@ -6,6 +6,9 @@ from control.agent_pipeline import AgentPipeline
 from control.emergent_orchestrator import EmergentOrchestrator
 
 
+SUCCESS_SCORE_THRESHOLD = 0.7
+
+
 class LiveExecutionLoop:
     """
     Gate 10 continuous execution loop with simple adaptation rules.
@@ -37,7 +40,7 @@ class LiveExecutionLoop:
             success = getattr(result, "status", "") == "success"
             last_score = self._extract_pipeline_score(result)
 
-            if success and last_score > 0.7:
+            if success and last_score > SUCCESS_SCORE_THRESHOLD:
                 break
 
             agent_sequence = self.orchestrator.adapt_pipeline(agent_sequence, last_score, not success)

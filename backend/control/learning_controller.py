@@ -64,7 +64,11 @@ class LearningController:
             ]
 
             successful = [entry for entry in similar_entries if entry.success]
-            recommended_agents = list(successful[0].pipeline_agents) if successful else []
+            if successful:
+                best_entry = max(successful, key=lambda e: e.score)
+                recommended_agents = list(best_entry.pipeline_agents)
+            else:
+                recommended_agents = []
 
             warnings: List[str] = []
             if any(not entry.success for entry in similar_entries):

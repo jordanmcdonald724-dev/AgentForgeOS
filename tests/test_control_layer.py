@@ -28,7 +28,7 @@ class _RecoverySpy:
 
     def recover(self, step, response, context, *, attempt=1):
         self.called = True
-        # ``attempt`` represents the recovery retry count (mirrors production signature).
+        # attempt represents the recovery retry count (mirrors production signature).
         recovered = dict(response)
         recovered.setdefault("metadata", {})["recovery_attempted"] = True
         return recovered

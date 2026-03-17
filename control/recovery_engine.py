@@ -18,7 +18,11 @@ class RecoveryEngine:
         *,
         attempt: int = 1,
     ) -> Dict[str, Any]:
-        """Return a recovered response or the original if no recovery is possible."""
+        """Return a recovered response or the original if no recovery is possible.
+
+        Only the first attempt performs a placeholder recovery; later attempts are
+        treated as no-ops until full retry logic is implemented.
+        """
         if attempt > 1:
             return response
 

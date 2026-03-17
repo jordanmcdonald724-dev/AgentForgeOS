@@ -9,6 +9,7 @@ from agents.base_agent import AgentResult
 from control.agent_supervisor import AgentSupervisor
 from control.execution_monitor import ExecutionMonitor
 from control.scoring_engine import ScoringEngine, ScoreResult
+from control.recovery_engine import RecoveryEngine
 from services.execution_history import ExecutionHistory
 
 
@@ -21,6 +22,7 @@ class PipelineStepResult:
     output_data: Dict[str, object]
     error: Optional[str]
     duration_ms: float
+    retry_attempts: int = 0
 
 
 @dataclass
@@ -45,6 +47,7 @@ class AgentPipeline:
         monitor: Optional[ExecutionMonitor] = None,
         scoring_engine: Optional[ScoringEngine] = None,
         history: Optional[ExecutionHistory] = None,
+        recovery_engine: Optional[RecoveryEngine] = None,
     ) -> None:
         if not isinstance(supervisor, AgentSupervisor):
             raise TypeError("AgentPipeline requires an AgentSupervisor instance.")
@@ -52,6 +55,7 @@ class AgentPipeline:
         self.monitor = monitor or ExecutionMonitor()
         self.scoring_engine = scoring_engine or ScoringEngine()
         self.history = history or ExecutionHistory()
+        self.recovery_engine = recovery_engine or RecoveryEngine()
 
     def run_pipeline(
         self,
@@ -99,92 +103,122 @@ class AgentPipeline:
             return result
 
         for index, agent_name in enumerate(agent_names):
-            step_started = datetime.now(UTC)
-            self._safe_monitor("step_start", pipeline_id, index, agent_name, current_input)
-            try:
-                result = self.supervisor.run_registered_agent(
-                    agent_name=agent_name,
-                    input_data=current_input,
-                    route_context=route_context,
-                )
-            except Exception as exc:  # pylint: disable=broad-except
-                duration_ms = (datetime.now(UTC) - step_started).total_seconds() * 1000.0
-                error_message = f"{type(exc).__name__}: {exc}"
-                self._safe_monitor("step_failed", pipeline_id, index, agent_name, error_message)
-                steps.append(
-                    self._build_step_result(
-                        step_index=index,
+            retries = 0
+            while True:
+                step_started = datetime.now(UTC)
+                self._safe_monitor("step_start", pipeline_id, index, agent_name, current_input)
+                try:
+                    result = self.supervisor.run_registered_agent(
                         agent_name=agent_name,
-                        status="failed",
                         input_data=current_input,
-                        output_data={},
-                        error=error_message,
-                        duration_ms=duration_ms,
+                        route_context=route_context,
                     )
+                except Exception as exc:  # pylint: disable=broad-except
+                    duration_ms = (datetime.now(UTC) - step_started).total_seconds() * 1000.0
+                    error_message = f"{type(exc).__name__}: {exc}"
+                    self._safe_monitor("step_failed", pipeline_id, index, agent_name, error_message)
+                    decision = self.recovery_engine.handle_failure(pipeline_id, index, agent_name, error_message)
+                    if decision.action == "retry":
+                        retries = decision.retry_count
+                        self._safe_monitor("step_retry", pipeline_id, index, agent_name, retries)
+                        continue
+
+                    steps.append(
+                        self._build_step_result(
+                            step_index=index,
+                            agent_name=agent_name,
+                            status="failed",
+                            input_data=current_input,
+                            output_data={},
+                            error=error_message,
+                            duration_ms=duration_ms,
+                            retry_attempts=retries,
+                        )
+                    )
+                    step_scores.append(self._failure_score(agent_name, index, error_message))
+                    pipeline_score = self._safe_score_pipeline(step_scores)
+                    result_pipeline = self._build_pipeline_failure(
+                        pipeline_id=pipeline_id,
+                        steps=steps,
+                        failed_step_index=index,
+                        error=error_message,
+                        total_steps=len(agent_names),
+                        completed_steps=index,
+                        step_scores=step_scores,
+                        pipeline_score=pipeline_score,
+                    )
+                    self._finalize_pipeline(result_pipeline, step_scores)
+                    return result_pipeline
+
+                output_data = result.output if isinstance(result.output, dict) else {}
+                status = result.status
+                duration_ms = (
+                    result.metadata.get("duration_ms")
+                    if isinstance(result.metadata, dict) and isinstance(result.metadata.get("duration_ms"), (int, float))
+                    else (datetime.now(UTC) - step_started).total_seconds() * 1000.0
                 )
-                step_scores.append(self._failure_score(agent_name, index, error_message))
-                pipeline_score = self._safe_score_pipeline(step_scores)
-                result_pipeline = self._build_pipeline_failure(
-                    pipeline_id=pipeline_id,
-                    steps=steps,
-                    failed_step_index=index,
-                    error=error_message,
-                    total_steps=len(agent_names),
-                    completed_steps=index,
-                    step_scores=step_scores,
-                    pipeline_score=pipeline_score,
+
+                error_text = None
+                if status != "success":
+                    feedback_error = result.feedback.get("error") if isinstance(result.feedback, dict) else None
+                    error_text = feedback_error or "agent_execution_failed"
+
+                if status != "success" or not isinstance(output_data, dict):
+                    failure_reason = error_text or "invalid_output"
+                    self._safe_monitor("step_failed", pipeline_id, index, agent_name, failure_reason)
+                    decision = self.recovery_engine.handle_failure(pipeline_id, index, agent_name, failure_reason)
+                    if decision.action == "retry":
+                        retries = decision.retry_count
+                        self._safe_monitor("step_retry", pipeline_id, index, agent_name, retries)
+                        continue
+
+                    steps.append(
+                        self._build_step_result(
+                            step_index=index,
+                            agent_name=agent_name,
+                            status="failed",
+                            input_data=current_input,
+                            output_data={},
+                            error=failure_reason,
+                            duration_ms=float(duration_ms),
+                            retry_attempts=retries,
+                        )
+                    )
+                    step_scores.append(self._failure_score(agent_name, index, failure_reason))
+                    pipeline_score = self._safe_score_pipeline(step_scores)
+                    result_pipeline = self._build_pipeline_failure(
+                        pipeline_id=pipeline_id,
+                        steps=steps,
+                        failed_step_index=index,
+                        error=failure_reason,
+                        total_steps=len(agent_names),
+                        completed_steps=index,
+                        step_scores=step_scores,
+                        pipeline_score=pipeline_score,
+                    )
+                    self._finalize_pipeline(result_pipeline, step_scores)
+                    return result_pipeline
+
+                self._safe_monitor("step_complete", pipeline_id, index, agent_name, output_data, float(duration_ms))
+
+                step_scores.append(self._safe_score_step(output_data))
+
+                step_result = self._build_step_result(
+                    step_index=index,
+                    agent_name=agent_name,
+                    status=status,
+                    input_data=current_input,
+                    output_data=output_data,
+                    error=error_text,
+                    duration_ms=float(duration_ms),
+                    retry_attempts=retries,
                 )
-                self._finalize_pipeline(result_pipeline, step_scores)
-                return result_pipeline
+                steps.append(step_result)
 
-            output_data = result.output if isinstance(result.output, dict) else {}
-            status = result.status
-            duration_ms = (
-                result.metadata.get("duration_ms")
-                if isinstance(result.metadata, dict) and isinstance(result.metadata.get("duration_ms"), (int, float))
-                else (datetime.now(UTC) - step_started).total_seconds() * 1000.0
-            )
-
-            error_text = None
-            if status != "success":
-                feedback_error = result.feedback.get("error") if isinstance(result.feedback, dict) else None
-                error_text = feedback_error or "agent_execution_failed"
-
-            step_result = self._build_step_result(
-                step_index=index,
-                agent_name=agent_name,
-                status=status,
-                input_data=current_input,
-                output_data=output_data,
-                error=error_text,
-                duration_ms=float(duration_ms),
-            )
-            steps.append(step_result)
-
-            if status != "success" or not isinstance(output_data, dict):
-                self._safe_monitor("step_failed", pipeline_id, index, agent_name, error_text or "invalid_output")
-                step_scores.append(self._failure_score(agent_name, index, error_text or "invalid_output"))
-                pipeline_score = self._safe_score_pipeline(step_scores)
-                result_pipeline = self._build_pipeline_failure(
-                    pipeline_id=pipeline_id,
-                    steps=steps,
-                    failed_step_index=index,
-                    error=error_text or "invalid_output",
-                    total_steps=len(agent_names),
-                    completed_steps=index,
-                    step_scores=step_scores,
-                    pipeline_score=pipeline_score,
-                )
-                self._finalize_pipeline(result_pipeline, step_scores)
-                return result_pipeline
-
-            self._safe_monitor("step_complete", pipeline_id, index, agent_name, output_data, float(duration_ms))
-
-            step_scores.append(self._safe_score_step(output_data))
-
-            merged_input = dict(current_input)
-            merged_input.update(output_data)
-            current_input = merged_input
+                merged_input = dict(current_input)
+                merged_input.update(output_data)
+                current_input = merged_input
+                break
 
         pipeline_score = self._safe_score_pipeline(step_scores)
         result_pipeline = self._build_pipeline_success(
@@ -211,6 +245,7 @@ class AgentPipeline:
         output_data: Dict[str, object],
         error: Optional[str],
         duration_ms: float,
+        retry_attempts: int = 0,
     ) -> PipelineStepResult:
         safe_input = input_data if isinstance(input_data, dict) else {}
         safe_output = output_data if isinstance(output_data, dict) else {}
@@ -222,6 +257,7 @@ class AgentPipeline:
             output_data=safe_output,
             error=error,
             duration_ms=float(duration_ms),
+            retry_attempts=max(0, int(retry_attempts)),
         )
 
     def _build_pipeline_success(

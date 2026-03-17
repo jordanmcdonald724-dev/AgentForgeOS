@@ -79,6 +79,15 @@ class ExecutionMonitor:
             data={"error": error},
         )
 
+    def step_retry(self, pipeline_id: str, step_index: int, agent_name: str, retry_attempt: int) -> None:
+        self._record_event(
+            event_type="step_retry",
+            pipeline_id=pipeline_id,
+            step_index=step_index,
+            agent_name=agent_name,
+            data={"retry_attempt": retry_attempt},
+        )
+
     def get_events(self, pipeline_id: Optional[str] = None) -> List[ExecutionEvent]:
         if pipeline_id is None:
             return list(self._events)

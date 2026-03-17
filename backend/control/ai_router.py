@@ -121,6 +121,10 @@ class AIRouter:
             if normalized in self._default_agents:
                 return normalized
 
+        # Fast path: strong engine keywords should force game_dev
+        if "unity" in request or "unreal" in request:
+            return "game_dev"
+
         scores: Dict[str, int] = {page: 0 for page in self._page_keywords}
 
         for page, keywords in self._page_keywords.items():

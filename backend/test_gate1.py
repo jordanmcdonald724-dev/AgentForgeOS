@@ -1,16 +1,8 @@
 from control.ai_router import AIRouter
-from control.agent_supervisor import (
-    AdaptivePlannerAgent,
-    AgentSupervisor,
-    AssetPlannerAgent,
-    DeploymentPlannerAgent,
-    GamePlannerAgent,
-    PlannerAgent,
-    ResearchIngestAgent,
-    TexturePlannerAgent,
-    UnrealPlannerAgent,
-    UnityPlannerAgent,
-)
+from control.agent_supervisor import AgentSupervisor
+from agents.planner_agent import PlannerAgent
+from agents.unity_planner_agent import UnityPlannerAgent
+from agents.unreal_planner_agent import UnrealPlannerAgent
 
 
 def main() -> None:
@@ -20,12 +12,7 @@ def main() -> None:
     supervisor.register_agent(PlannerAgent())
     supervisor.register_agent(UnityPlannerAgent())
     supervisor.register_agent(UnrealPlannerAgent())
-    supervisor.register_agent(AssetPlannerAgent())
-    supervisor.register_agent(TexturePlannerAgent())
-    supervisor.register_agent(AdaptivePlannerAgent())
-    supervisor.register_agent(ResearchIngestAgent())
-    supervisor.register_agent(GamePlannerAgent())
-    supervisor.register_agent(DeploymentPlannerAgent())
+    # Gate 1 quick test now uses Gate 2 compliant agents
 
     request = "Build a Unity inventory system with UI and item data"
 
@@ -46,7 +33,10 @@ def main() -> None:
     print(decision)
 
     print("\n=== EXECUTION RESULT ===")
-    print(result)
+    print(
+        f"status={result.status} agent={result.agent_name} "
+        f"confidence={result.confidence:.2f} output={result.output}"
+    )
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ from PIL import Image, ImageFilter, ImageEnhance
 import os
 
 # Replace this with the path to your 512×512 base icon image
-base_path = "/path/to/agentforge_icon_512.png"
+base_path = "<your_icon_path>/agentforge_icon_512.png"
 img = Image.open(base_path).convert("RGBA")
 
 # Create output directory

@@ -9,6 +9,13 @@ Use this short checklist to bring AgentForgeOS up locally.
 - (Optional) MongoDB for persistence
 
 ## 2) Install dependencies
+Create and activate a virtual environment (recommended):
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+```
+
+Install Python packages:
 ```bash
 pip install -r requirements.txt
 ```
@@ -27,11 +34,12 @@ python -m engine.main
 ```
 
 ## 5) Launch the UI
-- Browser: open `frontend/index.html` directly, **or**
-- Desktop: 
+- Browser: open `frontend/index.html` (first run will redirect to the setup wizard).  
+  Wizard file (Windows doc reference): `frontend/wizard.html`.
+- Desktop (Tauri):
   ```bash
   cd desktop
-  cargo tauri dev
+  cargo tauri dev  # alternative: npm run tauri dev
   ```
 
 ## 6) Optional local providers

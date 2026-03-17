@@ -74,13 +74,13 @@ class ControlLayerTests(unittest.TestCase):
 
         from agents.base_agent import BaseAgent
 
-        class BombAgent(BaseAgent):
+        class FailingAgent(BaseAgent):
             role = "Project Planner"
 
             async def run(self, prompt, *, context=None):
                 raise RuntimeError("boom")
 
-        sup._agent_classes["Project Planner"] = BombAgent
+        sup._agent_classes["Project Planner"] = FailingAgent
 
         responses = asyncio.run(sup.run_pipeline("test request"))
         self.assertTrue(recovery.called)

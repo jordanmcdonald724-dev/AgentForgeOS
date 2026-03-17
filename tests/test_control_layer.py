@@ -29,7 +29,7 @@ class _RecoverySpy:
     def recover(self, step, response, context, *, attempt=1):
         self.called = True
         recovered = dict(response)
-        recovered.setdefault("metadata", {})["recovered"] = True
+        recovered.setdefault("metadata", {})["recovery_attempted"] = True
         return recovered
 
 
@@ -85,7 +85,9 @@ class ControlLayerTests(unittest.TestCase):
         responses = asyncio.run(sup.run_pipeline("test request"))
         self.assertTrue(recovery.called)
         self.assertEqual(len(responses), len(AGENT_PIPELINE))
-        self.assertTrue(responses[0].get("metadata", {}).get("recovered", False))
+        self.assertTrue(
+            responses[0].get("metadata", {}).get("recovery_attempted", False)
+        )
 
     def test_learning_hooks_store_scores(self):
         scorer = _ScoringSpy()

@@ -116,7 +116,7 @@ class AgentSupervisor:
             self.monitor.start_step(agent_name, pipeline_ctx)
             try:
                 if agent_cls is not None:
-                    # Each role appears once per pipeline run; instantiate per-step for isolation.
+                    # Roles in AGENT_PIPELINE are unique; create a fresh instance per step for isolation.
                     agent = self.agent_factory.create(agent_cls, self.agent_service)
                     # Prefer execute(context) per spec; fall back to run(prompt).
                     if hasattr(agent, "execute"):

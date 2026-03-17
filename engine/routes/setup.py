@@ -152,18 +152,34 @@ async def reset_setup():
 
 def _run_command(cmd: List[str], cwd: Path) -> Dict[str, Any]:
     """Run a command and capture stdout/stderr."""
-    proc = subprocess.run(
-        cmd,
-        cwd=str(cwd),
-        capture_output=True,
-        text=True,
-    )
-    return {
-        "cmd": " ".join(cmd),
-        "returncode": proc.returncode,
-        "stdout": proc.stdout,
-        "stderr": proc.stderr,
-    }
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=str(cwd),
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        return {
+            "cmd": " ".join(cmd),
+            "returncode": proc.returncode,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+        }
+    except FileNotFoundError as exc:
+        return {
+            "cmd": " ".join(cmd),
+            "returncode": -1,
+            "stdout": "",
+            "stderr": f"Executable not found: {exc}",
+        }
+    except subprocess.TimeoutExpired as exc:
+        return {
+            "cmd": " ".join(cmd),
+            "returncode": -1,
+            "stdout": exc.stdout or "",
+            "stderr": f"Command timed out after {exc.timeout} seconds\n{exc.stderr or ''}",
+        }
 
 
 @router.post("/setup/bootstrap", tags=["setup"])
@@ -176,17 +192,17 @@ async def bootstrap(body: BootstrapRequest):
     """
 
     repo_root = Path(__file__).resolve().parent.parent.parent
-    commands: List[List[str]] = [
-        ["python", "-m", "pip", "install", "--upgrade", "pip"],
-        ["pip", "install", "-r", "requirements.txt"],
+    commands: List[Dict[str, Any]] = [
+        {"cmd": ["python", "-m", "pip", "install", "--upgrade", "pip"], "cwd": repo_root},
+        {"cmd": ["pip", "install", "-r", "requirements.txt"], "cwd": repo_root},
     ]
     if body.install_desktop:
-        commands.append(["npm", "install"])
+        commands.append({"cmd": ["npm", "install"], "cwd": repo_root / "desktop"})
 
     results = []
     success = True
-    for cmd in commands:
-        result = _run_command(cmd, repo_root if cmd[0] != "npm" else repo_root / "desktop")
+    for entry in commands:
+        result = _run_command(entry["cmd"], entry["cwd"])
         results.append(result)
         if result["returncode"] != 0:
             success = False

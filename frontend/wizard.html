@@ -383,7 +383,7 @@
             const logs = (payload.data?.commands || [])
               .map(
                 (c) =>
-                  `$ ${c.cmd}\n(exit ${c.returncode})\n${c.stdout || ""}${c.stderr || ""}`
+                  `$ ${c.cmd}\n(exit ${c.returncode})\n[stdout]\n${c.stdout || ""}\n[stderr]\n${c.stderr || ""}`
               )
               .join("\n----------------------\n");
             installLog.textContent = logs || "No output.";

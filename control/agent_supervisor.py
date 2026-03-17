@@ -6,7 +6,7 @@ from typing import Iterable, List, Optional, Type, Dict
 from services.agent_pipeline import AGENT_PIPELINE, PipelineContext
 from control.ai_router import AIRouter
 from control.file_guard import FileGuard
-from control.execution_monitor import ExecutionMonitor
+from control.execution_monitor import ExecutionMonitor, execution_monitor
 from control.scoring_engine import ScoringEngine
 from control.recovery_engine import RecoveryEngine
 from control.learning_controller import LearningController
@@ -46,7 +46,8 @@ class AgentSupervisor:
         self.agent_service = agent_service
         self.router = router or AIRouter()
         self.guard = guard or FileGuard()
-        self.monitor = monitor or ExecutionMonitor()
+        # Default to the shared monitor so UI websocket streaming stays consistent.
+        self.monitor = monitor or execution_monitor
         self.scorer = scorer or ScoringEngine()
         self.recovery = recovery or RecoveryEngine()
         self.learning = learning or LearningController()

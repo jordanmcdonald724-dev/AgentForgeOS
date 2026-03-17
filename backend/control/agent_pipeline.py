@@ -7,7 +7,7 @@ import uuid
 
 from agents.base_agent import AgentResult
 from control.agent_supervisor import AgentSupervisor
-from control.execution_monitor import ExecutionMonitor
+from control.execution_monitor import ExecutionMonitor, execution_monitor
 from control.scoring_engine import ScoringEngine, ScoreResult
 from control.recovery_engine import RecoveryEngine
 from control.learning_controller import LearningController
@@ -59,7 +59,7 @@ class AgentPipeline:
         if not isinstance(supervisor, AgentSupervisor):
             raise TypeError("AgentPipeline requires an AgentSupervisor instance.")
         self.supervisor = supervisor
-        self.monitor = monitor or ExecutionMonitor()
+        self.monitor = monitor or execution_monitor
         self.scoring_engine = scoring_engine or ScoringEngine()
         self.history = history or ExecutionHistory()
         self.recovery_engine = recovery_engine or RecoveryEngine()

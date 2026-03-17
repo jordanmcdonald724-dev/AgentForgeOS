@@ -120,6 +120,15 @@ class ExecutionMonitor:
             return list(self._events)
         return [event for event in self._events if event.pipeline_id == pipeline_id]
 
+    def get_events_since(self, cursor: int, pipeline_id: Optional[str] = None) -> List[ExecutionEvent]:
+        """Return events after the given cursor (0-based index into event list)."""
+        events = self.get_events(pipeline_id=pipeline_id)
+        if cursor <= 0:
+            return events
+        if cursor >= len(events):
+            return []
+        return events[cursor:]
+
     # ------------------------------------------------------------------ #
     # Internal helpers
     # ------------------------------------------------------------------ #
@@ -144,3 +153,7 @@ class ExecutionMonitor:
         except Exception:
             # Never allow monitoring failures to impact execution.
             return
+
+
+# Shared, process-wide execution monitor used for real-time streaming.
+execution_monitor = ExecutionMonitor()

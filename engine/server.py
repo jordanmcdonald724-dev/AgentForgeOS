@@ -13,6 +13,7 @@ from .worker_system import worker_system
 from .routes import modules_router, agent_router, setup_router, bridge_router
 from engine.routes.pipeline import router as pipeline_router
 from control.module_registry import module_registry
+from engine.ws import execution_ws
 
 logger = logging.getLogger(__name__)
 
@@ -60,16 +61,24 @@ def create_app() -> FastAPI:
         app, [_health_router(), modules_router, agent_router, setup_router, bridge_router, pipeline_router], prefix="/api"
     )
 
+    # Real-time event stream (WebSocket)
+    app.add_api_websocket_route("/ws", execution_ws)
+
     # Module-specific backend routes (discovered from apps/*/backend/routes.py)
     module_routers = collect_module_routers()
     for mod_router in module_routers:
         app.include_router(mod_router, prefix="/api/modules")
 
     # Serve the frontend (wizard, Studio, CSS, etc.) as static files.
-    # Mounted last so /api routes take priority.  ``html=True`` makes "/"
+    # Prefer built assets in frontend/dist when present; otherwise fall back to
+    # the frontend/ directory for dev/scaffold mode.
+    #
+    # Mounted last so /api routes take priority. ``html=True`` makes "/"
     # serve ``index.html`` and "/wizard.html" resolve correctly.
-    frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
-    if frontend_dir.is_dir():
-        app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+    frontend_root = Path(__file__).resolve().parent.parent / "frontend"
+    dist_dir = frontend_root / "dist"
+    serve_dir = dist_dir if dist_dir.is_dir() and (dist_dir / "index.html").exists() else frontend_root
+    if serve_dir.is_dir():
+        app.mount("/", StaticFiles(directory=str(serve_dir), html=True), name="frontend")
 
     return app

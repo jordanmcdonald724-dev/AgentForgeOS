@@ -1,11 +1,17 @@
 """Agent supervisor coordinating pipeline execution with guards."""
 
 import logging
-from typing import Iterable, List, Optional, Type
+from typing import Iterable, List, Optional, Type, Dict
 
 from services.agent_pipeline import AGENT_PIPELINE, PipelineContext
 from control.ai_router import AIRouter
 from control.file_guard import FileGuard
+from control.execution_monitor import ExecutionMonitor
+from control.scoring_engine import ScoringEngine
+from control.recovery_engine import RecoveryEngine
+from control.learning_controller import LearningController
+from control.dynamic_pipeline_builder import DynamicPipelineBuilder
+from control.agent_factory import AgentFactory
 from services import AgentService
 
 logger = logging.getLogger(__name__)
@@ -30,10 +36,22 @@ class AgentSupervisor:
         agent_service: AgentService,
         router: Optional[AIRouter] = None,
         guard: Optional[FileGuard] = None,
+        monitor: Optional[ExecutionMonitor] = None,
+        scorer: Optional[ScoringEngine] = None,
+        recovery: Optional[RecoveryEngine] = None,
+        learning: Optional[LearningController] = None,
+        pipeline_builder: Optional[DynamicPipelineBuilder] = None,
+        agent_factory: Optional[AgentFactory] = None,
     ):
         self.agent_service = agent_service
         self.router = router or AIRouter()
         self.guard = guard or FileGuard()
+        self.monitor = monitor or ExecutionMonitor()
+        self.scorer = scorer or ScoringEngine()
+        self.recovery = recovery or RecoveryEngine()
+        self.learning = learning or LearningController()
+        self.pipeline_builder = pipeline_builder or DynamicPipelineBuilder()
+        self.agent_factory = agent_factory or AgentFactory()
         self._agent_classes = self._load_agent_classes()
 
     @staticmethod
@@ -83,14 +101,22 @@ class AgentSupervisor:
                 for k, v in context.items():
                     pipeline_ctx.set(k, v)
 
+        # Pre-execution learning/context injection.
+        self.learning.before_execution(pipeline_ctx)
+
         responses = []
+        scores: Dict[str, Dict[str, float]] = {}
         prompt = user_request
 
-        for agent_name in self.pipeline():
+        # Allow dynamic pipeline shaping before execution.
+        pipeline_order = self.pipeline_builder.build(self.pipeline(), pipeline_ctx)
+
+        for agent_name in pipeline_order:
             agent_cls: Optional[Type] = self._agent_classes.get(agent_name)
+            self.monitor.start_step(agent_name, pipeline_ctx)
             try:
                 if agent_cls is not None:
-                    agent = agent_cls(agent_service=self.agent_service)
+                    agent = self.agent_factory.create(agent_cls, self.agent_service)
                     # Prefer execute(context) per spec; fall back to run(prompt).
                     if hasattr(agent, "execute"):
                         response = await agent.execute(pipeline_ctx)
@@ -108,6 +134,15 @@ class AgentSupervisor:
                     "error": f"{agent_name}: {exc}",
                 }
 
+            if not response.get("success"):
+                self.monitor.record_error(agent_name, str(response.get("error")))
+                # Attempt recovery once.
+                response = self.recovery.recover(
+                    agent_name, response, pipeline_ctx, attempt=1
+                )
+
+            self.monitor.end_step(agent_name, response)
+            scores[agent_name] = self.scorer.score(agent_name, response, pipeline_ctx)
             responses.append(response)
 
             if not response.get("success"):
@@ -122,5 +157,8 @@ class AgentSupervisor:
             if isinstance(data, dict) and "text" in data:
                 prompt = data["text"]
                 pipeline_ctx.set(agent_name, data["text"])
+
+        # Post-execution learning hook.
+        self.learning.after_execution(responses, scores, pipeline_ctx)
 
         return responses

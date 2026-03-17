@@ -215,7 +215,9 @@ Sandboxed filesystem access for agents is fully implemented.
 | `bridge/__init__.py` | ✅ DONE |
 | `bridge/bridge_server.py` — Read, write, list, delete within bridge root | ✅ DONE |
 | `bridge/bridge_security.py` — Path validation, extension allow-list, traversal protection | ✅ DONE |
+| `bridge/routes.py` — `/api/bridge/health`, `/list`, `/read`, `/sync` endpoints | ✅ DONE |
 | `/api/modules/studio/workspace` exposes bridge listing to the frontend | ✅ DONE |
+| Frontend file browser uses `/api/bridge/list` for project visibility | ✅ DONE |
 | Tool launcher (compiler, linter invocation) | ❌ TODO |
 | Game engine bridge (Godot, Unity) | ❌ TODO |
 

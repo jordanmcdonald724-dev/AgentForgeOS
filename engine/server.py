@@ -10,7 +10,7 @@ from .config import get_settings
 from .database import db
 from .module_loader import load_modules, collect_module_routers
 from .worker_system import worker_system
-from .routes import modules_router, agent_router, setup_router
+from .routes import modules_router, agent_router, setup_router, bridge_router
 from control.module_registry import module_registry
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ def create_app() -> FastAPI:
 
     # Core engine routes
     register_routers(
-        app, [_health_router(), modules_router, agent_router, setup_router], prefix="/api"
+        app, [_health_router(), modules_router, agent_router, setup_router, bridge_router], prefix="/api"
     )
 
     # Module-specific backend routes (discovered from apps/*/backend/routes.py)

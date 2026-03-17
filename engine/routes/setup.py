@@ -9,6 +9,7 @@ POST /api/setup/reset  — clears ``SETUP_COMPLETE`` so the wizard shows again
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import subprocess
@@ -202,7 +203,7 @@ async def bootstrap(body: BootstrapRequest):
     results = []
     success = True
     for entry in commands:
-        result = _run_command(entry["cmd"], entry["cwd"])
+        result = await asyncio.to_thread(_run_command, entry["cmd"], entry["cwd"])
         results.append(result)
         if result["returncode"] != 0:
             success = False

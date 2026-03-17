@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Dict
 
 
-DEFAULT_POLYCOUNT_CONSTRAINT = 8000
+DEFAULT_POLYCOUNT_CONSTRAINT = 8_000
 LOW_POLY_THRESHOLD = 10_000
-POLYCOUNT_INFLATION = 1000
+POLYCOUNT_INFLATION = 1_000
 
 
 class ModelGenerator:

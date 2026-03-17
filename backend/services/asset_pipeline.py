@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-REFINEMENT_POLYCOUNT_BUFFER = 2000
-
 from control.agent_pipeline import AgentPipeline
 from services.asset_planner import AssetPlanner
 from knowledge.reference_analyzer import ReferenceAnalyzer
@@ -11,6 +9,9 @@ from systems.model_generator import ModelGenerator
 from systems.texture_generator import TextureGenerator
 from systems.asset_validator import AssetValidator
 from services.asset_registry import AssetRegistry
+
+
+REFINEMENT_POLYCOUNT_BUFFER = 2000
 
 
 class AssetPipeline:

@@ -88,6 +88,24 @@ class ExecutionMonitor:
             data={"retry_attempt": retry_attempt},
         )
 
+    def pipeline_modified(self, pipeline_id: str, change_type: str, details: Dict[str, object]) -> None:
+        self._record_event(
+            event_type="pipeline_modified",
+            pipeline_id=pipeline_id,
+            step_index=None,
+            agent_name=None,
+            data={"change_type": change_type, "details": details or {}},
+        )
+
+    def agent_created(self, pipeline_id: str, agent_name: str, role: str) -> None:
+        self._record_event(
+            event_type="agent_created",
+            pipeline_id=pipeline_id,
+            step_index=None,
+            agent_name=agent_name,
+            data={"role": role},
+        )
+
     def get_events(self, pipeline_id: Optional[str] = None) -> List[ExecutionEvent]:
         if pipeline_id is None:
             return list(self._events)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 import uuid
 
 from agents.base_agent import AgentResult
@@ -11,6 +11,8 @@ from control.execution_monitor import ExecutionMonitor
 from control.scoring_engine import ScoringEngine, ScoreResult
 from control.recovery_engine import RecoveryEngine
 from control.learning_controller import LearningController
+from control.dynamic_pipeline_builder import DynamicPipelineBuilder
+from control.agent_factory import AgentFactory
 from services.execution_history import ExecutionHistory
 
 
@@ -50,6 +52,9 @@ class AgentPipeline:
         history: Optional[ExecutionHistory] = None,
         recovery_engine: Optional[RecoveryEngine] = None,
         learning_controller: Optional[LearningController] = None,
+        dynamic_pipeline_builder: Optional[DynamicPipelineBuilder] = None,
+        agent_factory: Optional[AgentFactory] = None,
+        max_steps: int = 20,
     ) -> None:
         if not isinstance(supervisor, AgentSupervisor):
             raise TypeError("AgentPipeline requires an AgentSupervisor instance.")
@@ -59,6 +64,9 @@ class AgentPipeline:
         self.history = history or ExecutionHistory()
         self.recovery_engine = recovery_engine or RecoveryEngine()
         self.learning_controller = learning_controller
+        self.dynamic_pipeline_builder = dynamic_pipeline_builder or DynamicPipelineBuilder()
+        self.agent_factory = agent_factory or AgentFactory()
+        self.max_steps = max(1, int(max_steps))
 
     def run_pipeline(
         self,
@@ -67,12 +75,15 @@ class AgentPipeline:
         route_context: Optional[Dict[str, object]] = None,
     ) -> PipelineResult:
         pipeline_id = str(uuid.uuid4())
-        total_steps = len(agent_names) if isinstance(agent_names, list) else 0
+        agent_sequence: List[str] = list(agent_names) if isinstance(agent_names, list) else []
+        total_steps = len(agent_sequence)
 
         step_scores: List[ScoreResult] = []
         steps: List[PipelineStepResult] = []
         current_input: Dict[str, object] = dict(initial_input) if isinstance(initial_input, dict) else {}
         output_data: Dict[str, object] = {}
+        adaptive_changes: List[Dict[str, object]] = []
+        created_agents: List[Dict[str, object]] = []
         request_text = ""
         if isinstance(initial_input, dict):
             request_value = initial_input.get("request")
@@ -85,6 +96,9 @@ class AgentPipeline:
         extra_metadata = {
             "similar_runs_count": similar_runs_count,
             "recommended_agents_used": recommended_agents_used,
+            "adaptive_changes": adaptive_changes,
+            "created_agents": created_agents,
+            "final_pipeline": agent_sequence,
         }
 
         self._safe_monitor("start_pipeline", pipeline_id, {"route_context": route_context or {}, "total_steps": total_steps})
@@ -123,7 +137,11 @@ class AgentPipeline:
             self._finalize_pipeline(result, step_scores)
             return result
 
-        for index, agent_name in enumerate(agent_names):
+        index = 0
+        processed_steps = 0
+        replaced_steps = set()
+        while index < len(agent_sequence) and processed_steps < self.max_steps:
+            agent_name = agent_sequence[index]
             retries = 0
             while True:
                 step_started = datetime.now(UTC)
@@ -142,6 +160,13 @@ class AgentPipeline:
                     if decision.action == "retry":
                         retries = decision.retry_count
                         self._safe_monitor("step_retry", pipeline_id, index, agent_name, retries)
+                        continue
+
+                    if self._try_replace_agent(
+                        pipeline_id, index, agent_name, agent_sequence, replaced_steps, adaptive_changes, created_agents
+                    ):
+                        agent_name = agent_sequence[index]
+                        retries = 0
                         continue
 
                     steps.append(
@@ -163,13 +188,18 @@ class AgentPipeline:
                         steps=steps,
                         failed_step_index=index,
                         error=error_message,
-                        total_steps=len(agent_names),
+                        total_steps=len(agent_sequence),
                         completed_steps=index,
                         step_scores=step_scores,
                         pipeline_score=pipeline_score,
-                        extra_metadata=extra_metadata,
+                        extra_metadata={
+                            **extra_metadata,
+                            "adaptive_changes": adaptive_changes,
+                            "created_agents": created_agents,
+                            "final_pipeline": agent_sequence,
+                        },
                     )
-                    self._store_learning(request_text, agent_names, False, pipeline_score.score, result_pipeline.metadata)
+                    self._store_learning(request_text, agent_sequence, False, pipeline_score.score, result_pipeline.metadata)
                     self._finalize_pipeline(result_pipeline, step_scores)
                     return result_pipeline
 
@@ -195,6 +225,13 @@ class AgentPipeline:
                         self._safe_monitor("step_retry", pipeline_id, index, agent_name, retries)
                         continue
 
+                    if self._try_replace_agent(
+                        pipeline_id, index, agent_name, agent_sequence, replaced_steps, adaptive_changes, created_agents
+                    ):
+                        agent_name = agent_sequence[index]
+                        retries = 0
+                        continue
+
                     steps.append(
                         self._build_step_result(
                             step_index=index,
@@ -214,19 +251,25 @@ class AgentPipeline:
                         steps=steps,
                         failed_step_index=index,
                         error=failure_reason,
-                        total_steps=len(agent_names),
+                        total_steps=len(agent_sequence),
                         completed_steps=index,
                         step_scores=step_scores,
                         pipeline_score=pipeline_score,
-                        extra_metadata=extra_metadata,
+                        extra_metadata={
+                            **extra_metadata,
+                            "adaptive_changes": adaptive_changes,
+                            "created_agents": created_agents,
+                            "final_pipeline": agent_sequence,
+                        },
                     )
-                    self._store_learning(request_text, agent_names, False, pipeline_score.score, result_pipeline.metadata)
+                    self._store_learning(request_text, agent_sequence, False, pipeline_score.score, result_pipeline.metadata)
                     self._finalize_pipeline(result_pipeline, step_scores)
                     return result_pipeline
 
                 self._safe_monitor("step_complete", pipeline_id, index, agent_name, output_data, float(duration_ms))
 
                 step_scores.append(self._safe_score_step(output_data))
+                current_score = step_scores[-1]
 
                 step_result = self._build_step_result(
                     step_index=index,
@@ -243,19 +286,41 @@ class AgentPipeline:
                 merged_input = dict(current_input)
                 merged_input.update(output_data)
                 current_input = merged_input
+                processed_steps += 1
+
+                if (
+                    current_score.score < 0.5
+                    and len(agent_sequence) < self.max_steps
+                    and self.dynamic_pipeline_builder.validate_pipeline(agent_sequence)
+                ):
+                    updated = self.dynamic_pipeline_builder.insert_step(agent_sequence, index + 1, "planner_agent")
+                    if len(updated) > len(agent_sequence):
+                        agent_sequence = updated
+                        adaptive_changes.append(
+                            {"type": "insert", "agent": "planner_agent", "after_index": index, "reason": "low_score"}
+                        )
+                        self._safe_monitor(
+                            "pipeline_modified",
+                            pipeline_id,
+                            "insert",
+                            {"agent": "planner_agent", "after_index": index, "reason": "low_score"},
+                        )
+
+                index += 1
                 break
 
+        extra_metadata.update({"adaptive_changes": adaptive_changes, "created_agents": created_agents, "final_pipeline": agent_sequence})
         pipeline_score = self._safe_score_pipeline(step_scores)
         result_pipeline = self._build_pipeline_success(
             pipeline_id=pipeline_id,
             steps=steps,
             final_output=output_data if steps else {},
-            total_steps=len(agent_names),
+            total_steps=len(agent_sequence),
             step_scores=step_scores,
             pipeline_score=pipeline_score,
             extra_metadata=extra_metadata,
         )
-        self._store_learning(request_text, agent_names, True, pipeline_score.score, result_pipeline.metadata)
+        self._store_learning(request_text, agent_sequence, True, pipeline_score.score, result_pipeline.metadata)
         self._finalize_pipeline(result_pipeline, step_scores)
         return result_pipeline
 
@@ -425,3 +490,38 @@ class AgentPipeline:
             self.history.store(record)
         except Exception:
             return
+
+    def _try_replace_agent(
+        self,
+        pipeline_id: str,
+        index: int,
+        agent_name: str,
+        agent_sequence: List[str],
+        replaced_steps: Set[int],
+        adaptive_changes: List[Dict[str, object]],
+        created_agents: List[Dict[str, object]],
+    ) -> bool:
+        try:
+            if not self.agent_factory or not self.dynamic_pipeline_builder:
+                return False
+            if index in replaced_steps or len(agent_sequence) >= self.max_steps:
+                return False
+            new_agent = self.agent_factory.create_agent(agent_name)
+            self.supervisor.register_agent(new_agent)
+            updated_sequence = self.dynamic_pipeline_builder.replace_step(agent_sequence, index, new_agent.name)
+            if updated_sequence == agent_sequence:
+                return False
+            agent_sequence[:] = updated_sequence
+            replaced_steps.add(index)
+            created_agents.append({"role": agent_name, "created_name": new_agent.name})
+            adaptive_changes.append({"type": "replace", "original_agent": agent_name, "new_agent": new_agent.name, "index": index})
+            self._safe_monitor("agent_created", pipeline_id, new_agent.name, agent_name)
+            self._safe_monitor(
+                "pipeline_modified",
+                pipeline_id,
+                "replace",
+                {"original_agent": agent_name, "new_agent": new_agent.name, "index": index, "reason": "max_retries_exceeded"},
+            )
+            return True
+        except Exception:
+            return False

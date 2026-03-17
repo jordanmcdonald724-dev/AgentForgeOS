@@ -69,10 +69,28 @@ class LearningController:
             if any(not entry.success for entry in similar_entries):
                 warnings.append("similar_failures_detected")
 
+            adaptive_patterns: Dict[str, object] = {"modifications": {}, "created_agents": {}}
+            for entry in similar_entries:
+                meta = entry.metadata if isinstance(entry.metadata, dict) else {}
+                changes = meta.get("adaptive_changes", []) if isinstance(meta, dict) else []
+                created = meta.get("created_agents", []) if isinstance(meta, dict) else []
+                outcome = "success" if entry.success else "failure"
+
+                for change in changes if isinstance(changes, list) else []:
+                    change_type = change.get("type", "unknown") if isinstance(change, dict) else "unknown"
+                    key = f"{change_type}:{outcome}"
+                    adaptive_patterns["modifications"][key] = adaptive_patterns["modifications"].get(key, 0) + 1
+
+                for created_agent in created if isinstance(created, list) else []:
+                    role = created_agent.get("role", "unknown") if isinstance(created_agent, dict) else "unknown"
+                    key = f"{role}:{outcome}"
+                    adaptive_patterns["created_agents"][key] = adaptive_patterns["created_agents"].get(key, 0) + 1
+
             return {
                 "similar_runs": similar_runs,
                 "recommended_agents": recommended_agents,
                 "warnings": warnings,
+                "adaptive_patterns": adaptive_patterns,
             }
         except Exception:
-            return {"similar_runs": [], "recommended_agents": [], "warnings": ["learning_controller_error"]}
+            return {"similar_runs": [], "recommended_agents": [], "warnings": ["learning_controller_error"], "adaptive_patterns": {}}

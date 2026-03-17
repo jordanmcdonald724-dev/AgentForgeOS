@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import Dict
 
 
+DEFAULT_POLYCOUNT_CONSTRAINT = 8000
+
+
 class ModelGenerator:
     """
     Deterministic placeholder for 3D model generation.
@@ -11,7 +14,7 @@ class ModelGenerator:
     def generate(self, plan: Dict[str, object], references: Dict[str, object]) -> Dict[str, object]:
         constraints = plan.get("constraints", {}) if isinstance(plan, dict) else {}
         constraint_poly = constraints.get("polycount") if isinstance(constraints, dict) else None
-        safe_constraint = int(constraint_poly) if isinstance(constraint_poly, int) else 8000
+        safe_constraint = int(constraint_poly) if isinstance(constraint_poly, int) else DEFAULT_POLYCOUNT_CONSTRAINT
 
         # Deliberately sit near the constraint; slightly above for possible refinement.
         if safe_constraint <= 0:

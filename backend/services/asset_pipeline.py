@@ -85,6 +85,7 @@ class AssetPipeline:
         model = self.model_generator.generate(refined_plan, ref_data)
         # Clamp to the refined constraint to guarantee determinism.
         if isinstance(constraints, dict) and isinstance(constraints.get("polycount"), int) and constraints["polycount"] > 0:
+            # Preserve a lower generated polycount if present, otherwise clamp to constraint.
             model["polycount"] = min(model.get("polycount", constraints["polycount"]), constraints["polycount"])
 
         textures = self.texture_generator.generate(refined_plan, ref_data)

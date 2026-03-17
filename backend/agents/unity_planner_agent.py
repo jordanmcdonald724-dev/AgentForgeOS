@@ -60,7 +60,9 @@ class UnityPlannerAgent(BaseAgent):
         if not required.intersection(normalized):
             modules.extend(["UI", "Logic"])
 
-        repaired["modules"] = list(dict.fromkeys(modules))  # dedupe while preserving order
+        repaired["modules"] = list(
+            dict.fromkeys(modules)
+        )  # dedupe while preserving order (Python 3.7+)
 
         if not repaired.get("suggested_steps"):
             repaired["suggested_steps"] = [

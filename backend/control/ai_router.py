@@ -132,7 +132,7 @@ class AIRouter:
                 if keyword in request:
                     scores[page] += 1
 
-        best_page = max(scores, key=scores.get)
+        best_page = max(scores, key=lambda page: scores[page])
         if scores[best_page] == 0:
             return "builds"
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from control.agent_pipeline import AgentPipeline
 from services.asset_planner import AssetPlanner
@@ -66,7 +66,7 @@ class AssetPipeline:
             "asset": asset,
         }
 
-    def _generate_and_validate(self, plan: Dict[str, object], ref_data: Dict[str, object]) -> (Dict[str, object], Dict[str, object]):
+    def _generate_and_validate(self, plan: Dict[str, object], ref_data: Dict[str, object]) -> Tuple[Dict[str, object], Dict[str, object]]:
         model = self.model_generator.generate(plan, ref_data)
         textures = self.texture_generator.generate(plan, ref_data)
 
@@ -74,7 +74,7 @@ class AssetPipeline:
         validation = self.validator.validate(asset, plan)
         return asset, validation
 
-    def _refine_once(self, plan: Dict[str, object], ref_data: Dict[str, object]) -> (Dict[str, object], Dict[str, object]):
+    def _refine_once(self, plan: Dict[str, object], ref_data: Dict[str, object]) -> Tuple[Dict[str, object], Dict[str, object]]:
         refined_plan = dict(plan)
         constraints = refined_plan.get("constraints", {})
         if isinstance(constraints, dict) and "polycount" in constraints and isinstance(constraints["polycount"], int):

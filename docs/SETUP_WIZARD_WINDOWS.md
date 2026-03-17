@@ -55,7 +55,7 @@ This starts FastAPI on `http://127.0.0.1:8000`. Leave it running while you compl
 ## 4) Open the setup wizard
 
 Choose one:
-- **Web**: open `frontend/wizard.html` in your browser (it will call the engine on `localhost:8000`).
+- **Web**: navigate to `http://localhost:8000/wizard.html` in your browser. (If you visit `http://localhost:8000` directly, Studio will auto-redirect to the wizard on first run.)
 - **Desktop shell (optional)**: from `desktop`, run `npm run tauri dev` to open the Tauri window; it loads the same wizard and will redirect there automatically when `SETUP_COMPLETE` is missing.
 
 ---
@@ -76,7 +76,7 @@ Allowed keys are restricted by the setup API (`/api/setup/save`) to prevent acci
 
 ## 6) Post-install checks
 
-- `config/.env` exists and includes `SETUP_COMPLETE=true`.
+- `config/.env` exists and includes `SETUP_COMPLETE=1`.
 - Engine health: `Invoke-WebRequest http://127.0.0.1:8000/api/health`.
 - Studio loads without redirecting back to the wizard.
 - Optional services reachable (if selected):

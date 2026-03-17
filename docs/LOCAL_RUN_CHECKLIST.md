@@ -34,8 +34,8 @@ python -m engine.main
 ```
 
 ## 5) Launch the UI
-- Browser: open `frontend/index.html` (first run will redirect to the setup wizard).  
-  Wizard file (Windows doc reference): `frontend/wizard.html`.
+- Browser: navigate to `http://localhost:8000` (first run will redirect to the setup wizard).
+  The engine serves the frontend automatically — no separate web server is needed.
 - Desktop (Tauri):
   ```bash
   cd desktop

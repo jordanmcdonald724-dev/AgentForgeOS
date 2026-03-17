@@ -185,6 +185,28 @@ Launch external engine.
 
 ---
 
+# 8. Setup Wizard API
+
+Base route:
+
+/api/setup
+
+Endpoints:
+
+GET /api/setup
+Return current configuration state and whether setup is complete.
+
+POST /api/setup/save
+Persist wizard-submitted values to `config/.env`. Only allow-listed keys are accepted.
+
+POST /api/setup/reset
+Remove `SETUP_COMPLETE` flag so the wizard shows again on next visit.
+
+POST /api/setup/bootstrap
+Run dependency installation (`pip install`, optional `npm install`) from the repo root.
+
+---
+
 # API Response Standard
 
 All API responses must follow this structure:

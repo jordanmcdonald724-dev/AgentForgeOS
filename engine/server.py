@@ -1,9 +1,11 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Iterable, Optional
 
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -25,6 +27,10 @@ from control.module_registry import module_registry
 from engine.ws import execution_ws
 
 logger = logging.getLogger(__name__)
+DEFAULT_CORS_ORIGINS = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+)
 
 
 def _health_router() -> APIRouter:
@@ -67,6 +73,18 @@ FRONTEND_ROOT = Path(__file__).resolve().parent.parent / "frontend"
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
+    cors_origins = [
+        origin.strip()
+        for origin in os.getenv("CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+        if origin.strip()
+    ]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # Core engine routes
     register_routers(

@@ -4,6 +4,9 @@ import BuildsPage from "../ui/pages/Builds/BuildsPage.jsx";
 import AssetsPage from "../ui/pages/Assets/AssetsPage.jsx";
 import SandboxPage from "../ui/pages/Sandbox/SandboxPage.jsx";
 import ResearchPage from "../ui/pages/Research/ResearchPage.jsx";
+import DeploymentPage from "../ui/pages/Deployment/DeploymentPage.jsx";
+import GameDevPage from "../ui/pages/GameDev/GameDevPage.jsx";
+import SaasBuilderPage from "../ui/pages/SaasBuilder/SaasBuilderPage.jsx";
 import CommandCenterPage from "../ui/pages/CommandCenterPage.tsx";
 import ProjectWorkspacePage from "../ui/pages/ProjectWorkspacePage.tsx";
 import ResearchLabPage from "../ui/pages/ResearchLabPage.tsx";
@@ -53,8 +56,14 @@ export default function Router() {
         return <BuildsPage />;
       case "assets":
         return <AssetsPage />;
+      case "deployment":
+        return <DeploymentPage />;
       case "sandbox":
         return <SandboxPage />;
+      case "game":
+        return <GameDevPage />;
+      case "saas":
+        return <SaasBuilderPage />;
       case "research":
         return <ResearchPage />;
       case "studio":
@@ -67,4 +76,3 @@ export default function Router() {
   if (!setupComplete) return null;
   return page;
 }
-

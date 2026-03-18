@@ -1,0 +1,10 @@
+{
+  "strategy": "local_docker",
+  "steps": [
+    "build_backend_image",
+    "build_frontend_image",
+    "run_database_migrations",
+    "start_stack"
+  ],
+  "status": "planned"
+}

@@ -1,0 +1,9 @@
+{
+  "product_type": "hybrid",
+  "layers": [
+    "frontend",
+    "backend",
+    "orchestration"
+  ],
+  "has_gameplay": false
+}

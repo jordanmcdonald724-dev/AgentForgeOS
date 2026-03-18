@@ -1,0 +1,12 @@
+code_generation:
+  - apps/
+  - services/
+bug_fix:
+  - apps/
+  - services/
+deployment:
+  - apps/deployment/
+research:
+  - apps/research/
+refactor:
+  - apps/

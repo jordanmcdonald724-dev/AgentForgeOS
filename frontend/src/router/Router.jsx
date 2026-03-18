@@ -7,9 +7,6 @@ import ResearchPage from "../ui/pages/Research/ResearchPage.jsx";
 import CommandCenterPage from "../ui/pages/CommandCenterPage.tsx";
 import ProjectWorkspacePage from "../ui/pages/ProjectWorkspacePage.tsx";
 import ResearchLabPage from "../ui/pages/ResearchLabPage.tsx";
-import DeploymentPage from "../ui/pages/Deployment/DeploymentPage.jsx";
-import GameDevPage from "../ui/pages/GameDev/GameDevPage.jsx";
-import SaasBuilderPage from "../ui/pages/SaasBuilder/SaasBuilderPage.jsx";
 
 function getRoute() {
   const raw = window.location.hash || "#/studio";
@@ -60,12 +57,6 @@ export default function Router() {
         return <SandboxPage />;
       case "research":
         return <ResearchPage />;
-      case "deployment":
-        return <DeploymentPage />;
-      case "game":
-        return <GameDevPage />;
-      case "saas":
-        return <SaasBuilderPage />;
       case "studio":
       default:
         return <StudioPage />;

@@ -1,132 +1,62 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import AppLayout from "../../components/layout/AppLayout";
 import GlassPanel from "../../components/panels/GlassPanel";
 import SectionHeader from "../../components/panels/SectionHeader";
 import AgentCard from "../../components/agents/AgentCard";
 import PipelineView from "../../components/pipeline/PipelineView";
-import { useAgentState } from "../../hooks/useAgentState";
-import { usePipelineState } from "../../hooks/usePipelineState";
-import { useSystem } from "../../context/SystemContext";
-
-// Seed agents shown before any agent_created WS events arrive.
-const SEED_AGENTS = [
-  { id: "planner", name: "Planner", role: "Project Planner", state: "idle" },
-  { id: "architect", name: "Architect", role: "System Architect", state: "idle" },
-  { id: "engineer", name: "Engineer", role: "Frontend Engineer", state: "idle" },
-  { id: "tester", name: "Tester", role: "Integration Tester", state: "idle" },
-];
-
-// Seed pipeline steps shown before any pipeline_modified WS events arrive.
-const SEED_STEPS = [
-  { id: "plan", label: "Plan" },
-  { id: "route", label: "Route" },
-  { id: "build", label: "Build" },
-  { id: "test", label: "Test" },
-  { id: "stabilize", label: "Stabilize" },
-];
 
 function nowTs() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 export default function StudioPage() {
-  // S-2: Live agent list driven by /ws agent_created + step_* events
-  const { agents } = useAgentState({ initialAgents: SEED_AGENTS });
-
-  // S-3: Live pipeline driven by /ws step_* and pipeline_modified events
-  const {
-    steps: pipelineSteps,
-    activeStepId,
-    running: pipelineRunning,
-    glowState,
-    events: pipelineEvents,
-    setActiveStepId,
-    setRunning,
-  } = usePipelineState({ initialSteps: SEED_STEPS });
-
-  // S-5: Global system state wired to /ws by G-3 (SystemContext)
-  const { state: systemState } = useSystem();
+  const agents = useMemo(
+    () => [
+      { id: "planner", name: "Planner", role: "Project Planner", state: "idle" },
+      { id: "architect", name: "Architect", role: "System Architect", state: "active" },
+      { id: "engineer", name: "Engineer", role: "Frontend Engineer", state: "idle" },
+      { id: "tester", name: "Tester", role: "Integration Tester", state: "idle" },
+    ],
+    []
+  );
 
   const [prompt, setPrompt] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [output, setOutput] = useState(
-    "AgentForge Studio online. Send a prompt to run an agent, or wait for execution stream events."
+    "AgentForge Studio online. Connect execution streams to drive pipeline, output, and glow."
   );
   const [logs, setLogs] = useState(() => [
     { level: "info", ts: nowTs(), msg: "Studio initialized" },
-    { level: "info", ts: nowTs(), msg: "Connecting to /ws execution stream…" },
+    { level: "info", ts: nowTs(), msg: "Waiting for execution_monitor events…" },
   ]);
 
-  const appendLog = useCallback((level, msg) => {
-    setLogs((prev) => [...prev, { level, ts: nowTs(), msg }].slice(-220));
-  }, []);
-
-  // S-4: Append step output from /ws step_complete events to the output panel
-  const lastProcessedEvent = useRef(null);
-  useEffect(() => {
-    if (!pipelineEvents.length) return;
-    const last = pipelineEvents[pipelineEvents.length - 1];
-    if (last === lastProcessedEvent.current) return;
-    lastProcessedEvent.current = last;
-
-    const agentLabel = last.data?.agent_name || last.data?.agent_id || "agent";
-    if (last.type === "step_start") {
-      appendLog("info", `Step start → ${agentLabel}`);
-    } else if (last.type === "step_complete") {
-      appendLog("info", `Step complete ← ${agentLabel}`);
-      if (last.data?.output) {
-        setOutput((prev) => `${prev}\n\n[${agentLabel}] ${last.data.output}`);
-      }
-    } else if (last.type === "step_failed") {
-      appendLog("error", `Step failed: ${last.data?.error || "unknown error"}`);
-    } else if (last.type === "step_retry") {
-      appendLog("warn", `Step retry: ${agentLabel}`);
-    } else if (last.type === "loop_iteration") {
-      appendLog("info", `Loop iteration ${last.data?.iteration ?? ""}`);
-    }
-  }, [pipelineEvents, appendLog]);
-
-  // S-1: Wire prompt submit → POST /api/agent/run
-  const submit = useCallback(
-    async (e) => {
-      e.preventDefault();
-      const p = prompt.trim();
-      if (!p || submitting) return;
-      setPrompt("");
-      setSubmitting(true);
-      appendLog("info", `Prompt: "${p.slice(0, 64)}${p.length > 64 ? "…" : ""}"`);
-      setOutput(`> ${p}\n\n[Waiting for agent…]`);
-      setRunning(true);
-
-      try {
-        const res = await fetch("/api/agent/run", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: p, pipeline: false }),
-        });
-        const json = await res.json();
-        if (json.success !== false) {
-          const text =
-            json.data?.response ??
-            json.data?.output ??
-            (typeof json.data === "string" ? json.data : JSON.stringify(json.data, null, 2));
-          setOutput(`> ${p}\n\n${text}`);
-          appendLog("info", "Agent response received");
-        } else {
-          const errText = json.error || "Unknown error";
-          setOutput(`> ${p}\n\n[Error: ${errText}]`);
-          appendLog("error", `Agent error: ${errText}`);
-        }
-      } catch {
-        setOutput(`> ${p}\n\n[Network error — is the engine running on :8000?]`);
-        appendLog("error", "Network error connecting to engine");
-      } finally {
-        setSubmitting(false);
-        setRunning(false);
-      }
-    },
-    [prompt, submitting, appendLog, setRunning]
+  const pipelineSteps = useMemo(
+    () => [
+      { id: "plan", label: "Plan" },
+      { id: "route", label: "Route" },
+      { id: "build", label: "Build" },
+      { id: "test", label: "Test" },
+      { id: "stabilize", label: "Stabilize" },
+    ],
+    []
   );
+
+  const [activeStep, setActiveStep] = useState("route");
+  const [pipelineRunning, setPipelineRunning] = useState(true);
+
+  const appendLog = (level, msg) => {
+    setLogs((prev) => [...prev, { level, ts: nowTs(), msg }].slice(-220));
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    const p = prompt.trim();
+    if (!p) return;
+    setPrompt("");
+    appendLog("info", `Prompt submitted: "${p.slice(0, 64)}${p.length > 64 ? "…" : ""}"`);
+    setOutput(`> ${p}\n\n[Awaiting agent_pipeline output…]`);
+    setPipelineRunning(true);
+    setActiveStep((s) => (s === "stabilize" ? "plan" : s));
+  };
 
   const topRegion = (
     <GlassPanel tight style={{ padding: 12 }}>
@@ -136,7 +66,7 @@ export default function StudioPage() {
 
   const mainRegion = (
     <GlassPanel className="af-scroll" style={{ padding: 12 }}>
-      <SectionHeader title="Agents" subtitle="Live state from /ws" />
+      <SectionHeader title="Agents" subtitle="State-driven glow" />
       <div style={{ height: 12 }} />
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {agents.map((a) => (
@@ -155,7 +85,7 @@ export default function StudioPage() {
   const agentConsoleRegion = (
     <div style={{ display: "grid", gridTemplateRows: "auto 1fr", gap: 14, height: "100%" }}>
       <GlassPanel tight style={{ padding: 12 }}>
-        <SectionHeader title="Input" subtitle="Runs against POST /api/agent/run" />
+        <SectionHeader title="Input" subtitle="Ctrl+Enter to submit (optional)" />
         <div style={{ height: 12 }} />
         <form onSubmit={submit} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10 }}>
           <input
@@ -164,16 +94,15 @@ export default function StudioPage() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Type a prompt…"
             aria-label="Prompt input"
-            disabled={submitting}
           />
-          <button className="af-button" type="submit" disabled={submitting || !prompt.trim()}>
-            {submitting ? "…" : "Send"}
+          <button className="af-button" type="submit">
+            Send
           </button>
         </form>
       </GlassPanel>
 
-      <GlassPanel className="af-scroll" glowState={glowState} style={{ padding: 12 }}>
-        <SectionHeader title="Output" subtitle="API response + /ws step_complete stream" />
+      <GlassPanel className="af-scroll" glowState={pipelineRunning ? "active" : "idle"} style={{ padding: 12 }}>
+        <SectionHeader title="Output" subtitle="agent_pipeline stream binds here" />
         <div style={{ height: 12 }} />
         <pre
           style={{
@@ -197,17 +126,17 @@ export default function StudioPage() {
       <GlassPanel tight style={{ padding: 12 }}>
         <SectionHeader
           title="Pipeline"
-          subtitle="/ws step_* drives active step"
+          subtitle="execution_monitor drives active step"
           right={
             <button
               className="af-button"
               type="button"
               onClick={() => {
-                const ids = pipelineSteps.map((s) => (typeof s === "string" ? s : s.id));
-                const currentIdx = ids.indexOf(activeStepId);
-                const nextId = ids[(currentIdx + 1) % ids.length];
-                setActiveStepId(nextId);
-                appendLog("info", `Active step: ${nextId}`);
+                const ids = pipelineSteps.map((s) => s.id);
+                const idx = ids.indexOf(activeStep);
+                const next = ids[(idx + 1) % ids.length];
+                setActiveStep(next);
+                appendLog("info", `Active step: ${next}`);
               }}
             >
               Next
@@ -219,12 +148,12 @@ export default function StudioPage() {
       <GlassPanel className="af-scroll" style={{ padding: 12 }}>
         <PipelineView
           steps={pipelineSteps}
-          activeStepId={activeStepId}
+          activeStepId={activeStep}
           orientation="vertical"
           running={pipelineRunning}
         />
         <div style={{ height: 14 }} />
-        <SectionHeader title="Logs" subtitle="/ws event stream" />
+        <SectionHeader title="Logs" subtitle="event stream (scrollable)" />
         <div style={{ height: 12 }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {logs.map((l, i) => (
@@ -245,7 +174,9 @@ export default function StudioPage() {
                   color:
                     l.level === "error"
                       ? "rgba(184, 50, 69, 0.92)"
-                      : "rgba(230, 237, 243, 0.86)",
+                      : l.level === "warn"
+                        ? "rgba(230, 237, 243, 0.86)"
+                        : "rgba(230, 237, 243, 0.86)",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                 }}
@@ -260,32 +191,24 @@ export default function StudioPage() {
     </div>
   );
 
-  // S-5: Display global system state from SystemContext (score, iteration, pipeline status)
-  const sysStatus = systemState?.pipeline?.status ?? (pipelineRunning ? "running" : "idle");
-  const sysIteration = systemState?.iteration ?? 0;
-  const sysScore = systemState?.score ?? 0;
-
   const floating = (
-    <GlassPanel tight glowState={glowState} style={{ padding: 12 }}>
+    <GlassPanel tight glowState={pipelineRunning ? "running" : "idle"} style={{ padding: 12 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div style={{ fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>System State</div>
           <div className="af-text-muted" style={{ fontSize: 12 }}>
-            {sysStatus}
-            {sysIteration > 0 && ` · iter ${sysIteration}`}
-            {sysScore > 0 && ` · score ${sysScore}`}
+            {pipelineRunning ? "Running" : "Idle"}
           </div>
         </div>
         <button
           className="af-button"
           type="button"
           onClick={() => {
-            const next = !pipelineRunning;
-            setRunning(next);
-            appendLog("info", `Pipeline toggled: ${next ? "running" : "idle"}`);
+            setPipelineRunning((v) => !v);
+            appendLog("info", `Pipeline toggled: ${!pipelineRunning ? "running" : "idle"}`);
           }}
         >
-          {pipelineRunning ? "Pause" : "Resume"}
+          Toggle
         </button>
       </div>
     </GlassPanel>

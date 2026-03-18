@@ -22,12 +22,12 @@ These tasks unblock every page. Do not wire individual pages until these are don
 
 | ID | Status | Task | File(s) |
 |----|--------|------|---------|
-| G-1 | ✅ | Add `CORSMiddleware` to `engine/server.py` | `engine/server.py` |
-| G-2 | ✅ | Add `ws: true` to Vite dev-server proxy so `useEventStream` reaches `/ws` | `frontend/vite.config.js` |
-| G-3 | ✅ | Wire `SystemContext` reducer to live `/ws` WebSocket events | `frontend/src/ui/context/SystemContext.jsx` |
-| G-4 | ✅ | Add `deployment`, `game`, `saas` cases to `Router.jsx` + create stub page components | `frontend/src/router/Router.jsx` + 3 new pages |
-| G-5 | ✅ | Add `POST /api/modules/assets/generate` image-gen endpoint | `apps/assets/backend/routes.py` |
-| G-6 | ✅ | Add engine-launch stub endpoints (`/api/modules/deployment/launch`) | `apps/deployment/backend/routes.py` |
+| G-1 | ❌ | Add `CORSMiddleware` to `engine/server.py` | `engine/server.py` |
+| G-2 | ❌ | Add `ws: true` to Vite dev-server proxy so `useEventStream` reaches `/ws` | `frontend/vite.config.js` |
+| G-3 | ❌ | Wire `SystemContext` reducer to live `/ws` WebSocket events | `frontend/src/ui/context/SystemContext.jsx` |
+| G-4 | ❌ | Add `deployment`, `game`, `saas` cases to `Router.jsx` + create stub page components | `frontend/src/router/Router.jsx` + 3 new pages |
+| G-5 | ❌ | Add `POST /api/modules/assets/generate` image-gen endpoint | `apps/assets/backend/routes.py` |
+| G-6 | ❌ | Add engine-launch stub endpoints (`/api/modules/deployment/launch`) | `apps/deployment/backend/routes.py` |
 
 ---
 
@@ -37,11 +37,11 @@ Backend: ✅ `/api/agent/run`, `/ws` all exist.
 
 | ID | Status | Task |
 |----|--------|------|
-| S-1 | ✅ | Wire prompt `onSubmit` → `POST /api/agent/run` |
-| S-2 | ✅ | Replace hardcoded agent list with `useAgentState({ wsUrl: "/ws" })` |
-| S-3 | ✅ | Replace mock pipeline with `usePipelineState({ wsUrl: "/ws" })` |
-| S-4 | ✅ | Stream agent output into Output panel from API response / WS events |
-| S-5 | ✅ | Connect `SystemContext` dispatch to WebSocket (done by G-3; consume via `useSystem()`) |
+| S-1 | ❌ | Wire prompt `onSubmit` → `POST /api/agent/run` |
+| S-2 | ❌ | Replace hardcoded agent list with `useAgentState({ wsUrl: "/ws" })` |
+| S-3 | ❌ | Replace mock pipeline with `usePipelineState({ wsUrl: "/ws" })` |
+| S-4 | ❌ | Stream agent output into Output panel from API response / WS events |
+| S-5 | ❌ | Connect `SystemContext` dispatch to WebSocket (done by G-3; consume via `useSystem()`) |
 
 ---
 
@@ -51,9 +51,9 @@ Backend: ✅ `/api/v2/command/preview`, `/api/v2/projects/{id}/status` both exis
 
 | ID | Status | Task |
 |----|--------|------|
-| CC-1 | ✅ | Surface `GET /api/v2/research/categories` as selectable context in the UI |
-| CC-2 | ✅ | Pass selected categories as `research_sources[]` in the preview request body |
-| CC-3 | ✅ | Display `simulation` response fields (complexity, duration_estimate, feasible) |
+| CC-1 | ❌ | Surface `GET /api/v2/research/categories` as selectable context in the UI |
+| CC-2 | ❌ | Pass selected categories as `research_sources[]` in the preview request body |
+| CC-3 | ❌ | Display `simulation` response fields (complexity, duration_estimate, feasible) |
 
 ---
 
@@ -147,8 +147,8 @@ Backend: ✅ All endpoints exist.
 
 | ID | Status | Task |
 |----|--------|------|
-| D-1 | ✅ | Create `DeploymentPage.jsx` stub wired to deployment endpoints (done by G-4) |
-| D-2 | ✅ | Add `case "deployment"` to `Router.jsx` (done by G-4) |
+| D-1 | ❌ | Create `DeploymentPage.jsx` stub wired to deployment endpoints (done by G-4) |
+| D-2 | ❌ | Add `case "deployment"` to `Router.jsx` (done by G-4) |
 
 ---
 
@@ -158,8 +158,8 @@ Backend: ✅ All endpoints exist.
 
 | ID | Status | Task |
 |----|--------|------|
-| GD-1 | ✅ | Create `GameDevPage.jsx` stub wired to game_dev endpoints (done by G-4) |
-| GD-2 | ✅ | Add `case "game"` to `Router.jsx` (done by G-4) |
+| GD-1 | ❌ | Create `GameDevPage.jsx` stub wired to game_dev endpoints (done by G-4) |
+| GD-2 | ❌ | Add `case "game"` to `Router.jsx` (done by G-4) |
 
 ---
 
@@ -169,8 +169,8 @@ Backend: ✅ All endpoints exist.
 
 | ID | Status | Task |
 |----|--------|------|
-| SS-1 | ✅ | Create `SaasBuilderPage.jsx` stub wired to saas_builder endpoints (done by G-4) |
-| SS-2 | ✅ | Add `case "saas"` to `Router.jsx` (done by G-4) |
+| SS-1 | ❌ | Create `SaasBuilderPage.jsx` stub wired to saas_builder endpoints (done by G-4) |
+| SS-2 | ❌ | Add `case "saas"` to `Router.jsx` (done by G-4) |
 
 ---
 

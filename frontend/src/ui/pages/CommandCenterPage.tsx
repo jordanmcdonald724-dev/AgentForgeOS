@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import AppLayout from "../components/layout/AppLayout";
 import GlassPanel from "../components/panels/GlassPanel";
 import SectionHeader from "../components/panels/SectionHeader";
@@ -98,35 +98,6 @@ export const CommandCenterPage: React.FC = () => {
   const [preview, setPreview] = useState<CommandPreviewResponse["data"] | null>(null);
   const [projectStatus, setProjectStatus] = useState<ProjectStatusResponse["data"] | null>(null);
 
-  // CC-1: categories fetched from GET /api/v2/research/categories
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    fetch("/api/v2/research/categories")
-      .then((r) => r.json())
-      .then((json: { success: boolean; data?: { categories: string[] } }) => {
-        if (json.success && json.data?.categories) {
-          setCategories(json.data.categories);
-        }
-      })
-      .catch(() => {
-        // best-effort; stay empty if backend unreachable
-      });
-  }, []);
-
-  const toggleCategory = useCallback((cat: string) => {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) {
-        next.delete(cat);
-      } else {
-        next.add(cat);
-      }
-      return next;
-    });
-  }, []);
-
   const fetchProjectStatus = useCallback(async (projectId: string) => {
     try {
       const res = await fetch(`/api/v2/projects/${encodeURIComponent(projectId)}/status`);
@@ -144,20 +115,10 @@ export const CommandCenterPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      // CC-2: pass selected categories as research_sources[]
-      const researchSources = Array.from(selectedCategories).map((id) => ({
-        id,
-        kind: "research",
-        label: id,
-      }));
       const res = await fetch("/api/v2/command/preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          command,
-          brief: { source: "command-center" },
-          research_sources: researchSources.length > 0 ? researchSources : undefined,
-        }),
+        body: JSON.stringify({ command, brief: { source: "command-center" } }),
       });
       const json: CommandPreviewResponse = await res.json();
       if (!json.success) {
@@ -171,7 +132,7 @@ export const CommandCenterPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [command, selectedCategories, fetchProjectStatus]);
+  }, [command, fetchProjectStatus]);
 
   // Local, relaxed-typing aliases so this TSX file doesn't require
   // specifying optional visual props like glowState/right/floating.
@@ -197,47 +158,6 @@ export const CommandCenterPage: React.FC = () => {
           placeholder="Describe the product or game you want AgentForge to plan and simulate…"
           aria-label="Command input"
         />
-
-        {/* CC-1: Research context categories */}
-        {categories.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <span
-              style={{
-                fontSize: 11,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "rgba(148,163,184,0.80)",
-              }}
-            >
-              Research context
-            </span>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {categories.map((cat) => {
-                const active = selectedCategories.has(cat);
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => toggleCategory(cat)}
-                    style={{
-                      fontSize: 11,
-                      padding: "3px 10px",
-                      borderRadius: 999,
-                      border: `1px solid ${active ? "rgba(45,212,191,0.80)" : "rgba(148,163,184,0.40)"}`,
-                      background: active ? "rgba(45,212,191,0.12)" : "rgba(15,23,42,0.85)",
-                      color: active ? "rgba(45,212,191,0.96)" : "rgba(148,163,184,0.80)",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    {cat.replace(/_/g, " ")}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button
             className="af-button"
@@ -247,11 +167,6 @@ export const CommandCenterPage: React.FC = () => {
           >
             {loading ? "Simulating…" : "Run Simulation"}
           </button>
-          {selectedCategories.size > 0 && (
-            <span style={{ fontSize: 11, color: "rgba(45,212,191,0.80)" }}>
-              {selectedCategories.size} context{selectedCategories.size > 1 ? "s" : ""} selected
-            </span>
-          )}
           {error && <span style={{ fontSize: 12, color: "rgba(248,113,113,0.96)" }}>{error}</span>}
         </div>
       </div>
@@ -397,74 +312,6 @@ export const CommandCenterPage: React.FC = () => {
           {preview?.build_status ?? "pending"}
         </span>
       </div>
-
-      {/* CC-3: Simulation report fields */}
-      {preview?.simulation && Object.keys(preview.simulation).length > 0 && (
-        <>
-          <div style={{ height: 14 }} />
-          <ShellSectionHeader title="Simulation Report" subtitle="complexity · duration · feasibility" />
-          <div style={{ height: 10 }} />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: 8,
-              fontSize: 11,
-            }}
-          >
-            {preview.simulation.complexity != null && (
-              <span className="af-text-muted">
-                Complexity:{" "}
-                <span style={{ color: "rgba(230,237,243,0.92)" }}>
-                  {preview.simulation.complexity}
-                </span>
-              </span>
-            )}
-            {preview.simulation.duration_estimate != null && (
-              <span className="af-text-muted">
-                Duration:{" "}
-                <span style={{ color: "rgba(230,237,243,0.92)" }}>
-                  {preview.simulation.duration_estimate}
-                </span>
-              </span>
-            )}
-            {preview.simulation.project_size != null && (
-              <span className="af-text-muted">
-                Project size:{" "}
-                <span style={{ color: "rgba(230,237,243,0.92)" }}>
-                  {preview.simulation.project_size}
-                </span>
-              </span>
-            )}
-            {preview.simulation.feasible != null && (
-              <span className="af-text-muted">
-                Feasible:{" "}
-                <span
-                  style={{
-                    color: preview.simulation.feasible
-                      ? "rgba(45,212,191,0.92)"
-                      : "rgba(248,113,113,0.92)",
-                  }}
-                >
-                  {preview.simulation.feasible ? "yes" : "no"}
-                </span>
-              </span>
-            )}
-            {preview.simulation.architecture_preview != null && (
-              <span
-                className="af-text-muted"
-                style={{ gridColumn: "1 / -1", whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-              >
-                Architecture:{" "}
-                <span style={{ color: "rgba(230,237,243,0.92)" }}>
-                  {preview.simulation.architecture_preview}
-                </span>
-              </span>
-            )}
-          </div>
-        </>
-      )}
-
       {projectStatus?.artifact_index && (
         <>
           <div style={{ height: 14 }} />

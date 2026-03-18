@@ -1,0 +1,18 @@
+{
+  "frontend": {
+    "pages": [
+      "command_center",
+      "project_workspace",
+      "research_lab"
+    ]
+  },
+  "backend": {
+    "services": [
+      "orchestration",
+      "knowledge",
+      "research",
+      "infrastructure"
+    ]
+  },
+  "gameplay": {}
+}

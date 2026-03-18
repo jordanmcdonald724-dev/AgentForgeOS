@@ -1,0 +1,8 @@
+{
+  "name": "Research",
+  "id": "research",
+  "version": "1.0",
+  "description": "Knowledge search and analysis",
+  "entry": "module.py",
+  "class": "ResearchModule"
+}

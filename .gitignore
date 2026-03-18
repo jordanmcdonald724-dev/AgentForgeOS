@@ -2,7 +2,6 @@
 
 # IDE and editors
 .idea/
-.vscode/
 
 # Dependencies
 node_modules/
@@ -31,7 +30,10 @@ dist/
 dist
 
 # Environment files (comprehensive coverage)
+*.env
+*.env.*
 
+# Credentials and secrets
 *token.json*
 *credentials.json*
 
@@ -77,19 +79,10 @@ agenthub/agents/youtube/db
 .cache/
 
 # Mobile development
-android-sdk/ -e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+android-sdk/
+
+# Emergent agent build artifacts
+.emergent/
+.gitconfig
+test_result.md
+test_reports/

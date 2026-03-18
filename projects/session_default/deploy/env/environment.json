@@ -1,0 +1,8 @@
+{
+  "environment": "dev",
+  "services": [
+    "backend",
+    "frontend",
+    "db"
+  ]
+}

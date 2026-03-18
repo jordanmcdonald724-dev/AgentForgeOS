@@ -2012,7 +2012,6 @@ const SetupWizard = ({ onComplete }) => {
 
   const finishSetup = () => {
     // In real app, this would save to config/.env
-    console.log("Setup complete with config:", config);
     onComplete();
   };
 

@@ -569,12 +569,15 @@ const SandboxPanel = ({ addLog }) => {
       ));
       
       setTimeout(() => {
-        setBuildSteps(prev => prev.map((s, i) => 
-          i === stepIndex ? { ...s, status: "done", output: `Step ${i + 1} completed` } : s
-        ));
-        setConsoleOutput(prev => [...prev, 
-          { type: "info", text: `[${buildSteps[stepIndex].name}] Completed` }
-        ]);
+        setBuildSteps(prev => {
+          const stepName = prev[stepIndex]?.name || `Step ${stepIndex + 1}`;
+          setConsoleOutput(c => [...c, 
+            { type: "info", text: `[${stepName}] Completed` }
+          ]);
+          return prev.map((s, i) => 
+            i === stepIndex ? { ...s, status: "done", output: `Step ${i + 1} completed` } : s
+          );
+        });
         stepIndex++;
         runStep();
       }, 800 + Math.random() * 400);

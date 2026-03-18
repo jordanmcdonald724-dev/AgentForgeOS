@@ -11,7 +11,11 @@ import {
   Box, Gamepad2, Building2, FolderOpen, ChevronRight,
   Send, Settings, User, Cpu, FileText, FileCode, File,
   Plus, Search, Upload, Database, Globe, Zap, Play, Square,
-  Circle, GitBranch, Link2, Trash2, Eye, Code, Terminal
+  Circle, GitBranch, Link2, Trash2, Eye, Code, Terminal,
+  X, Clock, Star, Folder, Check, AlertTriangle, Activity,
+  Server, HardDrive, Wifi, WifiOff, Key, Palette, Bell,
+  Keyboard, Monitor, Moon, Sun, Volume2, Shield, Lock,
+  Mail, Calendar, BarChart3, TrendingUp, Award, Target
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -50,8 +54,743 @@ const formatTime = () => {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 };
 
+// ===============================================
+// MODAL PAGES FOR TOP NAVIGATION
+// ===============================================
+
+// Modal Container
+const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-container" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title">{title}</h2>
+          <button className="modal-close" onClick={onClose}>
+            <X size={20} />
+          </button>
+        </div>
+        <div className="modal-content">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 1. PROJECT PAGE
+const ProjectPage = ({ isOpen, onClose, addLog }) => {
+  const [projects, setProjects] = useState([
+    { id: 1, name: "AgentForgeOS", path: "/projects/agentforge", lastOpened: "2 hours ago", starred: true },
+    { id: 2, name: "GameEngine Module", path: "/projects/game-engine", lastOpened: "Yesterday", starred: false },
+    { id: 3, name: "SaaS Template", path: "/projects/saas-template", lastOpened: "3 days ago", starred: true },
+  ]);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [activeTab, setActiveTab] = useState("recent");
+
+  const createProject = () => {
+    if (!newProjectName.trim()) return;
+    const newProject = {
+      id: Date.now(),
+      name: newProjectName,
+      path: `/projects/${newProjectName.toLowerCase().replace(/\s+/g, '-')}`,
+      lastOpened: "Just now",
+      starred: false
+    };
+    setProjects([newProject, ...projects]);
+    setNewProjectName("");
+    addLog("info", `Project created: ${newProjectName}`);
+  };
+
+  const toggleStar = (id) => {
+    setProjects(projects.map(p => p.id === id ? { ...p, starred: !p.starred } : p));
+  };
+
+  const openProject = (project) => {
+    addLog("info", `Opened project: ${project.name}`);
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Project Manager">
+      <div className="page-tabs">
+        <button className={`page-tab ${activeTab === 'recent' ? 'active' : ''}`} onClick={() => setActiveTab('recent')}>
+          <Clock size={14} /> Recent
+        </button>
+        <button className={`page-tab ${activeTab === 'starred' ? 'active' : ''}`} onClick={() => setActiveTab('starred')}>
+          <Star size={14} /> Starred
+        </button>
+        <button className={`page-tab ${activeTab === 'new' ? 'active' : ''}`} onClick={() => setActiveTab('new')}>
+          <Plus size={14} /> New Project
+        </button>
+      </div>
+
+      {activeTab === 'new' && (
+        <div className="page-section">
+          <div className="form-group">
+            <label>Project Name</label>
+            <input 
+              className="input" 
+              placeholder="My Awesome Project" 
+              value={newProjectName} 
+              onChange={(e) => setNewProjectName(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Template</label>
+            <div className="template-grid">
+              <div className="template-card active">
+                <Layout size={24} />
+                <span>Blank Project</span>
+              </div>
+              <div className="template-card">
+                <Gamepad2 size={24} />
+                <span>Game Dev</span>
+              </div>
+              <div className="template-card">
+                <Building2 size={24} />
+                <span>SaaS Starter</span>
+              </div>
+              <div className="template-card">
+                <Globe size={24} />
+                <span>API Service</span>
+              </div>
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={createProject} style={{ width: '100%' }}>
+            <Plus size={14} /> Create Project
+          </button>
+        </div>
+      )}
+
+      {(activeTab === 'recent' || activeTab === 'starred') && (
+        <div className="project-list">
+          {projects
+            .filter(p => activeTab === 'recent' || p.starred)
+            .map(project => (
+              <div key={project.id} className="project-card" onClick={() => openProject(project)}>
+                <div className="project-icon">
+                  <Folder size={20} />
+                </div>
+                <div className="project-info">
+                  <span className="project-name">{project.name}</span>
+                  <span className="project-path">{project.path}</span>
+                </div>
+                <span className="project-time">{project.lastOpened}</span>
+                <button 
+                  className={`star-btn ${project.starred ? 'starred' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); toggleStar(project.id); }}
+                >
+                  <Star size={16} fill={project.starred ? "currentColor" : "none"} />
+                </button>
+              </div>
+            ))}
+        </div>
+      )}
+    </Modal>
+  );
+};
+
+// 2. WORKSPACE PAGE
+const WorkspacePage = ({ isOpen, onClose, addLog }) => {
+  const [layout, setLayout] = useState("default");
+  const [theme, setTheme] = useState("dark");
+  const [activeModules, setActiveModules] = useState(["studio", "builds", "research", "sandbox"]);
+
+  const layouts = [
+    { id: "default", name: "Default", desc: "Sidebar + Workspace + 3-Panel Bottom" },
+    { id: "focused", name: "Focused", desc: "Maximized workspace, minimal UI" },
+    { id: "split", name: "Split View", desc: "Side-by-side workspaces" },
+    { id: "compact", name: "Compact", desc: "Condensed layout for smaller screens" },
+  ];
+
+  const toggleModule = (id) => {
+    setActiveModules(prev => 
+      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+    );
+  };
+
+  const applyLayout = (layoutId) => {
+    setLayout(layoutId);
+    addLog("info", `Layout changed to: ${layouts.find(l => l.id === layoutId)?.name}`);
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Workspace Configuration">
+      <div className="page-section">
+        <h3 className="section-title">Layout Presets</h3>
+        <div className="layout-grid">
+          {layouts.map(l => (
+            <div 
+              key={l.id} 
+              className={`layout-card ${layout === l.id ? 'active' : ''}`}
+              onClick={() => applyLayout(l.id)}
+            >
+              <div className="layout-preview">
+                <Monitor size={32} />
+              </div>
+              <span className="layout-name">{l.name}</span>
+              <span className="layout-desc">{l.desc}</span>
+              {layout === l.id && <Check size={16} className="layout-check" />}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Active Modules</h3>
+        <p className="section-desc">Toggle which modules appear in the sidebar</p>
+        <div className="module-toggles">
+          {MODULES.map(mod => {
+            const Icon = mod.icon;
+            return (
+              <div 
+                key={mod.id} 
+                className={`module-toggle ${activeModules.includes(mod.id) ? 'active' : ''}`}
+                onClick={() => toggleModule(mod.id)}
+              >
+                <Icon size={18} />
+                <span>{mod.name}</span>
+                <div className="toggle-switch">
+                  <div className="toggle-knob" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Quick Actions</h3>
+        <div className="quick-actions">
+          <button className="btn btn-secondary">
+            <Upload size={14} /> Export Layout
+          </button>
+          <button className="btn btn-secondary">
+            <FolderOpen size={14} /> Import Layout
+          </button>
+          <button className="btn btn-danger">
+            Reset to Default
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+// 3. PROVIDERS PAGE
+const ProvidersPage = ({ isOpen, onClose, addLog }) => {
+  const [providers, setProviders] = useState({
+    llm: { provider: "ollama", apiKey: "", model: "llama3", status: "connected" },
+    image: { provider: "comfyui", apiKey: "", endpoint: "http://localhost:8188", status: "connected" },
+    tts: { provider: "piper", apiKey: "", voice: "en_US-lessac", status: "disconnected" },
+    embedding: { provider: "ollama", apiKey: "", model: "nomic-embed-text", status: "connected" },
+  });
+
+  const providerOptions = {
+    llm: ["ollama", "openai", "anthropic", "local"],
+    image: ["comfyui", "fal", "replicate", "local"],
+    tts: ["piper", "elevenlabs", "openai-tts", "local"],
+    embedding: ["ollama", "openai", "local"],
+  };
+
+  const updateProvider = (type, field, value) => {
+    setProviders(prev => ({
+      ...prev,
+      [type]: { ...prev[type], [field]: value }
+    }));
+  };
+
+  const testConnection = (type) => {
+    const provider = providers[type];
+    addLog("info", `Testing ${type.toUpperCase()} connection to ${provider.provider}...`);
+    // Simulate connection test
+    setTimeout(() => {
+      updateProvider(type, 'status', Math.random() > 0.3 ? 'connected' : 'error');
+      addLog(providers[type].status === 'connected' ? "success" : "error", 
+        `${type.toUpperCase()} ${providers[type].status === 'connected' ? 'connected' : 'failed'}`);
+    }, 1000);
+  };
+
+  const ProviderCard = ({ type, title, icon: Icon }) => {
+    const p = providers[type];
+    return (
+      <div className="provider-card">
+        <div className="provider-header">
+          <Icon size={20} />
+          <span className="provider-title">{title}</span>
+          <span className={`provider-status ${p.status}`}>
+            {p.status === 'connected' ? <Wifi size={14} /> : <WifiOff size={14} />}
+            {p.status}
+          </span>
+        </div>
+        <div className="provider-body">
+          <div className="form-row">
+            <label>Provider</label>
+            <select 
+              className="select" 
+              value={p.provider} 
+              onChange={(e) => updateProvider(type, 'provider', e.target.value)}
+            >
+              {providerOptions[type].map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+          {p.provider !== 'local' && p.provider !== 'ollama' && p.provider !== 'piper' && p.provider !== 'comfyui' && (
+            <div className="form-row">
+              <label>API Key</label>
+              <div className="input-with-icon">
+                <Key size={14} />
+                <input 
+                  type="password" 
+                  className="input" 
+                  placeholder="sk-..." 
+                  value={p.apiKey}
+                  onChange={(e) => updateProvider(type, 'apiKey', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+          <div className="form-row">
+            <label>Model / Voice</label>
+            <input 
+              className="input" 
+              value={p.model || p.voice || p.endpoint || ''} 
+              onChange={(e) => updateProvider(type, p.model ? 'model' : p.voice ? 'voice' : 'endpoint', e.target.value)}
+            />
+          </div>
+          <button className="btn btn-secondary" onClick={() => testConnection(type)}>
+            <Activity size={14} /> Test Connection
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="AI Providers">
+      <div className="providers-grid">
+        <ProviderCard type="llm" title="LLM Provider" icon={Cpu} />
+        <ProviderCard type="image" title="Image Generation" icon={ImageIcon} />
+        <ProviderCard type="tts" title="Text-to-Speech" icon={Volume2} />
+        <ProviderCard type="embedding" title="Embeddings" icon={Database} />
+      </div>
+      <div className="page-section">
+        <div className="provider-note">
+          <AlertTriangle size={16} />
+          <span>Local providers (Ollama, ComfyUI, Piper) must be running on your machine. No API keys required.</span>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+// 4. SYSTEM PAGE
+const SystemPage = ({ isOpen, onClose, addLog }) => {
+  const [services, setServices] = useState([
+    { name: "Engine Server", status: "running", port: 8001, uptime: "2h 34m", cpu: "2.3%", memory: "128MB" },
+    { name: "Database", status: "running", port: 27017, uptime: "2h 34m", cpu: "0.8%", memory: "256MB" },
+    { name: "Bridge Server", status: "running", port: 8080, uptime: "2h 34m", cpu: "0.2%", memory: "64MB" },
+    { name: "Worker System", status: "running", port: null, uptime: "2h 34m", cpu: "5.1%", memory: "512MB" },
+    { name: "Vector Store", status: "stopped", port: 6333, uptime: "-", cpu: "-", memory: "-" },
+  ]);
+
+  const [systemStats, setSystemStats] = useState({
+    totalCpu: "8.4%",
+    totalMemory: "1.2GB / 16GB",
+    activeAgents: 3,
+    queuedTasks: 12,
+    completedToday: 47,
+  });
+
+  const toggleService = (name) => {
+    setServices(services.map(s => 
+      s.name === name ? { ...s, status: s.status === 'running' ? 'stopped' : 'running' } : s
+    ));
+    addLog("info", `${name} ${services.find(s => s.name === name)?.status === 'running' ? 'stopped' : 'started'}`);
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="System Status">
+      <div className="system-overview">
+        <div className="stat-card">
+          <Cpu size={20} />
+          <div className="stat-info">
+            <span className="stat-value">{systemStats.totalCpu}</span>
+            <span className="stat-label">CPU Usage</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <HardDrive size={20} />
+          <div className="stat-info">
+            <span className="stat-value">{systemStats.totalMemory}</span>
+            <span className="stat-label">Memory</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <Activity size={20} />
+          <div className="stat-info">
+            <span className="stat-value">{systemStats.activeAgents}</span>
+            <span className="stat-label">Active Agents</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <Clock size={20} />
+          <div className="stat-info">
+            <span className="stat-value">{systemStats.queuedTasks}</span>
+            <span className="stat-label">Queued Tasks</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Services</h3>
+        <div className="services-list">
+          {services.map(service => (
+            <div key={service.name} className="service-row">
+              <div className={`service-status ${service.status}`}>
+                {service.status === 'running' ? <Check size={14} /> : <X size={14} />}
+              </div>
+              <div className="service-info">
+                <span className="service-name">{service.name}</span>
+                {service.port && <span className="service-port">:{service.port}</span>}
+              </div>
+              <span className="service-metric">{service.uptime}</span>
+              <span className="service-metric">{service.cpu}</span>
+              <span className="service-metric">{service.memory}</span>
+              <button 
+                className={`btn btn-sm ${service.status === 'running' ? 'btn-danger' : 'btn-primary'}`}
+                onClick={() => toggleService(service.name)}
+              >
+                {service.status === 'running' ? 'Stop' : 'Start'}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Protected Directories</h3>
+        <p className="section-desc">AI agents cannot modify these system directories:</p>
+        <div className="protected-dirs">
+          <code>engine/</code>
+          <code>services/</code>
+          <code>providers/</code>
+          <code>control/</code>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+// 5. SETTINGS PAGE
+const SettingsPage = ({ isOpen, onClose, addLog }) => {
+  const [settings, setSettings] = useState({
+    theme: "dark",
+    accentColor: "red",
+    fontSize: "medium",
+    notifications: true,
+    sounds: false,
+    autoSave: true,
+    telemetry: false,
+  });
+
+  const [activeSection, setActiveSection] = useState("appearance");
+
+  const updateSetting = (key, value) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+    addLog("info", `Setting updated: ${key} = ${value}`);
+  };
+
+  const shortcuts = [
+    { action: "Open Project", keys: "Ctrl + O" },
+    { action: "Save", keys: "Ctrl + S" },
+    { action: "New File", keys: "Ctrl + N" },
+    { action: "Command Palette", keys: "Ctrl + Shift + P" },
+    { action: "Toggle Sidebar", keys: "Ctrl + B" },
+    { action: "Run Build", keys: "F5" },
+    { action: "Stop Build", keys: "Shift + F5" },
+    { action: "Toggle Console", keys: "Ctrl + `" },
+  ];
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Settings">
+      <div className="settings-layout">
+        <div className="settings-nav">
+          <button 
+            className={`settings-nav-item ${activeSection === 'appearance' ? 'active' : ''}`}
+            onClick={() => setActiveSection('appearance')}
+          >
+            <Palette size={16} /> Appearance
+          </button>
+          <button 
+            className={`settings-nav-item ${activeSection === 'notifications' ? 'active' : ''}`}
+            onClick={() => setActiveSection('notifications')}
+          >
+            <Bell size={16} /> Notifications
+          </button>
+          <button 
+            className={`settings-nav-item ${activeSection === 'shortcuts' ? 'active' : ''}`}
+            onClick={() => setActiveSection('shortcuts')}
+          >
+            <Keyboard size={16} /> Shortcuts
+          </button>
+          <button 
+            className={`settings-nav-item ${activeSection === 'privacy' ? 'active' : ''}`}
+            onClick={() => setActiveSection('privacy')}
+          >
+            <Shield size={16} /> Privacy
+          </button>
+        </div>
+
+        <div className="settings-content">
+          {activeSection === 'appearance' && (
+            <div className="settings-section">
+              <h3>Appearance</h3>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Theme</span>
+                  <span className="setting-desc">Choose your preferred color scheme</span>
+                </div>
+                <div className="theme-options">
+                  <button 
+                    className={`theme-btn ${settings.theme === 'dark' ? 'active' : ''}`}
+                    onClick={() => updateSetting('theme', 'dark')}
+                  >
+                    <Moon size={16} /> Dark
+                  </button>
+                  <button 
+                    className={`theme-btn ${settings.theme === 'light' ? 'active' : ''}`}
+                    onClick={() => updateSetting('theme', 'light')}
+                  >
+                    <Sun size={16} /> Light
+                  </button>
+                </div>
+              </div>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Accent Color</span>
+                  <span className="setting-desc">Primary highlight color</span>
+                </div>
+                <div className="color-options">
+                  {['red', 'blue', 'green', 'purple', 'orange'].map(color => (
+                    <button 
+                      key={color}
+                      className={`color-btn ${color} ${settings.accentColor === color ? 'active' : ''}`}
+                      onClick={() => updateSetting('accentColor', color)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Font Size</span>
+                  <span className="setting-desc">UI text size</span>
+                </div>
+                <select 
+                  className="select"
+                  value={settings.fontSize}
+                  onChange={(e) => updateSetting('fontSize', e.target.value)}
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'notifications' && (
+            <div className="settings-section">
+              <h3>Notifications</h3>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Enable Notifications</span>
+                  <span className="setting-desc">Show desktop notifications for events</span>
+                </div>
+                <div 
+                  className={`toggle-switch-lg ${settings.notifications ? 'active' : ''}`}
+                  onClick={() => updateSetting('notifications', !settings.notifications)}
+                >
+                  <div className="toggle-knob" />
+                </div>
+              </div>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Sound Effects</span>
+                  <span className="setting-desc">Play sounds for actions</span>
+                </div>
+                <div 
+                  className={`toggle-switch-lg ${settings.sounds ? 'active' : ''}`}
+                  onClick={() => updateSetting('sounds', !settings.sounds)}
+                >
+                  <div className="toggle-knob" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'shortcuts' && (
+            <div className="settings-section">
+              <h3>Keyboard Shortcuts</h3>
+              <div className="shortcuts-list">
+                {shortcuts.map((s, i) => (
+                  <div key={i} className="shortcut-row">
+                    <span className="shortcut-action">{s.action}</span>
+                    <kbd className="shortcut-keys">{s.keys}</kbd>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'privacy' && (
+            <div className="settings-section">
+              <h3>Privacy & Data</h3>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Auto-Save</span>
+                  <span className="setting-desc">Automatically save changes</span>
+                </div>
+                <div 
+                  className={`toggle-switch-lg ${settings.autoSave ? 'active' : ''}`}
+                  onClick={() => updateSetting('autoSave', !settings.autoSave)}
+                >
+                  <div className="toggle-knob" />
+                </div>
+              </div>
+              <div className="setting-row">
+                <div className="setting-info">
+                  <span className="setting-label">Usage Analytics</span>
+                  <span className="setting-desc">Help improve AgentForgeOS</span>
+                </div>
+                <div 
+                  className={`toggle-switch-lg ${settings.telemetry ? 'active' : ''}`}
+                  onClick={() => updateSetting('telemetry', !settings.telemetry)}
+                >
+                  <div className="toggle-knob" />
+                </div>
+              </div>
+              <div className="setting-row">
+                <button className="btn btn-danger">
+                  <Trash2 size={14} /> Clear All Data
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+// 6. PROFILE PAGE
+const ProfilePage = ({ isOpen, onClose, addLog }) => {
+  const [profile, setProfile] = useState({
+    name: "Developer",
+    email: "dev@agentforge.local",
+    avatar: "https://images.unsplash.com/photo-1605504836193-e77d3d9ede8a?w=100&h=100&fit=crop",
+    role: "Admin",
+    joinDate: "January 2024",
+  });
+
+  const [stats, setStats] = useState({
+    projectsCreated: 12,
+    buildsRun: 156,
+    experimentsRun: 43,
+    hoursActive: 89,
+  });
+
+  const [achievements, setAchievements] = useState([
+    { id: 1, name: "First Build", desc: "Completed your first build", unlocked: true },
+    { id: 2, name: "Agent Master", desc: "Used all 12 agents", unlocked: true },
+    { id: 3, name: "Knowledge Seeker", desc: "Added 50 research notes", unlocked: false },
+    { id: 4, name: "Deploy King", desc: "10 successful deployments", unlocked: true },
+  ]);
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Profile">
+      <div className="profile-header">
+        <div className="profile-avatar-section">
+          <img src={profile.avatar} alt="Avatar" className="profile-avatar" />
+          <button className="btn btn-secondary btn-sm">Change Avatar</button>
+        </div>
+        <div className="profile-info-section">
+          <input 
+            className="input profile-name-input" 
+            value={profile.name} 
+            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+          />
+          <div className="profile-meta">
+            <span><Mail size={14} /> {profile.email}</span>
+            <span><Shield size={14} /> {profile.role}</span>
+            <span><Calendar size={14} /> Joined {profile.joinDate}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Activity Stats</h3>
+        <div className="profile-stats">
+          <div className="profile-stat">
+            <Folder size={20} />
+            <span className="stat-value">{stats.projectsCreated}</span>
+            <span className="stat-label">Projects</span>
+          </div>
+          <div className="profile-stat">
+            <Layers size={20} />
+            <span className="stat-value">{stats.buildsRun}</span>
+            <span className="stat-label">Builds</span>
+          </div>
+          <div className="profile-stat">
+            <Box size={20} />
+            <span className="stat-value">{stats.experimentsRun}</span>
+            <span className="stat-label">Experiments</span>
+          </div>
+          <div className="profile-stat">
+            <Clock size={20} />
+            <span className="stat-value">{stats.hoursActive}h</span>
+            <span className="stat-label">Active</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Achievements</h3>
+        <div className="achievements-grid">
+          {achievements.map(a => (
+            <div key={a.id} className={`achievement-card ${a.unlocked ? 'unlocked' : 'locked'}`}>
+              <Award size={24} />
+              <span className="achievement-name">{a.name}</span>
+              <span className="achievement-desc">{a.desc}</span>
+              {!a.unlocked && <Lock size={14} className="achievement-lock" />}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="page-section">
+        <h3 className="section-title">Account Actions</h3>
+        <div className="quick-actions">
+          <button className="btn btn-secondary">
+            <Key size={14} /> Change Password
+          </button>
+          <button className="btn btn-secondary">
+            <Upload size={14} /> Export Data
+          </button>
+          <button className="btn btn-danger">
+            <Trash2 size={14} /> Delete Account
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
 // Components
-const NavBar = () => (
+const NavBar = ({ onOpenModal }) => (
   <header className="nav-bar">
     <div className="nav-logo">
       <div className="logo-hexagon">
@@ -60,18 +799,27 @@ const NavBar = () => (
       <span className="nav-logo-text">AgentForgeOS</span>
     </div>
     <div className="nav-pills">
-      <button className="nav-pill">Project</button>
-      <button className="nav-pill">Workspace</button>
-      <button className="nav-pill">Providers</button>
-      <button className="nav-pill">
+      <button className="nav-pill" onClick={() => onOpenModal('project')} data-testid="nav-project">
+        <Folder size={14} style={{ marginRight: 6, display: 'inline' }} />
+        Project
+      </button>
+      <button className="nav-pill" onClick={() => onOpenModal('workspace')} data-testid="nav-workspace">
+        <Monitor size={14} style={{ marginRight: 6, display: 'inline' }} />
+        Workspace
+      </button>
+      <button className="nav-pill" onClick={() => onOpenModal('providers')} data-testid="nav-providers">
+        <Globe size={14} style={{ marginRight: 6, display: 'inline' }} />
+        Providers
+      </button>
+      <button className="nav-pill" onClick={() => onOpenModal('system')} data-testid="nav-system">
         <Cpu size={14} style={{ marginRight: 6, display: 'inline' }} />
         System
       </button>
-      <button className="nav-pill">
+      <button className="nav-pill" onClick={() => onOpenModal('settings')} data-testid="nav-settings">
         <Settings size={14} style={{ marginRight: 6, display: 'inline' }} />
         Settings
       </button>
-      <button className="nav-pill">
+      <button className="nav-pill" onClick={() => onOpenModal('profile')} data-testid="nav-profile">
         <User size={14} style={{ marginRight: 6, display: 'inline' }} />
         Profile
       </button>
@@ -1034,14 +1782,18 @@ const OutputLog = ({ logs }) => {
 const Studio = () => {
   const [activeModule, setActiveModule] = useState(MODULES[0]);
   const [logs, setLogs] = useState([{ time: formatTime(), level: "info", message: "AgentForgeOS initialized" }]);
+  const [activeModal, setActiveModal] = useState(null);
 
   const addLog = (level, message) => {
     setLogs((prev) => [...prev.slice(-50), { time: formatTime(), level, message }]);
   };
 
+  const openModal = (modal) => setActiveModal(modal);
+  const closeModal = () => setActiveModal(null);
+
   return (
     <div className="studio-layout" data-testid="studio-layout">
-      <NavBar />
+      <NavBar onOpenModal={openModal} />
       <ResizablePanelGroup direction="vertical" className="studio-resizable-main">
         {/* Top: Sidebar + Workspace */}
         <ResizablePanel defaultSize={70} minSize={40}>
@@ -1081,6 +1833,14 @@ const Studio = () => {
           </ResizablePanelGroup>
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      {/* Modal Pages */}
+      <ProjectPage isOpen={activeModal === 'project'} onClose={closeModal} addLog={addLog} />
+      <WorkspacePage isOpen={activeModal === 'workspace'} onClose={closeModal} addLog={addLog} />
+      <ProvidersPage isOpen={activeModal === 'providers'} onClose={closeModal} addLog={addLog} />
+      <SystemPage isOpen={activeModal === 'system'} onClose={closeModal} addLog={addLog} />
+      <SettingsPage isOpen={activeModal === 'settings'} onClose={closeModal} addLog={addLog} />
+      <ProfilePage isOpen={activeModal === 'profile'} onClose={closeModal} addLog={addLog} />
     </div>
   );
 };

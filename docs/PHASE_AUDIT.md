@@ -70,6 +70,6 @@ For a per-layer capability table, see `docs/SYSTEM_CAPABILITY_MAP.md`.
 ## Phase 10 — Compliance & Reporting ✅ COMPLETE
 - Run full repository tests: `python -m unittest discover -s tests` (173 tests, all pass).
 - Verify integration coverage via `tests/test_phase_integration.py`.
-- Confirm compliance checklist documented in `docs/legacy/phases/PHASE10_COMPLIANCE.md`.
+- Confirm compliance checklist documented in `docs/PHASE10_COMPLIANCE.md`.
 - CI/CD pipeline at `.github/workflows/ci.yml` runs the full test suite on every push and pull request.
 - Record outcomes in release notes or PR description when completing a phase.

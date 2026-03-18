@@ -1,5 +1,5 @@
 {
-  "command": "analyze prior work",
+  "command": "build a sample project",
   "product_type": "hybrid",
   "scope": {
     "has_gameplay": false,

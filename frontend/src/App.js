@@ -397,9 +397,12 @@ const ProvidersPage = ({ isOpen, onClose, addLog }) => {
     addLog("info", `Testing ${type.toUpperCase()} connection to ${provider.provider}...`);
     // Simulate connection test
     setTimeout(() => {
-      updateProvider(type, 'status', Math.random() > 0.3 ? 'connected' : 'error');
-      addLog(providers[type].status === 'connected' ? "success" : "error", 
-        `${type.toUpperCase()} ${providers[type].status === 'connected' ? 'connected' : 'failed'}`);
+      const newStatus = Math.random() > 0.3 ? 'connected' : 'error';
+      updateProvider(type, 'status', newStatus);
+      addLog(
+        newStatus === 'connected' ? "success" : "error",
+        `${type.toUpperCase()} ${newStatus === 'connected' ? 'connected' : 'failed'}`
+      );
     }, 1000);
   };
 

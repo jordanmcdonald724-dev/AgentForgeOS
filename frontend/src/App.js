@@ -1884,13 +1884,17 @@ const SetupWizard = ({ onComplete }) => {
     bridgeRoot: "C:\\AgentForgeOS\\workspace",
     logLevel: "INFO",
     mongoEnabled: false,
+    mongoType: "atlas",
     mongoUrl: "mongodb://localhost:27017",
+    mongoAtlasUrl: "",
+    mongoDbName: "agentforge",
   });
   const [connectionTests, setConnectionTests] = useState({
     engine: null,
     llm: null,
     image: null,
     tts: null,
+    mongo: null,
   });
   const [testing, setTesting] = useState({});
 
@@ -2403,7 +2407,7 @@ const SetupWizard = ({ onComplete }) => {
               </div>
 
               <div className="provider-section">
-                <h3><Database size={18} /> Database (Optional)</h3>
+                <h3><Database size={18} /> MongoDB Database</h3>
                 <div className="tts-toggle">
                   <span>Enable MongoDB</span>
                   <div 
@@ -2416,14 +2420,86 @@ const SetupWizard = ({ onComplete }) => {
                 <p className="section-desc muted">Without MongoDB, data is stored in-memory (lost on restart).</p>
 
                 {config.mongoEnabled && (
-                  <div className="config-field">
-                    <label>MongoDB URL</label>
-                    <input 
-                      className="input" 
-                      value={config.mongoUrl} 
-                      onChange={(e) => updateConfig('mongoUrl', e.target.value)}
-                      placeholder="mongodb://localhost:27017"
-                    />
+                  <div className="mongo-config">
+                    <div className="provider-selection horizontal">
+                      <div 
+                        className={`provider-option small ${config.mongoType === 'local' ? 'selected' : ''}`}
+                        onClick={() => updateConfig('mongoType', 'local')}
+                      >
+                        <Radio size={16} className={config.mongoType === 'local' ? 'checked' : ''} />
+                        <span>Local</span>
+                        <span className="provider-badge local">Free</span>
+                      </div>
+                      <div 
+                        className={`provider-option small ${config.mongoType === 'atlas' ? 'selected' : ''}`}
+                        onClick={() => updateConfig('mongoType', 'atlas')}
+                      >
+                        <Radio size={16} className={config.mongoType === 'atlas' ? 'checked' : ''} />
+                        <span>MongoDB Atlas</span>
+                        <span className="provider-badge cloud">Cloud</span>
+                      </div>
+                    </div>
+
+                    {config.mongoType === 'local' && (
+                      <div className="inline-config">
+                        <div className="config-field flex-1">
+                          <label>Local MongoDB URL</label>
+                          <input 
+                            className="input" 
+                            value={config.mongoUrl} 
+                            onChange={(e) => updateConfig('mongoUrl', e.target.value)}
+                            placeholder="mongodb://localhost:27017"
+                          />
+                        </div>
+                        <button 
+                          className="btn btn-secondary"
+                          onClick={() => testConnection('mongo')}
+                          disabled={testing.mongo}
+                        >
+                          Test
+                        </button>
+                      </div>
+                    )}
+
+                    {config.mongoType === 'atlas' && (
+                      <div className="atlas-config">
+                        <div className="config-field">
+                          <label>MongoDB Atlas Connection String</label>
+                          <div className="input-with-icon">
+                            <Key size={14} />
+                            <input 
+                              type="password"
+                              className="input" 
+                              value={config.mongoAtlasUrl} 
+                              onChange={(e) => updateConfig('mongoAtlasUrl', e.target.value)}
+                              placeholder="mongodb+srv://username:password@cluster.mongodb.net/agentforge"
+                            />
+                          </div>
+                        </div>
+                        <div className="config-row">
+                          <div className="config-field flex-1">
+                            <label>Database Name</label>
+                            <input 
+                              className="input" 
+                              value={config.mongoDbName} 
+                              onChange={(e) => updateConfig('mongoDbName', e.target.value)}
+                              placeholder="agentforge"
+                            />
+                          </div>
+                          <button 
+                            className="btn btn-secondary"
+                            onClick={() => testConnection('mongo')}
+                            disabled={testing.mongo}
+                          >
+                            <Activity size={14} /> Test Connection
+                          </button>
+                        </div>
+                        <ConnectionStatus status={connectionTests.mongo} testing={testing.mongo} />
+                        <a href="https://cloud.mongodb.com" target="_blank" rel="noopener noreferrer" className="provider-link">
+                          <ExternalLink size={14} /> Get MongoDB Atlas Connection String
+                        </a>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -2494,8 +2570,14 @@ const SetupWizard = ({ onComplete }) => {
                   <h4><Database size={16} /> Database</h4>
                   <div className="review-item">
                     <span>MongoDB:</span>
-                    <code>{config.mongoEnabled ? 'Enabled' : 'In-Memory'}</code>
+                    <code>{config.mongoEnabled ? (config.mongoType === 'atlas' ? 'Atlas (Cloud)' : 'Local') : 'In-Memory'}</code>
                   </div>
+                  {config.mongoEnabled && config.mongoType === 'atlas' && (
+                    <div className="review-item">
+                      <span>Database:</span>
+                      <code>{config.mongoDbName}</code>
+                    </div>
+                  )}
                 </div>
               </div>
 

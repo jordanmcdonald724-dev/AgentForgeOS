@@ -2802,6 +2802,26 @@
   margin-top: 12px;
 }
 
+/* MongoDB Config */
+.mongo-config {
+  margin-top: 16px;
+}
+
+.atlas-config {
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.atlas-config .provider-link {
+  margin-top: 4px;
+}
+
 /* Section Description */
 .section-desc {
   font-size: 13px;

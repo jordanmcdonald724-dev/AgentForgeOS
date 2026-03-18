@@ -1,9 +1,11 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Iterable, Optional
 
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -67,6 +69,23 @@ FRONTEND_ROOT = Path(__file__).resolve().parent.parent / "frontend"
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
+
+    # CORS — allow the Vite dev server (port 5173) and Tauri shell to reach the
+    # engine API without browser pre-flight failures.  In production the
+    # frontend is served from the same origin so this is a no-op.
+    # CORS_ORIGINS: comma-separated list of allowed origins,
+    # e.g. "http://localhost:5173,https://my-app.example.com"
+    _cors_origins = os.environ.get(
+        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[o.strip() for o in _cors_origins],
+        allow_origin_regex=r"tauri://.*",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # Core engine routes
     register_routers(

@@ -4,10 +4,863 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AgentForgeOS Studio</title>
-    <script type="module" crossorigin src="/assets/index-xnw5ZvjQ.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-t0gIF7el.css">
+    <script type="module" crossorigin src="/assets/index-B0eYUKvt.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DiOo6Mqw.css">
   </head>
   <body style="margin: 0; background: #0b0f14;">
-    <div id="root"></div>
+    <div id="root"></div>
+  </body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentForgeOS Studio</title>
+  </head>
+  <body class="studio">
+    <header class="nav">
+      <span class="badge">AgentForgeOS</span>
+      <span class="pill">Project ▾</span>
+      <span class="pill">Workspace ▾</span>
+      <span class="pill">Providers</span>
+      <span class="pill">System Status</span>
+      <span class="pill">Settings</span>
+      <span class="pill">Profile</span>
+    </header>
+
+    <main class="layout-main">
+      <aside class="sidebar">
+        <h2>Modules</h2>
+        <div id="module-list" class="nav-list">
+          <div class="nav-item nav-item--muted">Loading modules...</div>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div class="workspace-card">
+          <div class="title">Main Workspace</div>
+          <div class="module-header">
+            <div id="active-module-name" class="module-name">Loading modules...</div>
+            <div id="active-module-version" class="module-version"></div>
+          </div>
+          <p id="active-module-description">Modules are loading from the backend.</p>
+        </div>
+        <div id="module-panel" class="workspace-card module-panel">
+          <div class="module-panel-placeholder">Select a module from the sidebar to view its workspace.</div>
+        </div>
+      </section>
+    </main>
+
+    <section class="bottom">
+      <div class="panel panel--console">
+        <div class="title">Agent Console</div>
+        <div id="console-messages" class="console-messages" aria-live="polite" aria-label="Agent conversation history"></div>
+        <form id="console-form" class="console-form" autocomplete="off">
+          <textarea
+            id="console-input"
+            class="console-input"
+            placeholder="Type a prompt and press Enter (Shift+Enter for newline)…"
+            rows="2"
+            aria-label="Agent prompt input"
+          ></textarea>
+          <button type="submit" id="console-send" class="console-send" aria-label="Send prompt">Send</button>
+        </form>
+      </div>
+      <div class="panel panel--pipeline">
+        <div class="title">Pipeline / System Monitor</div>
+        <div id="pipeline-stages" class="pipeline-stages" aria-label="Pipeline stages"></div>
+        <div class="title output-log-title">Output Log</div>
+        <div id="output-log" class="output-log" aria-live="polite" aria-label="System output log"></div>
+      </div>
+    </section>
+    <script>
+      (() => {
+        // ── First-run wizard redirect ─────────────────────────────────────
+        // Check whether the setup wizard has been completed.  If not, redirect
+        // to wizard.html (skipped when the API is unreachable so the Studio
+        // still loads in offline/test environments).
+        fetch("/api/setup")
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && data.data && !data.data.setup_complete) {
+              window.location.href = "/wizard.html";
+            }
+          })
+          .catch(() => {
+            // Backend not running yet — show Studio anyway
+          });
+
+        const MODULE_FETCH_TIMEOUT_MS = 8000;
+        const VERSION_PREFIX = "v";
+        const moduleListEl = document.getElementById("module-list");
+        const activeModuleName = document.getElementById("active-module-name");
+        const activeModuleVersion = document.getElementById("active-module-version");
+        const activeModuleDescription = document.getElementById("active-module-description");
+        const modulePanelEl = document.getElementById("module-panel");
+
+        let activeModule = null;
+
+        const getModuleDisplayName = (module) => {
+          if (!module) return "No modules available";
+          if (module.name) return module.name;
+          if (module.id) return `Module ID: ${module.id}`;
+          return "Unnamed Module";
+        };
+
+        const updateActiveHighlight = (moduleId) => {
+          const items = moduleListEl.querySelectorAll(".nav-item[data-module-id]");
+          items.forEach((item) => {
+            item.classList.toggle("active", item.dataset.moduleId === moduleId);
+          });
+        };
+
+        const setActiveModule = (module) => {
+          activeModule = module;
+          activeModuleName.textContent = getModuleDisplayName(module);
+          activeModuleVersion.textContent = module && module.version ? `${VERSION_PREFIX}${module.version}` : "";
+          activeModuleDescription.textContent =
+            module && module.description ? module.description : "Modules are not currently available.";
+          updateActiveHighlight(module?.id || null);
+          loadModulePanel(module);
+        };
+
+        const renderModules = (modules) => {
+          moduleListEl.innerHTML = "";
+
+          if (!modules.length) {
+            const empty = document.createElement("div");
+            empty.className = "nav-item nav-item--muted";
+            empty.textContent = "No modules available";
+            moduleListEl.appendChild(empty);
+            setActiveModule(null);
+            return;
+          }
+
+          modules.forEach((mod) => {
+            const item = document.createElement("div");
+            item.className = "nav-item";
+            item.dataset.moduleId = mod.id;
+            item.textContent = getModuleDisplayName(mod);
+            item.addEventListener("click", () => setActiveModule(mod));
+            moduleListEl.appendChild(item);
+          });
+
+          setActiveModule(modules[0]);
+        };
+
+        const showError = (message) => {
+          moduleListEl.innerHTML = "";
+          const error = document.createElement("div");
+          error.className = "nav-item nav-item--error";
+          error.textContent = "Unable to load modules";
+          moduleListEl.appendChild(error);
+          setActiveModule(null);
+          activeModuleDescription.textContent =
+            message || "The module service is unavailable. Please try again later.";
+        };
+
+        const fetchWithTimeout = (url, options = {}, timeoutMs = MODULE_FETCH_TIMEOUT_MS) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeoutMs);
+          return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+        };
+
+        const describeInvalidPayload = (value) => {
+          if (value === null) return "null";
+          if (typeof value === "string") return `string: ${value.slice(0, 80)}`;
+          return typeof value;
+        };
+
+        const fetchModules = async () => {
+          try {
+            const response = await fetchWithTimeout("/api/modules");
+            if (!response.ok) {
+              const statusLabel = response.statusText ? ` ${response.statusText}` : "";
+              throw new Error(`Failed to fetch modules: ${response.status}${statusLabel}`);
+            }
+            const payload = await response.json();
+            let modules = [];
+            if (Array.isArray(payload)) {
+              modules = payload;
+            } else if (payload && typeof payload === "object") {
+              modules = Array.isArray(payload.data) ? payload.data : [];
+            } else {
+              const typeLabel = describeInvalidPayload(payload);
+              throw new Error(
+                `Invalid module response: expected array or object with a data property but received ${typeLabel}`
+              );
+            }
+            renderModules(modules);
+            appendLog("info", `Loaded ${modules.length} module(s) from the server`);
+          } catch (error) {
+            console.error(error);
+            if (error.name === "AbortError") {
+              showError("Module request timed out. Please try again.");
+              appendLog("error", "Module request timed out");
+              return;
+            }
+            appendLog("error", `Module load failed: ${error.message}`);
+            showError();
+          }
+        };
+
+        fetchModules();
+
+        // ----------------------------------------------------------------
+        // Agent Console
+        // ----------------------------------------------------------------
+
+        const AGENT_RUN_URL = "/api/agent/run";
+        const consoleMessages = document.getElementById("console-messages");
+        const consoleForm = document.getElementById("console-form");
+        const consoleInput = document.getElementById("console-input");
+        const consoleSend = document.getElementById("console-send");
+
+        const appendMessage = (role, content) => {
+          const msg = document.createElement("div");
+          msg.className = `console-msg console-msg--${role}`;
+          const label = document.createElement("span");
+          label.className = "console-msg-role";
+          label.textContent = role === "user" ? "You" : "Agent";
+          const text = document.createElement("p");
+          text.className = "console-msg-text";
+          text.textContent = content;
+          msg.appendChild(label);
+          msg.appendChild(text);
+          consoleMessages.appendChild(msg);
+          consoleMessages.scrollTop = consoleMessages.scrollHeight;
+        };
+
+        const setConsoleLoading = (loading) => {
+          consoleSend.disabled = loading;
+          consoleSend.textContent = loading ? "…" : "Send";
+          consoleInput.disabled = loading;
+        };
+
+        const sendPrompt = async (prompt) => {
+          if (!prompt.trim()) return;
+          appendMessage("user", prompt);
+          setConsoleLoading(true);
+          try {
+            const response = await fetchWithTimeout(
+              AGENT_RUN_URL,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt }),
+              },
+              30000
+            );
+            const payload = await response.json();
+            const text =
+              payload?.data?.data?.text ||
+              payload?.data?.error ||
+              (payload?.error) ||
+              "No response received.";
+            appendMessage("agent", text);
+            appendLog("info", `Agent responded to: "${prompt.slice(0, 60)}${prompt.length > 60 ? "…" : ""}"`);
+          } catch (err) {
+            appendMessage("agent", `Error: ${err.message || "request failed"}`);
+            appendLog("error", `Agent run error: ${err.message}`);
+          } finally {
+            setConsoleLoading(false);
+            consoleInput.focus();
+          }
+        };
+
+        consoleForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const prompt = consoleInput.value;
+          consoleInput.value = "";
+          sendPrompt(prompt);
+        });
+
+        consoleInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            consoleForm.dispatchEvent(new Event("submit"));
+          }
+        });
+
+        // ----------------------------------------------------------------
+        // Pipeline Monitor
+        // ----------------------------------------------------------------
+
+        const pipelineStages = document.getElementById("pipeline-stages");
+
+        const PIPELINE_ROLES = [
+          "Project Planner", "System Architect", "Task Router",
+          "Module Builder", "API Architect", "Data Architect",
+          "Backend Engineer", "Frontend Engineer", "AI Integration Engineer",
+          "Integration Tester", "Security Auditor", "System Stabilizer",
+        ];
+
+        const renderPipelineStages = (activeStage) => {
+          pipelineStages.innerHTML = "";
+          PIPELINE_ROLES.forEach((role) => {
+            const chip = document.createElement("div");
+            chip.className = "chip" + (role === activeStage ? " chip--active" : "");
+            chip.textContent = role;
+            pipelineStages.appendChild(chip);
+          });
+        };
+
+        renderPipelineStages(null);
+
+        // ----------------------------------------------------------------
+        // Output Log
+        // ----------------------------------------------------------------
+
+        const outputLog = document.getElementById("output-log");
+
+        const appendLog = (level, message) => {
+          if (!outputLog) return;
+          const entry = document.createElement("div");
+          entry.className = `log-entry log-entry--${level}`;
+          const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          const tsEl = document.createElement("span");
+          tsEl.className = "log-ts";
+          tsEl.textContent = ts;
+          const lvlEl = document.createElement("span");
+          lvlEl.className = "log-lvl";
+          lvlEl.textContent = `[${level.toUpperCase()}]`;
+          const msgEl = document.createElement("span");
+          msgEl.className = "log-msg";
+          msgEl.textContent = message;
+          entry.appendChild(tsEl);
+          entry.appendChild(lvlEl);
+          entry.appendChild(msgEl);
+          outputLog.appendChild(entry);
+          outputLog.scrollTop = outputLog.scrollHeight;
+        };
+
+        // ----------------------------------------------------------------
+        // Dynamic Module Panels
+        // ----------------------------------------------------------------
+
+        const formatBytes = (bytes) => {
+          if (bytes == null) return "";
+          if (bytes < 1024) return `${bytes} B`;
+          if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+          return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        };
+
+        const loadModulePanel = (module) => {
+          if (!module) {
+            modulePanelEl.innerHTML = '<div class="module-panel-placeholder">Select a module from the sidebar to view its workspace.</div>';
+            return;
+          }
+          const id = (module.id || "").toLowerCase();
+          switch (id) {
+            case "studio":       renderStudioPanel(); break;
+            case "builds":       renderBuildsPanel(); break;
+            case "research":     renderResearchPanel(); break;
+            case "assets":       renderAssetsPanel(); break;
+            case "deployment":   renderDeploymentPanel(); break;
+            case "sandbox":      renderSandboxPanel(); break;
+            case "game_dev":     renderGameDevPanel(); break;
+            case "saas_builder": renderSaasBuilderPanel(); break;
+            default:
+              modulePanelEl.innerHTML = `<div class="module-panel-placeholder">No dedicated panel for "${module.id}".</div>`;
+          }
+        };
+
+        // ---- Studio: Project File Browser --------------------------------
+
+        const renderStudioPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Project Files</div>
+            <div id="file-browser-breadcrumb" class="breadcrumb" aria-label="File path"></div>
+            <div id="file-browser-list" class="file-browser">
+              <div class="file-browser-loading">Loading workspace…</div>
+            </div>
+          `;
+          loadFileBrowser(".");
+        };
+
+        const loadFileBrowser = async (path) => {
+          const listEl = document.getElementById("file-browser-list");
+          const crumbEl = document.getElementById("file-browser-breadcrumb");
+          if (!listEl) return;
+
+          listEl.innerHTML = '<div class="file-browser-loading">Loading…</div>';
+
+          // Render breadcrumb
+          const parts = path === "." ? [] : path.split("/").filter(Boolean);
+          let crumbHTML = `<span class="crumb" data-path=".">workspace</span>`;
+          parts.forEach((part, i) => {
+            const crumbPath = parts.slice(0, i + 1).join("/");
+            crumbHTML += ` <span class="crumb-sep">›</span> <span class="crumb" data-path="${crumbPath}">${part}</span>`;
+          });
+          if (crumbEl) {
+            crumbEl.innerHTML = crumbHTML;
+            crumbEl.querySelectorAll(".crumb").forEach((el) => {
+              el.addEventListener("click", () => loadFileBrowser(el.dataset.path));
+            });
+          }
+
+          try {
+            const response = await fetchWithTimeout(
+              `/api/bridge/list?path=${encodeURIComponent(path)}`
+            );
+            const payload = await response.json();
+            const entries = payload?.data?.entries || [];
+
+            if (!entries.length) {
+              listEl.innerHTML = '<div class="file-browser-empty">Empty directory</div>';
+              appendLog("info", `Workspace "${path}": empty`);
+              return;
+            }
+
+            listEl.innerHTML = "";
+            entries.forEach((entry) => {
+              const el = document.createElement("div");
+              el.className = `file-entry file-entry--${entry.type}`;
+              const icon = document.createElement("span");
+              icon.className = "file-entry-icon";
+              icon.textContent = entry.type === "directory" ? "📁" : "📄";
+              const name = document.createElement("span");
+              name.className = "file-entry-name";
+              name.textContent = entry.name;
+              el.appendChild(icon);
+              el.appendChild(name);
+              if (entry.size != null) {
+                const size = document.createElement("span");
+                size.className = "file-entry-size";
+                size.textContent = formatBytes(entry.size);
+                el.appendChild(size);
+              }
+              if (entry.type === "directory") {
+                const subPath = path === "." ? entry.name : `${path}/${entry.name}`;
+                el.addEventListener("click", () => loadFileBrowser(subPath));
+              }
+              listEl.appendChild(el);
+            });
+            appendLog("info", `Workspace "${path}": ${entries.length} item(s)`);
+          } catch (err) {
+            listEl.innerHTML = `<div class="file-browser-error">Error loading workspace: ${err.message}</div>`;
+            appendLog("error", `File browser error: ${err.message}`);
+          }
+        };
+
+        // ---- Builds: Build Pipelines -------------------------------------
+
+        const renderBuildsPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Build Pipelines</div>
+            <div class="panel-actions">
+              <input id="build-project" class="panel-input" placeholder="Project name" />
+              <button id="build-trigger-btn" class="action-btn">Trigger Build</button>
+            </div>
+            <div id="builds-list" class="item-list"><div class="item-list-empty">Loading runs…</div></div>
+          `;
+          document.getElementById("build-trigger-btn").addEventListener("click", async () => {
+            const project = document.getElementById("build-project").value.trim() || "default";
+            try {
+              const r = await fetchWithTimeout("/api/modules/builds/trigger", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ project }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Build triggered for "${project}" (id: ${payload?.data?.id})`);
+              loadBuildsRuns();
+            } catch (err) {
+              appendLog("error", `Build trigger failed: ${err.message}`);
+            }
+          });
+          loadBuildsRuns();
+        };
+
+        const loadBuildsRuns = async () => {
+          const listEl = document.getElementById("builds-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/builds/runs");
+            const payload = await r.json();
+            const runs = payload?.data || [];
+            if (!runs.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No builds yet. Trigger one above.</div>';
+              return;
+            }
+            listEl.innerHTML = runs.slice().reverse().map((run) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${run.status}">${run.status}</span>
+                <span class="item-name">${run.project}</span>
+                <span class="item-meta">#${run.id} &middot; ${new Date(run.triggered_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Research: Notes & Knowledge Search --------------------------
+
+        const renderResearchPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Research Notes</div>
+            <div class="panel-actions">
+              <input id="research-search" class="panel-input" placeholder="Search knowledge…" />
+              <button id="research-search-btn" class="action-btn">Search</button>
+            </div>
+            <div class="panel-actions panel-actions--col">
+              <input id="note-title" class="panel-input" placeholder="Note title" />
+              <textarea id="note-content" class="panel-textarea" placeholder="Note content…" rows="2"></textarea>
+              <button id="note-add-btn" class="action-btn">Add Note</button>
+            </div>
+            <div id="research-list" class="item-list"><div class="item-list-empty">Loading notes…</div></div>
+          `;
+          document.getElementById("research-search-btn").addEventListener("click", async () => {
+            const query = document.getElementById("research-search").value.trim();
+            if (!query) return;
+            const listEl = document.getElementById("research-list");
+            listEl.innerHTML = '<div class="item-list-empty">Searching…</div>';
+            try {
+              const r = await fetchWithTimeout("/api/modules/research/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query }),
+              });
+              const payload = await r.json();
+              const results = payload?.data || [];
+              if (!results.length) {
+                listEl.innerHTML = '<div class="item-list-empty">No results found.</div>';
+              } else {
+                listEl.innerHTML = results.map((res) => `
+                  <div class="item-row">
+                    <span class="item-name">${res.metadata?.title || "Result"}</span>
+                    <span class="item-meta">${(res.text || "").slice(0, 80)}</span>
+                  </div>
+                `).join("");
+              }
+              appendLog("info", `Research search "${query}": ${results.length} result(s)`);
+            } catch (err) {
+              listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+            }
+          });
+          document.getElementById("note-add-btn").addEventListener("click", async () => {
+            const title = document.getElementById("note-title").value.trim();
+            const content = document.getElementById("note-content").value.trim();
+            if (!content) return;
+            try {
+              await fetchWithTimeout("/api/modules/research/notes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: title || "Untitled", content }),
+              });
+              document.getElementById("note-title").value = "";
+              document.getElementById("note-content").value = "";
+              appendLog("info", `Research note added: "${title || "Untitled"}"`);
+              loadResearchNotes();
+            } catch (err) {
+              appendLog("error", `Note add failed: ${err.message}`);
+            }
+          });
+          loadResearchNotes();
+        };
+
+        const loadResearchNotes = async () => {
+          const listEl = document.getElementById("research-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/research/notes");
+            const payload = await r.json();
+            const notes = payload?.data || [];
+            if (!notes.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No notes yet.</div>';
+              return;
+            }
+            listEl.innerHTML = notes.slice().reverse().map((note) => `
+              <div class="item-row">
+                <span class="item-name">${note.title}</span>
+                <span class="item-meta">${(note.content || "").slice(0, 80)}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Assets: Asset Registry --------------------------------------
+
+        const renderAssetsPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Generated Assets</div>
+            <div id="assets-list" class="item-list"><div class="item-list-empty">Loading assets…</div></div>
+          `;
+          loadAssetsList();
+        };
+
+        const loadAssetsList = async () => {
+          const listEl = document.getElementById("assets-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/assets/list");
+            const payload = await r.json();
+            const assets = payload?.data || [];
+            if (!assets.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No assets registered yet.</div>';
+              return;
+            }
+            listEl.innerHTML = assets.slice().reverse().map((a) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${a.type}">${a.type}</span>
+                <span class="item-name">${a.path || "—"}</span>
+                <span class="item-meta">${a.source || ""}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Deployment: Deployment Manager ------------------------------
+
+        const renderDeploymentPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Deployments</div>
+            <div class="panel-actions">
+              <input id="deploy-project" class="panel-input" placeholder="Project name" />
+              <input id="deploy-version" class="panel-input" placeholder="Version (e.g. 1.0.0)" />
+              <select id="deploy-target" class="panel-input panel-select">
+                <option value="local">local</option>
+                <option value="staging">staging</option>
+                <option value="production">production</option>
+              </select>
+              <button id="deploy-btn" class="action-btn action-btn--danger">Deploy</button>
+            </div>
+            <div id="deployment-list" class="item-list"><div class="item-list-empty">Loading deployments…</div></div>
+          `;
+          document.getElementById("deploy-btn").addEventListener("click", async () => {
+            const project = document.getElementById("deploy-project").value.trim() || "default";
+            const version = document.getElementById("deploy-version").value.trim() || "0.0.1";
+            const target = document.getElementById("deploy-target").value;
+            try {
+              const r = await fetchWithTimeout("/api/modules/deployment/deploy", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ project, version, target }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Deployed "${project}" v${version} → ${target} (id: ${payload?.data?.id})`);
+              loadDeploymentList();
+            } catch (err) {
+              appendLog("error", `Deployment failed: ${err.message}`);
+            }
+          });
+          loadDeploymentList();
+        };
+
+        const loadDeploymentList = async () => {
+          const listEl = document.getElementById("deployment-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/deployment/list");
+            const payload = await r.json();
+            const deployments = payload?.data || [];
+            if (!deployments.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No deployments yet.</div>';
+              return;
+            }
+            listEl.innerHTML = deployments.slice().reverse().map((d) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${d.status}">${d.status}</span>
+                <span class="item-name">${d.project} → ${d.target}</span>
+                <span class="item-meta">v${d.version} &middot; ${new Date(d.initiated_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Sandbox: Agent Experimentation Sandbox ----------------------
+
+        const renderSandboxPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Agent Sandbox</div>
+            <div class="panel-actions">
+              <textarea id="sandbox-prompt" class="panel-textarea" placeholder="Enter an agent experiment prompt…" rows="2"></textarea>
+              <select id="sandbox-provider" class="panel-input panel-select">
+                <option value="ollama">ollama</option>
+                <option value="openai">openai</option>
+                <option value="noop">noop</option>
+              </select>
+              <button id="sandbox-run-btn" class="action-btn">Run Experiment</button>
+            </div>
+            <div id="sandbox-list" class="item-list"><div class="item-list-empty">Loading experiments…</div></div>
+          `;
+          document.getElementById("sandbox-run-btn").addEventListener("click", async () => {
+            const prompt = document.getElementById("sandbox-prompt").value.trim();
+            const provider = document.getElementById("sandbox-provider").value;
+            if (!prompt) return;
+            try {
+              const r = await fetchWithTimeout("/api/modules/sandbox/run", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt, provider }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Sandbox experiment queued (id: ${payload?.data?.id})`);
+              loadSandboxExperiments();
+            } catch (err) {
+              appendLog("error", `Sandbox run failed: ${err.message}`);
+            }
+          });
+          loadSandboxExperiments();
+        };
+
+        const loadSandboxExperiments = async () => {
+          const listEl = document.getElementById("sandbox-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/sandbox/experiments");
+            const payload = await r.json();
+            const experiments = payload?.data || [];
+            if (!experiments.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No experiments yet. Run one above.</div>';
+              return;
+            }
+            listEl.innerHTML = experiments.slice().reverse().map((e) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${e.status}">${e.status}</span>
+                <span class="item-name">${(e.prompt || "").slice(0, 60)}</span>
+                <span class="item-meta">#${e.id} &middot; ${e.provider} &middot; ${new Date(e.created_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- Game Dev: Game Development Assistant ------------------------
+
+        const renderGameDevPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">Game Development</div>
+            <div class="panel-actions">
+              <input id="game-title" class="panel-input" placeholder="Game title" />
+              <input id="game-genre" class="panel-input" placeholder="Genre (e.g. platformer)" />
+              <select id="game-platform" class="panel-input panel-select">
+                <option value="cross-platform">cross-platform</option>
+                <option value="pc">PC</option>
+                <option value="mobile">mobile</option>
+                <option value="web">web</option>
+              </select>
+              <button id="game-design-btn" class="action-btn">Create Design Doc</button>
+            </div>
+            <div id="game-projects-list" class="item-list"><div class="item-list-empty">Loading projects…</div></div>
+          `;
+          document.getElementById("game-design-btn").addEventListener("click", async () => {
+            const title = document.getElementById("game-title").value.trim() || "Untitled Game";
+            const genre = document.getElementById("game-genre").value.trim() || "unknown";
+            const platform = document.getElementById("game-platform").value;
+            try {
+              const r = await fetchWithTimeout("/api/modules/game_dev/design", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, genre, platform }),
+              });
+              const payload = await r.json();
+              appendLog("info", `Game design doc created: "${title}" (id: ${payload?.data?.id})`);
+              loadGameProjects();
+            } catch (err) {
+              appendLog("error", `Game design failed: ${err.message}`);
+            }
+          });
+          loadGameProjects();
+        };
+
+        const loadGameProjects = async () => {
+          const listEl = document.getElementById("game-projects-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/game_dev/projects");
+            const payload = await r.json();
+            const projects = payload?.data || [];
+            if (!projects.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No projects yet. Create a design doc above.</div>';
+              return;
+            }
+            listEl.innerHTML = projects.slice().reverse().map((p) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${p.status}">${p.status}</span>
+                <span class="item-name">${p.title}</span>
+                <span class="item-meta">${p.genre} &middot; ${p.platform} &middot; ${new Date(p.created_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+
+        // ---- SaaS Builder: End-to-End SaaS Scaffolding -------------------
+
+        const renderSaasBuilderPanel = () => {
+          modulePanelEl.innerHTML = `
+            <div class="title">SaaS Builder</div>
+            <div class="panel-actions">
+              <input id="saas-name" class="panel-input" placeholder="Project name" />
+              <select id="saas-stack-frontend" class="panel-input panel-select" aria-label="Frontend stack">
+                <option value="react">React</option>
+                <option value="vue">Vue</option>
+                <option value="svelte">Svelte</option>
+              </select>
+              <select id="saas-stack-backend" class="panel-input panel-select" aria-label="Backend stack">
+                <option value="fastapi">FastAPI</option>
+                <option value="express">Express</option>
+                <option value="django">Django</option>
+              </select>
+              <button id="saas-scaffold-btn" class="action-btn">Scaffold Project</button>
+            </div>
+            <div id="saas-projects-list" class="item-list"><div class="item-list-empty">Loading projects…</div></div>
+          `;
+          document.getElementById("saas-scaffold-btn").addEventListener("click", async () => {
+            const name = document.getElementById("saas-name").value.trim() || "Untitled SaaS";
+            const frontend = document.getElementById("saas-stack-frontend").value;
+            const backend = document.getElementById("saas-stack-backend").value;
+            try {
+              const r = await fetchWithTimeout("/api/modules/saas_builder/scaffold", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, stack: { frontend, backend, db: "postgres" } }),
+              });
+              const payload = await r.json();
+              appendLog("info", `SaaS project scaffolded: "${name}" (id: ${payload?.data?.id})`);
+              loadSaasProjects();
+            } catch (err) {
+              appendLog("error", `SaaS scaffold failed: ${err.message}`);
+            }
+          });
+          loadSaasProjects();
+        };
+
+        const loadSaasProjects = async () => {
+          const listEl = document.getElementById("saas-projects-list");
+          if (!listEl) return;
+          try {
+            const r = await fetchWithTimeout("/api/modules/saas_builder/projects");
+            const payload = await r.json();
+            const projects = payload?.data || [];
+            if (!projects.length) {
+              listEl.innerHTML = '<div class="item-list-empty">No projects yet. Scaffold one above.</div>';
+              return;
+            }
+            listEl.innerHTML = projects.slice().reverse().map((p) => `
+              <div class="item-row">
+                <span class="item-badge item-badge--${p.status}">${p.status}</span>
+                <span class="item-name">${p.name}</span>
+                <span class="item-meta">${p.stack?.frontend || ""} + ${p.stack?.backend || ""} &middot; ${new Date(p.created_at).toLocaleString()}</span>
+              </div>
+            `).join("");
+          } catch (err) {
+            listEl.innerHTML = `<div class="item-list-error">Error: ${err.message}</div>`;
+          }
+        };
+      })();
+    </script>
   </body>
 </html>

@@ -62,13 +62,101 @@ const formatTime = () => {
 
 // Modal Container
 const Modal = ({ isOpen, onClose, title, children }) => {
+  const containerRef = useRef(null);
+  const previouslyFocusedElementRef = useRef(null);
+  const titleIdRef = useRef(`modal-title-${Math.random().toString(36).slice(2)}`);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    // Save the element that was focused before opening the modal
+    previouslyFocusedElementRef.current = document.activeElement;
+
+    const focusableSelectors =
+      'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), ' +
+      'textarea:not([disabled]), button:not([disabled]), iframe, object, embed, ' +
+      '*[tabindex]:not([tabindex="-1"]), *[contenteditable=true]';
+
+    const getFocusableElements = () => {
+      return Array.from(container.querySelectorAll(focusableSelectors)).filter(
+        (el) => !el.hasAttribute("disabled") && el.getAttribute("aria-hidden") !== "true"
+      );
+    };
+
+    const focusableElements = getFocusableElements();
+    if (focusableElements.length > 0) {
+      focusableElements[0].focus();
+    } else {
+      container.focus();
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        onClose();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        const elements = getFocusableElements();
+        if (elements.length === 0) {
+          event.preventDefault();
+          return;
+        }
+
+        const firstElement = elements[0];
+        const lastElement = elements[elements.length - 1];
+        const isShift = event.shiftKey;
+        const current = document.activeElement;
+
+        if (!isShift && current === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        } else if (isShift && current === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      }
+    };
+
+    container.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      container.removeEventListener("keydown", handleKeyDown);
+      const previouslyFocused = previouslyFocusedElementRef.current;
+      if (
+        previouslyFocused &&
+        typeof previouslyFocused.focus === "function"
+      ) {
+        previouslyFocused.focus();
+      }
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={e => e.stopPropagation()}>
+      <div
+        className="modal-container"
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleIdRef.current}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
-          <h2 className="modal-title">{title}</h2>
+          <h2 className="modal-title" id={titleIdRef.current}>
+            {title}
+          </h2>
           <button className="modal-close" onClick={onClose}>
             <X size={20} />
           </button>

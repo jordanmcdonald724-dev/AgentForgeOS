@@ -1,0 +1,8 @@
+{
+  "name": "Studio",
+  "id": "studio",
+  "version": "1.0",
+  "description": "Primary AI development environment",
+  "entry": "module.py",
+  "class": "StudioModule"
+}

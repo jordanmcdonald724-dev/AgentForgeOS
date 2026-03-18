@@ -1,0 +1,9 @@
+{
+  "frontend_backend": {
+    "protocol": "http",
+    "endpoints": [
+      "/api/v2/command/preview",
+      "/api/v2/research/ingest"
+    ]
+  }
+}

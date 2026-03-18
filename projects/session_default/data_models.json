@@ -1,0 +1,19 @@
+{
+  "Project": {
+    "fields": [
+      "id",
+      "name",
+      "type",
+      "created_at"
+    ]
+  },
+  "Task": {
+    "fields": [
+      "id",
+      "agent",
+      "status",
+      "inputs",
+      "outputs"
+    ]
+  }
+}

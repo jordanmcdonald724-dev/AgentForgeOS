@@ -1,0 +1,50 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "run tests",
+			"type": "shell",
+			"command": "C:/Users/jordans/AppData/Local/Python/pythoncore-3.14-64/python.exe",
+			"args": [
+				"-m",
+				"unittest",
+				"discover",
+				"-s",
+				"tests"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "run tests after studio routes fix",
+			"type": "shell",
+			"command": "C:/Users/jordans/AppData/Local/Python/pythoncore-3.14-64/python.exe",
+			"args": [
+				"-m",
+				"unittest",
+				"discover",
+				"-s",
+				"tests"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "run tests after wizard route fix",
+			"type": "shell",
+			"command": "C:/Users/jordans/AppData/Local/Python/pythoncore-3.14-64/python.exe",
+			"args": [
+				"-m",
+				"unittest",
+				"discover",
+				"-s",
+				"tests"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		}
+	]
+}

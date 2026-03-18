@@ -1,0 +1,8 @@
+{
+  "name": "Sandbox",
+  "id": "sandbox",
+  "version": "1.0",
+  "description": "Isolated agent experimentation sandbox",
+  "entry": "module.py",
+  "class": "SandboxModule"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "SaaS Builder",
+  "id": "saas_builder",
+  "version": "1.0",
+  "description": "End-to-end SaaS project scaffolding and management",
+  "entry": "module.py",
+  "class": "SaaSBuilderModule"
+}

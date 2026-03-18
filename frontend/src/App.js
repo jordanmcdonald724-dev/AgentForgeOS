@@ -15,7 +15,9 @@ import {
   X, Clock, Star, Folder, Check, AlertTriangle, Activity,
   Server, HardDrive, Wifi, WifiOff, Key, Palette, Bell,
   Keyboard, Monitor, Moon, Sun, Volume2, Shield, Lock,
-  Mail, Calendar, BarChart3, TrendingUp, Award, Target
+  Mail, Calendar, BarChart3, TrendingUp, Award, Target,
+  ChevronLeft, Sparkles, Download, ExternalLink, CheckCircle2,
+  XCircle, ArrowRight, Radio, Mic, Bot, Cog
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -1845,7 +1847,740 @@ const Studio = () => {
   );
 };
 
+// ===============================================
+// SETUP WIZARD - First Time Setup Flow
+// ===============================================
+
+const WIZARD_STEPS = [
+  { id: 1, name: "Welcome", icon: Sparkles },
+  { id: 2, name: "LLM Provider", icon: Bot },
+  { id: 3, name: "Image & Voice", icon: ImageIcon },
+  { id: 4, name: "Storage & Bridge", icon: HardDrive },
+  { id: 5, name: "Review & Launch", icon: Rocket },
+];
+
+const SetupWizard = ({ onComplete }) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [config, setConfig] = useState({
+    // Engine
+    engineHost: "127.0.0.1",
+    enginePort: "8000",
+    // LLM
+    llmProvider: "ollama",
+    ollamaUrl: "http://localhost:11434",
+    ollamaModel: "llama3",
+    openaiKey: "",
+    openaiModel: "gpt-4",
+    // Image
+    imageProvider: "comfyui",
+    comfyuiUrl: "http://localhost:8188",
+    falApiKey: "",
+    // Voice
+    ttsEnabled: false,
+    ttsProvider: "piper",
+    piperModelPath: "",
+    elevenlabsKey: "",
+    // Storage
+    bridgeRoot: "C:\\AgentForgeOS\\workspace",
+    logLevel: "INFO",
+    mongoEnabled: false,
+    mongoUrl: "mongodb://localhost:27017",
+  });
+  const [connectionTests, setConnectionTests] = useState({
+    engine: null,
+    llm: null,
+    image: null,
+    tts: null,
+  });
+  const [testing, setTesting] = useState({});
+
+  const updateConfig = (key, value) => {
+    setConfig(prev => ({ ...prev, [key]: value }));
+  };
+
+  const testConnection = async (type) => {
+    setTesting(prev => ({ ...prev, [type]: true }));
+    // Simulate connection test
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const success = Math.random() > 0.2; // 80% success rate for demo
+    setConnectionTests(prev => ({ ...prev, [type]: success }));
+    setTesting(prev => ({ ...prev, [type]: false }));
+  };
+
+  const nextStep = () => {
+    if (currentStep < 5) setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const finishSetup = () => {
+    // In real app, this would save to config/.env
+    console.log("Setup complete with config:", config);
+    onComplete();
+  };
+
+  // Connection status indicator
+  const ConnectionStatus = ({ status, testing: isTesting }) => {
+    if (isTesting) {
+      return <span className="connection-status testing"><div className="spinner-sm" /> Testing...</span>;
+    }
+    if (status === null) {
+      return <span className="connection-status pending">Not tested</span>;
+    }
+    return status ? (
+      <span className="connection-status success"><CheckCircle2 size={14} /> Connected</span>
+    ) : (
+      <span className="connection-status error"><XCircle size={14} /> Failed</span>
+    );
+  };
+
+  return (
+    <div className="wizard-overlay">
+      <div className="wizard-container">
+        {/* Header */}
+        <div className="wizard-header">
+          <div className="wizard-logo">
+            <div className="logo-hexagon large">
+              <span className="logo-letters">AF</span>
+            </div>
+            <div className="wizard-title-group">
+              <h1 className="wizard-title">AgentForgeOS Setup</h1>
+              <p className="wizard-subtitle">Let's configure your local development environment</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="wizard-progress">
+          {WIZARD_STEPS.map((step, idx) => {
+            const Icon = step.icon;
+            const isActive = step.id === currentStep;
+            const isComplete = step.id < currentStep;
+            return (
+              <div key={step.id} className={`wizard-step ${isActive ? 'active' : ''} ${isComplete ? 'complete' : ''}`}>
+                <div className="wizard-step-icon">
+                  {isComplete ? <Check size={16} /> : <Icon size={16} />}
+                </div>
+                <span className="wizard-step-name">{step.name}</span>
+                {idx < WIZARD_STEPS.length - 1 && <div className="wizard-step-line" />}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Content */}
+        <div className="wizard-content">
+          {/* Step 1: Welcome */}
+          {currentStep === 1 && (
+            <div className="wizard-step-content">
+              <div className="welcome-hero">
+                <Sparkles size={48} className="welcome-icon" />
+                <h2>Welcome to AgentForgeOS</h2>
+                <p>Your local-first AI development operating system for building software with intelligent agents.</p>
+              </div>
+
+              <div className="prereq-section">
+                <h3>Prerequisites Check</h3>
+                <p className="prereq-desc">Make sure you have these installed before continuing:</p>
+                <div className="prereq-grid">
+                  <div className="prereq-item installed">
+                    <Check size={16} />
+                    <span>Windows 10 (64-bit)</span>
+                  </div>
+                  <div className="prereq-item installed">
+                    <Check size={16} />
+                    <span>Python 3.11+</span>
+                  </div>
+                  <div className="prereq-item installed">
+                    <Check size={16} />
+                    <span>Git</span>
+                  </div>
+                  <div className="prereq-item optional">
+                    <Circle size={16} />
+                    <span>Node.js 20+ (for desktop)</span>
+                  </div>
+                  <div className="prereq-item optional">
+                    <Circle size={16} />
+                    <span>Rust + Cargo (for desktop)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="engine-config">
+                <h3>Engine Configuration</h3>
+                <div className="config-row">
+                  <div className="config-field">
+                    <label>Host</label>
+                    <input 
+                      className="input" 
+                      value={config.engineHost} 
+                      onChange={(e) => updateConfig('engineHost', e.target.value)}
+                    />
+                  </div>
+                  <div className="config-field">
+                    <label>Port</label>
+                    <input 
+                      className="input" 
+                      value={config.enginePort} 
+                      onChange={(e) => updateConfig('enginePort', e.target.value)}
+                    />
+                  </div>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => testConnection('engine')}
+                    disabled={testing.engine}
+                  >
+                    <Activity size={14} /> Test
+                  </button>
+                </div>
+                <ConnectionStatus status={connectionTests.engine} testing={testing.engine} />
+              </div>
+
+              <div className="bootstrap-commands">
+                <h3>Quick Bootstrap (PowerShell)</h3>
+                <div className="code-block">
+                  <code>
+                    cd AgentForgeOS{'\n'}
+                    python -m venv .venv{'\n'}
+                    .\.venv\Scripts\Activate.ps1{'\n'}
+                    pip install -r requirements.txt{'\n'}
+                    python -m engine.main
+                  </code>
+                  <button className="copy-btn" onClick={() => navigator.clipboard.writeText('cd AgentForgeOS\npython -m venv .venv\n.\\.venv\\Scripts\\Activate.ps1\npip install -r requirements.txt\npython -m engine.main')}>
+                    Copy
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: LLM Provider */}
+          {currentStep === 2 && (
+            <div className="wizard-step-content">
+              <div className="step-header">
+                <Bot size={32} className="step-icon" />
+                <div>
+                  <h2>LLM Provider</h2>
+                  <p>Choose how agents will communicate with language models</p>
+                </div>
+              </div>
+
+              <div className="provider-selection">
+                <div 
+                  className={`provider-option ${config.llmProvider === 'ollama' ? 'selected' : ''}`}
+                  onClick={() => updateConfig('llmProvider', 'ollama')}
+                >
+                  <div className="provider-option-header">
+                    <Radio size={18} className={config.llmProvider === 'ollama' ? 'checked' : ''} />
+                    <div className="provider-option-title">
+                      <span>Ollama</span>
+                      <span className="provider-badge local">Local</span>
+                    </div>
+                  </div>
+                  <p>Run LLMs locally on your machine. No API key required.</p>
+                  <a href="https://ollama.com/download/windows" target="_blank" rel="noopener noreferrer" className="provider-link">
+                    <Download size={14} /> Download Ollama
+                  </a>
+                </div>
+
+                <div 
+                  className={`provider-option ${config.llmProvider === 'openai' ? 'selected' : ''}`}
+                  onClick={() => updateConfig('llmProvider', 'openai')}
+                >
+                  <div className="provider-option-header">
+                    <Radio size={18} className={config.llmProvider === 'openai' ? 'checked' : ''} />
+                    <div className="provider-option-title">
+                      <span>OpenAI</span>
+                      <span className="provider-badge cloud">Cloud</span>
+                    </div>
+                  </div>
+                  <p>Use GPT-4 and other OpenAI models via API.</p>
+                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="provider-link">
+                    <ExternalLink size={14} /> Get API Key
+                  </a>
+                </div>
+              </div>
+
+              {config.llmProvider === 'ollama' && (
+                <div className="provider-config">
+                  <h3>Ollama Configuration</h3>
+                  <div className="config-row">
+                    <div className="config-field flex-1">
+                      <label>Base URL</label>
+                      <input 
+                        className="input" 
+                        value={config.ollamaUrl} 
+                        onChange={(e) => updateConfig('ollamaUrl', e.target.value)}
+                        placeholder="http://localhost:11434"
+                      />
+                    </div>
+                    <div className="config-field">
+                      <label>Model</label>
+                      <select 
+                        className="select"
+                        value={config.ollamaModel}
+                        onChange={(e) => updateConfig('ollamaModel', e.target.value)}
+                      >
+                        <option value="llama3">llama3</option>
+                        <option value="llama3:70b">llama3:70b</option>
+                        <option value="mistral">mistral</option>
+                        <option value="codellama">codellama</option>
+                        <option value="deepseek-coder">deepseek-coder</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="config-row">
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={() => testConnection('llm')}
+                      disabled={testing.llm}
+                    >
+                      <Activity size={14} /> Test Connection
+                    </button>
+                    <ConnectionStatus status={connectionTests.llm} testing={testing.llm} />
+                  </div>
+                  <div className="helper-box">
+                    <AlertTriangle size={16} />
+                    <div>
+                      <strong>First time?</strong> Run this in PowerShell:
+                      <code>ollama pull {config.ollamaModel}</code>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {config.llmProvider === 'openai' && (
+                <div className="provider-config">
+                  <h3>OpenAI Configuration</h3>
+                  <div className="config-row">
+                    <div className="config-field flex-1">
+                      <label>API Key</label>
+                      <div className="input-with-icon">
+                        <Key size={14} />
+                        <input 
+                          type="password"
+                          className="input" 
+                          value={config.openaiKey} 
+                          onChange={(e) => updateConfig('openaiKey', e.target.value)}
+                          placeholder="sk-..."
+                        />
+                      </div>
+                    </div>
+                    <div className="config-field">
+                      <label>Model</label>
+                      <select 
+                        className="select"
+                        value={config.openaiModel}
+                        onChange={(e) => updateConfig('openaiModel', e.target.value)}
+                      >
+                        <option value="gpt-4">gpt-4</option>
+                        <option value="gpt-4-turbo">gpt-4-turbo</option>
+                        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="config-row">
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={() => testConnection('llm')}
+                      disabled={testing.llm || !config.openaiKey}
+                    >
+                      <Activity size={14} /> Test Connection
+                    </button>
+                    <ConnectionStatus status={connectionTests.llm} testing={testing.llm} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 3: Image & Voice */}
+          {currentStep === 3 && (
+            <div className="wizard-step-content">
+              <div className="step-header">
+                <ImageIcon size={32} className="step-icon" />
+                <div>
+                  <h2>Image & Voice Providers</h2>
+                  <p>Configure optional media generation capabilities</p>
+                </div>
+              </div>
+
+              {/* Image Provider */}
+              <div className="provider-section">
+                <h3><ImageIcon size={18} /> Image Generation</h3>
+                <div className="provider-selection horizontal">
+                  <div 
+                    className={`provider-option small ${config.imageProvider === 'comfyui' ? 'selected' : ''}`}
+                    onClick={() => updateConfig('imageProvider', 'comfyui')}
+                  >
+                    <Radio size={16} className={config.imageProvider === 'comfyui' ? 'checked' : ''} />
+                    <span>ComfyUI</span>
+                    <span className="provider-badge local">Local</span>
+                  </div>
+                  <div 
+                    className={`provider-option small ${config.imageProvider === 'fal' ? 'selected' : ''}`}
+                    onClick={() => updateConfig('imageProvider', 'fal')}
+                  >
+                    <Radio size={16} className={config.imageProvider === 'fal' ? 'checked' : ''} />
+                    <span>Fal.ai</span>
+                    <span className="provider-badge cloud">Cloud</span>
+                  </div>
+                  <div 
+                    className={`provider-option small ${config.imageProvider === 'none' ? 'selected' : ''}`}
+                    onClick={() => updateConfig('imageProvider', 'none')}
+                  >
+                    <Radio size={16} className={config.imageProvider === 'none' ? 'checked' : ''} />
+                    <span>Disabled</span>
+                  </div>
+                </div>
+
+                {config.imageProvider === 'comfyui' && (
+                  <div className="inline-config">
+                    <div className="config-field flex-1">
+                      <label>ComfyUI URL</label>
+                      <input 
+                        className="input" 
+                        value={config.comfyuiUrl} 
+                        onChange={(e) => updateConfig('comfyuiUrl', e.target.value)}
+                        placeholder="http://localhost:8188"
+                      />
+                    </div>
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={() => testConnection('image')}
+                      disabled={testing.image}
+                    >
+                      Test
+                    </button>
+                    <ConnectionStatus status={connectionTests.image} testing={testing.image} />
+                  </div>
+                )}
+
+                {config.imageProvider === 'fal' && (
+                  <div className="inline-config">
+                    <div className="config-field flex-1">
+                      <label>Fal.ai API Key</label>
+                      <input 
+                        type="password"
+                        className="input" 
+                        value={config.falApiKey} 
+                        onChange={(e) => updateConfig('falApiKey', e.target.value)}
+                        placeholder="Enter API key..."
+                      />
+                    </div>
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={() => testConnection('image')}
+                      disabled={testing.image}
+                    >
+                      Test
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* TTS Provider */}
+              <div className="provider-section">
+                <h3><Mic size={18} /> Text-to-Speech</h3>
+                <div className="tts-toggle">
+                  <span>Enable TTS</span>
+                  <div 
+                    className={`toggle-switch-lg ${config.ttsEnabled ? 'active' : ''}`}
+                    onClick={() => updateConfig('ttsEnabled', !config.ttsEnabled)}
+                  >
+                    <div className="toggle-knob" />
+                  </div>
+                </div>
+
+                {config.ttsEnabled && (
+                  <>
+                    <div className="provider-selection horizontal">
+                      <div 
+                        className={`provider-option small ${config.ttsProvider === 'piper' ? 'selected' : ''}`}
+                        onClick={() => updateConfig('ttsProvider', 'piper')}
+                      >
+                        <Radio size={16} className={config.ttsProvider === 'piper' ? 'checked' : ''} />
+                        <span>Piper</span>
+                        <span className="provider-badge local">Local</span>
+                      </div>
+                      <div 
+                        className={`provider-option small ${config.ttsProvider === 'elevenlabs' ? 'selected' : ''}`}
+                        onClick={() => updateConfig('ttsProvider', 'elevenlabs')}
+                      >
+                        <Radio size={16} className={config.ttsProvider === 'elevenlabs' ? 'checked' : ''} />
+                        <span>ElevenLabs</span>
+                        <span className="provider-badge cloud">Cloud</span>
+                      </div>
+                    </div>
+
+                    {config.ttsProvider === 'piper' && (
+                      <div className="inline-config">
+                        <div className="config-field flex-1">
+                          <label>Voice Model Path (optional)</label>
+                          <input 
+                            className="input" 
+                            value={config.piperModelPath} 
+                            onChange={(e) => updateConfig('piperModelPath', e.target.value)}
+                            placeholder="C:\piper\en_US-lessac-medium.onnx"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {config.ttsProvider === 'elevenlabs' && (
+                      <div className="inline-config">
+                        <div className="config-field flex-1">
+                          <label>ElevenLabs API Key</label>
+                          <input 
+                            type="password"
+                            className="input" 
+                            value={config.elevenlabsKey} 
+                            onChange={(e) => updateConfig('elevenlabsKey', e.target.value)}
+                            placeholder="Enter API key..."
+                          />
+                        </div>
+                        <button 
+                          className="btn btn-secondary"
+                          onClick={() => testConnection('tts')}
+                          disabled={testing.tts}
+                        >
+                          Test
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Storage & Bridge */}
+          {currentStep === 4 && (
+            <div className="wizard-step-content">
+              <div className="step-header">
+                <HardDrive size={32} className="step-icon" />
+                <div>
+                  <h2>Storage & Bridge</h2>
+                  <p>Configure file system access and logging</p>
+                </div>
+              </div>
+
+              <div className="provider-section">
+                <h3><Folder size={18} /> Bridge Root (Sandbox)</h3>
+                <p className="section-desc">This is the root directory where agents can read/write files. Keep it isolated for safety.</p>
+                <div className="config-field">
+                  <label>Workspace Path</label>
+                  <input 
+                    className="input" 
+                    value={config.bridgeRoot} 
+                    onChange={(e) => updateConfig('bridgeRoot', e.target.value)}
+                    placeholder="C:\AgentForgeOS\workspace"
+                  />
+                </div>
+                <div className="helper-box info">
+                  <Shield size={16} />
+                  <span>Agents cannot access files outside this directory.</span>
+                </div>
+              </div>
+
+              <div className="provider-section">
+                <h3><FileText size={18} /> Logging</h3>
+                <div className="config-field">
+                  <label>Log Level</label>
+                  <select 
+                    className="select"
+                    value={config.logLevel}
+                    onChange={(e) => updateConfig('logLevel', e.target.value)}
+                  >
+                    <option value="DEBUG">DEBUG - Verbose</option>
+                    <option value="INFO">INFO - Standard</option>
+                    <option value="WARNING">WARNING - Minimal</option>
+                    <option value="ERROR">ERROR - Errors Only</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="provider-section">
+                <h3><Database size={18} /> Database (Optional)</h3>
+                <div className="tts-toggle">
+                  <span>Enable MongoDB</span>
+                  <div 
+                    className={`toggle-switch-lg ${config.mongoEnabled ? 'active' : ''}`}
+                    onClick={() => updateConfig('mongoEnabled', !config.mongoEnabled)}
+                  >
+                    <div className="toggle-knob" />
+                  </div>
+                </div>
+                <p className="section-desc muted">Without MongoDB, data is stored in-memory (lost on restart).</p>
+
+                {config.mongoEnabled && (
+                  <div className="config-field">
+                    <label>MongoDB URL</label>
+                    <input 
+                      className="input" 
+                      value={config.mongoUrl} 
+                      onChange={(e) => updateConfig('mongoUrl', e.target.value)}
+                      placeholder="mongodb://localhost:27017"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Review & Launch */}
+          {currentStep === 5 && (
+            <div className="wizard-step-content">
+              <div className="step-header">
+                <Rocket size={32} className="step-icon" />
+                <div>
+                  <h2>Review & Launch</h2>
+                  <p>Confirm your configuration and start AgentForgeOS</p>
+                </div>
+              </div>
+
+              <div className="review-grid">
+                <div className="review-card">
+                  <h4><Server size={16} /> Engine</h4>
+                  <div className="review-item">
+                    <span>Host:</span>
+                    <code>{config.engineHost}:{config.enginePort}</code>
+                  </div>
+                </div>
+
+                <div className="review-card">
+                  <h4><Bot size={16} /> LLM Provider</h4>
+                  <div className="review-item">
+                    <span>Provider:</span>
+                    <code>{config.llmProvider}</code>
+                  </div>
+                  <div className="review-item">
+                    <span>Model:</span>
+                    <code>{config.llmProvider === 'ollama' ? config.ollamaModel : config.openaiModel}</code>
+                  </div>
+                </div>
+
+                <div className="review-card">
+                  <h4><ImageIcon size={16} /> Image</h4>
+                  <div className="review-item">
+                    <span>Provider:</span>
+                    <code>{config.imageProvider}</code>
+                  </div>
+                </div>
+
+                <div className="review-card">
+                  <h4><Mic size={16} /> TTS</h4>
+                  <div className="review-item">
+                    <span>Enabled:</span>
+                    <code>{config.ttsEnabled ? config.ttsProvider : 'Disabled'}</code>
+                  </div>
+                </div>
+
+                <div className="review-card">
+                  <h4><Folder size={16} /> Storage</h4>
+                  <div className="review-item">
+                    <span>Workspace:</span>
+                    <code>{config.bridgeRoot}</code>
+                  </div>
+                  <div className="review-item">
+                    <span>Log Level:</span>
+                    <code>{config.logLevel}</code>
+                  </div>
+                </div>
+
+                <div className="review-card">
+                  <h4><Database size={16} /> Database</h4>
+                  <div className="review-item">
+                    <span>MongoDB:</span>
+                    <code>{config.mongoEnabled ? 'Enabled' : 'In-Memory'}</code>
+                  </div>
+                </div>
+              </div>
+
+              <div className="config-file-preview">
+                <h4>Config File Preview (config/.env)</h4>
+                <div className="code-block dark">
+                  <code>
+                    SETUP_COMPLETE=1{'\n'}
+                    ENGINE_HOST={config.engineHost}{'\n'}
+                    ENGINE_PORT={config.enginePort}{'\n'}
+                    {'\n'}
+                    # LLM{'\n'}
+                    LLM_PROVIDER={config.llmProvider}{'\n'}
+                    {config.llmProvider === 'ollama' ? `OLLAMA_URL=${config.ollamaUrl}\nOLLAMA_MODEL=${config.ollamaModel}` : `OPENAI_API_KEY=${config.openaiKey ? '***' : ''}\nOPENAI_MODEL=${config.openaiModel}`}{'\n'}
+                    {'\n'}
+                    # Image{'\n'}
+                    IMAGE_PROVIDER={config.imageProvider}{'\n'}
+                    {config.imageProvider === 'comfyui' ? `COMFYUI_URL=${config.comfyuiUrl}` : ''}{'\n'}
+                    {'\n'}
+                    # Storage{'\n'}
+                    BRIDGE_ROOT={config.bridgeRoot}{'\n'}
+                    LOG_LEVEL={config.logLevel}
+                  </code>
+                </div>
+              </div>
+
+              <div className="launch-ready">
+                <CheckCircle2 size={24} />
+                <span>Ready to launch AgentForgeOS!</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Navigation */}
+        <div className="wizard-footer">
+          <button 
+            className="btn btn-secondary"
+            onClick={prevStep}
+            disabled={currentStep === 1}
+          >
+            <ChevronLeft size={16} /> Back
+          </button>
+          <div className="wizard-step-indicator">
+            Step {currentStep} of {WIZARD_STEPS.length}
+          </div>
+          {currentStep < 5 ? (
+            <button className="btn btn-primary" onClick={nextStep}>
+              Next <ChevronRight size={16} />
+            </button>
+          ) : (
+            <button className="btn btn-primary launch-btn" onClick={finishSetup}>
+              <Rocket size={16} /> Launch Studio
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
+  const [showWizard, setShowWizard] = useState(() => {
+    // Check if setup is complete (would check localStorage or config in real app)
+    return localStorage.getItem('agentforge_setup_complete') !== 'true';
+  });
+
+  const handleWizardComplete = () => {
+    localStorage.setItem('agentforge_setup_complete', 'true');
+    setShowWizard(false);
+  };
+
+  // For demo: allow resetting wizard with ?wizard=true in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('wizard') === 'true') {
+      localStorage.removeItem('agentforge_setup_complete');
+      setShowWizard(true);
+    }
+  }, []);
+
+  if (showWizard) {
+    return <SetupWizard onComplete={handleWizardComplete} />;
+  }
+
   return (
     <div className="App">
       <BrowserRouter>

@@ -1,0 +1,45 @@
+All 6 Top Navigation Modal Pages:
+
+1. Project Manager
+
+Recent/Starred/New Project tabs
+Project list with star toggles
+Template selection (Blank, Game Dev, SaaS, API Service)
+Create new project functionality
+
+2. Workspace Configuration
+
+Layout presets (Default, Focused, Split View, Compact)
+Toggle active modules on/off with switches
+Export/Import layout options
+
+3. AI Providers
+
+4 provider cards (LLM, Image, TTS, Embeddings)
+Provider dropdown (ollama, openai, etc.)
+Connection status indicators (green/red)
+Test Connection buttons
+API key inputs for cloud providers
+
+4. System Status
+
+Real-time stats (CPU 8.4%, Memory 1.2GB/16GB, 3 Active Agents, 12 Queued Tasks)
+Service list with uptime, CPU, memory for each
+Start/Stop buttons per service
+Protected directories display
+
+5. Settings
+
+Sidebar navigation (Appearance, Notifications, Shortcuts, Privacy)
+Theme toggle (Dark/Light)
+Accent color picker (5 colors)
+Font size selector
+Toggle switches for notifications, sounds, auto-save, telemetry
+
+6. Profile
+
+Avatar with Change button
+Editable name field
+Activity stats (12 Projects, 156 Builds, 43 Experiments, 89h Active)
+Achievements grid with unlock status
+Account actions (Change Password, Export Data, Delete Account)

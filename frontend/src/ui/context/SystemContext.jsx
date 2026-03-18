@@ -1,4 +1,5 @@
-import React, { createContext, useReducer, useContext } from "react";
+import React, { createContext, useContext, useEffect, useReducer } from "react";
+import { useEventStream } from "../hooks/useEventStream";
 
 const SystemContext = createContext();
 
@@ -18,6 +19,12 @@ function reducer(state, action) {
   switch (action.type) {
     case "STEP_START": {
       const { stepIndex, agentName } = action.payload;
+      const nextAgents = agentName
+        ? {
+            ...state.agents,
+            [agentName]: "active",
+          }
+        : state.agents;
 
       return {
         ...state,
@@ -26,15 +33,18 @@ function reducer(state, action) {
           currentStep: stepIndex,
           status: "running",
         },
-        agents: {
-          ...state.agents,
-          [agentName]: "active",
-        },
+        agents: nextAgents,
       };
     }
 
     case "STEP_COMPLETE": {
       const { stepIndex, agentName, output } = action.payload;
+      const nextAgents = agentName
+        ? {
+            ...state.agents,
+            [agentName]: "idle",
+          }
+        : state.agents;
 
       return {
         ...state,
@@ -47,15 +57,18 @@ function reducer(state, action) {
             { stepIndex, agentName, output, status: "complete" },
           ],
         },
-        agents: {
-          ...state.agents,
-          [agentName]: "idle",
-        },
+        agents: nextAgents,
       };
     }
 
     case "STEP_FAILED": {
       const { stepIndex, agentName, error } = action.payload;
+      const nextAgents = agentName
+        ? {
+            ...state.agents,
+            [agentName]: "error",
+          }
+        : state.agents;
 
       return {
         ...state,
@@ -63,10 +76,7 @@ function reducer(state, action) {
           ...state.pipeline,
           status: "error",
         },
-        agents: {
-          ...state.agents,
-          [agentName]: "error",
-        },
+        agents: nextAgents,
         logs: [...state.logs, { type: "error", error }],
       };
     }
@@ -87,6 +97,7 @@ function reducer(state, action) {
 
     case "AGENT_CREATED": {
       const { agentName } = action.payload;
+      if (!agentName) return state;
 
       return {
         ...state,
@@ -125,6 +136,50 @@ function reducer(state, action) {
 
 export function SystemProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { lastEvent } = useEventStream({ url: "/ws", enabled: true });
+
+  useEffect(() => {
+    if (!lastEvent) return;
+    const data = lastEvent.data ?? {};
+    const stepIndex = data.step_index ?? data.step_id ?? data.step;
+    const agentName = data.agent_name ?? data.agent_id ?? data.agent ?? data.by;
+
+    switch (lastEvent.type) {
+      case "step_start":
+        dispatch({ type: "STEP_START", payload: { stepIndex, agentName } });
+        break;
+      case "step_complete":
+        dispatch({
+          type: "STEP_COMPLETE",
+          payload: {
+            stepIndex,
+            agentName,
+            output: data.output ?? data.message ?? data.result,
+          },
+        });
+        break;
+      case "step_failed":
+        dispatch({
+          type: "STEP_FAILED",
+          payload: { stepIndex, agentName, error: data.error ?? "Step failed" },
+        });
+        break;
+      case "step_retry":
+        dispatch({ type: "STEP_RETRY", payload: { stepIndex, agentName } });
+        break;
+      case "pipeline_modified":
+        dispatch({ type: "PIPELINE_MODIFIED", payload: data });
+        break;
+      case "agent_created":
+        dispatch({ type: "AGENT_CREATED", payload: { agentName } });
+        break;
+      case "loop_iteration":
+        dispatch({ type: "LOOP_ITERATION", payload: { iteration: data.iteration ?? 0 } });
+        break;
+      default:
+        break;
+    }
+  }, [lastEvent]);
 
   return (
     <SystemContext.Provider value={{ state, dispatch }}>

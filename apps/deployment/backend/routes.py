@@ -75,8 +75,6 @@ async def launch_engine(body: LaunchRequest):
     Returns a launch record with a ``status`` field of ``"queued"`` for
     real engines and ``"not_configured"`` for unimplemented targets.
     """
-    import datetime
-
     engine = (body.engine or "").lower()
 
     _SUPPORTED = {"web"}

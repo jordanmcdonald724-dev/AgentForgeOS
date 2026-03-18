@@ -73,6 +73,8 @@ def create_app() -> FastAPI:
     # CORS — allow the Vite dev server (port 5173) and Tauri shell to reach the
     # engine API without browser pre-flight failures.  In production the
     # frontend is served from the same origin so this is a no-op.
+    # CORS_ORIGINS: comma-separated list of allowed origins,
+    # e.g. "http://localhost:5173,https://my-app.example.com"
     _cors_origins = os.environ.get(
         "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
     ).split(",")

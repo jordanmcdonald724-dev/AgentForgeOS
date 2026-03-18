@@ -84,6 +84,10 @@ async def generate_asset(body: GenerateAssetRequest):
     error_msg: Optional[str] = None
 
     try:
+        # Providers are imported lazily here because they carry optional
+        # heavyweight dependencies (httpx is fine, but fal/comfyui may pull in
+        # extra packages).  This keeps the asset module importable even when
+        # those providers are not installed.
         if provider_name == "fal":
             from providers.fal_provider import FalImageProvider
             provider = FalImageProvider()

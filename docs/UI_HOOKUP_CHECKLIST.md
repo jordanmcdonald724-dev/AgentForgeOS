@@ -37,11 +37,11 @@ Backend: ✅ `/api/agent/run`, `/ws` all exist.
 
 | ID | Status | Task |
 |----|--------|------|
-| S-1 | ❌ | Wire prompt `onSubmit` → `POST /api/agent/run` |
-| S-2 | ❌ | Replace hardcoded agent list with `useAgentState({ wsUrl: "/ws" })` |
-| S-3 | ❌ | Replace mock pipeline with `usePipelineState({ wsUrl: "/ws" })` |
-| S-4 | ❌ | Stream agent output into Output panel from API response / WS events |
-| S-5 | ❌ | Connect `SystemContext` dispatch to WebSocket (done by G-3; consume via `useSystem()`) |
+| S-1 | ✅ | Wire prompt `onSubmit` → `POST /api/agent/run` |
+| S-2 | ✅ | Replace hardcoded agent list with `useAgentState({ wsUrl: "/ws" })` |
+| S-3 | ✅ | Replace mock pipeline with `usePipelineState({ wsUrl: "/ws" })` |
+| S-4 | ✅ | Stream agent output into Output panel from API response / WS events |
+| S-5 | ✅ | Connect `SystemContext` dispatch to WebSocket (done by G-3; consume via `useSystem()`) |
 
 ---
 

@@ -1,6 +1,6 @@
 # Applications (Phase 8 Scaffold)
 
-This directory holds app modules outlined in `docs/BOOTSTRAP_PLAN.md` and `docs/REPOSITORY_STRUCTURE.md`.
+This directory holds app modules outlined in `docs/archive/BOOTSTRAP_PLAN.md` and `docs/REPOSITORY_STRUCTURE.md`.
 
 Current placeholders:
 

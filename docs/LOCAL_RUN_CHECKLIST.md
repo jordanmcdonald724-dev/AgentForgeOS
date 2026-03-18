@@ -53,4 +53,4 @@ python -m unittest discover -s tests
 
 ## Notes
 - The Windows setup wizard flow is documented in `docs/SETUP_WIZARD_WINDOWS.md`.
-- Current build status and phase audit: see `docs/BUILD_STATUS.md` and `docs/PHASE_AUDIT.md`.
+- Current build status and phase audit: see `docs/BUILD_STATUS.md` and `docs/legacy/phases/PHASE_AUDIT.md`.

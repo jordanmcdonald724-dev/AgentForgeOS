@@ -24,7 +24,7 @@ Desktop (Tauri)
                                             └── Bridge (Filesystem, Tools)
 ```
 
-For a detailed view see `docs/ARCHITECTURE_MAP.md` and `docs/SYSTEM_ARCHITECTURE.md`.
+For a detailed view see `docs/SYSTEM_ARCHITECTURE.md` (includes the architecture map).
 
 ---
 
@@ -111,22 +111,21 @@ AgentForgeOS/
 | Document | Purpose |
 |---|---|
 | `docs/AGENTFORGE_OS_SPEC.md` | Master system specification |
-| `docs/AGENTFORGE_BOOTSTRAP_PROMPT.md` | Bootstrap instructions for AI coding agents |
+| `docs/archive/AGENTFORGE_BOOTSTRAP_PROMPT.md` | Archived bootstrap instructions for AI coding agents |
 | `docs/AI_DEVELOPMENT_RULES.md` | Mandatory rules for AI agent code changes |
-| `docs/AI_PIPELINE_SYSTEM.md` | 12-agent pipeline description |
-| `docs/AGENT_SYSTEM.md` | AI agent team roles and responsibilities |
+| `docs/AI_PIPELINE_SYSTEM.md` | 12-agent pipeline and agent team overview |
 | `docs/ARCHITECTURE_DECISION_RECORDS.md` | Architecture decision records (ADR) |
-| `docs/ARCHITECTURE_MAP.md` | Visual component diagram |
-| `docs/BOOTSTRAP_PLAN.md` | Phase-by-phase build plan |
+| `docs/SYSTEM_ARCHITECTURE.md` | Architecture layers and visual map |
+| `docs/archive/BOOTSTRAP_PLAN.md` | Archived phase-by-phase build plan |
 | `docs/BUILD_STATUS.md` | What is done vs. still needed |
 | `docs/CONTROL_LAYER.md` | AI safety system description |
 | `docs/DATABASE_SCHEMA.md` | MongoDB collection schemas |
 | `docs/ERROR_HANDLING_SYSTEM.md` | Consistent error response format |
 | `docs/ICON_PACK.md` | Icon pack generation script |
 | `docs/LOCAL_RUN_CHECKLIST.md` | Quick-start local run checklist |
-| `docs/PHASE_AUDIT.md` | Phase-by-phase completion audit |
-| `docs/PHASE7-10_REPORT.md` | Phase 7–10 build verification report |
-| `docs/PHASE10_COMPLIANCE.md` | Compliance checklist |
+| `docs/legacy/phases/PHASE_AUDIT.md` | Phase-by-phase completion audit (archived) |
+| `docs/legacy/phases/PHASE7-10_REPORT.md` | Phase 7–10 build verification report (archived) |
+| `docs/legacy/phases/PHASE10_COMPLIANCE.md` | Compliance checklist (archived) |
 | `docs/PROVIDER_IMPLEMENTATION_GUIDE.md` | How to add a new provider |
 | `docs/REPOSITORY_STRUCTURE.md` | Required repository layout |
 | `docs/SETUP_WIZARD_WINDOWS.md` | Local Windows 10 setup wizard flow |
@@ -135,7 +134,7 @@ AgentForgeOS/
 | `docs/SYSTEM_ARCHITECTURE.md` | Architecture layer definitions |
 | `docs/SYSTEM_CAPABILITY_MAP.md` | Per-capability build status |
 | `docs/TASK_DECOMPOSITION_SYSTEM.md` | Agent task decomposition rules |
-| `docs/UI_SHELL_LOCK.md` | Immutable Studio shell layout |
+| `docs/UI_STUDIO_LAYOUT.md` | Immutable Studio shell + layout spec |
 | `docs/UI_STUDIO_LAYOUT.md` | Five-region Studio UI spec |
 
 ---

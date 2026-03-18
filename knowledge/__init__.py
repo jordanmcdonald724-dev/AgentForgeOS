@@ -12,4 +12,24 @@ __all__ = [
     "EmbeddingService",
     "PatternExtractor",
     "ProjectGenome",
+    "V2_KNOWLEDGE_CATEGORIES",
+]
+
+# V2 knowledge categories (from BUILD_BIBLE_V2):
+# - architecture_patterns
+# - code_templates
+# - bug_patterns
+# - optimization_patterns
+# - gameplay_systems
+# - research_insights
+# - project_genomes
+
+V2_KNOWLEDGE_CATEGORIES = [
+    "architecture_patterns",
+    "code_templates",
+    "bug_patterns",
+    "optimization_patterns",
+    "gameplay_systems",
+    "research_insights",
+    "project_genomes",
 ]

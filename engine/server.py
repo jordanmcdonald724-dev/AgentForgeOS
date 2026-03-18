@@ -4,13 +4,22 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from fastapi import APIRouter, FastAPI
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import get_settings
 from .database import db
 from .module_loader import load_modules, collect_module_routers
 from .worker_system import worker_system
-from .routes import modules_router, agent_router, setup_router, bridge_router
+from .routes import (
+    modules_router,
+    agent_router,
+    setup_router,
+    bridge_router,
+    v2_orchestration_router,
+    v2_infrastructure_router,
+    v2_research_router,
+)
 from engine.routes.pipeline import router as pipeline_router
 from control.module_registry import module_registry
 from engine.ws import execution_ws
@@ -52,13 +61,28 @@ def register_routers(
             app.include_router(router)
 
 
+FRONTEND_ROOT = Path(__file__).resolve().parent.parent / "frontend"
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
 
     # Core engine routes
     register_routers(
-        app, [_health_router(), modules_router, agent_router, setup_router, bridge_router, pipeline_router], prefix="/api"
+        app,
+        [
+            _health_router(),
+            modules_router,
+            agent_router,
+            setup_router,
+            bridge_router,
+            pipeline_router,
+            v2_orchestration_router,
+            v2_infrastructure_router,
+            v2_research_router,
+        ],
+        prefix="/api",
     )
 
     # Real-time event stream (WebSocket)
@@ -69,13 +93,28 @@ def create_app() -> FastAPI:
     for mod_router in module_routers:
         app.include_router(mod_router, prefix="/api/modules")
 
+    # Explicit setup wizard route so it remains available even when the
+    # Studio frontend is served from a built ``frontend/dist`` directory
+    # that does not contain ``wizard.html``.
+    @app.get("/wizard.html", include_in_schema=False)
+    async def wizard_page():
+        wizard_path = FRONTEND_ROOT / "wizard.html"
+        if wizard_path.is_file():
+            return FileResponse(str(wizard_path), media_type="text/html")
+        # Fallback: redirect to the Studio root if the wizard file is missing.
+        return RedirectResponse("/")
+
+    # Optional convenience redirect from /wizard → /wizard.html
+    @app.get("/wizard", include_in_schema=False)
+    async def wizard_redirect():
+        return RedirectResponse("/wizard.html")
+
     # Serve the frontend (wizard, Studio, CSS, etc.) as static files.
     # Prefer built assets in frontend/dist when present; otherwise fall back to
     # the frontend/ directory for dev/scaffold mode.
     #
-    # Mounted last so /api routes take priority. ``html=True`` makes "/"
-    # serve ``index.html`` and "/wizard.html" resolve correctly.
-    frontend_root = Path(__file__).resolve().parent.parent / "frontend"
+    # Mounted last so /api routes take priority.
+    frontend_root = FRONTEND_ROOT
     dist_dir = frontend_root / "dist"
     serve_dir = dist_dir if dist_dir.is_dir() and (dist_dir / "index.html").exists() else frontend_root
     if serve_dir.is_dir():

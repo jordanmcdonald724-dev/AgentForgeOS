@@ -78,7 +78,7 @@ All service files exist and are functional. Core services now delegate to the Ph
 | `services/project_genome_service.py` — Project tracker | ✅ DONE |
 | `services/autopsy_service.py` — Build failure analyzer | ✅ DONE |
 | `services/agent_pipeline.py` — 12-agent pipeline + PipelineContext | ✅ DONE |
-| `services/agent_registry.py` — Role-to-class registry (AGENT_REGISTRY) | ✅ DONE |
+| `services/agent_registry.py` — Authoritative role-to-class registry (AGENT_REGISTRY) | ✅ DONE |
 | MongoDB memory wired into AgentService via agent route | ✅ DONE |
 
 ---
@@ -179,7 +179,7 @@ Core wiring works. Providers, agents and module routes are all functional. First
 | Control layer enforces permissions | ✅ DONE |
 | Agent pipeline executes with real Ollama provider | ⚠️ REQUIRES Ollama running |
 | Bridge provides sandboxed filesystem access to agents | ✅ DONE |
-| `/api/modules/studio/workspace?path=` navigable file browser for frontend | ✅ DONE |
+| `/api/modules/studio/workspace` exposes bridge listing to the frontend | ✅ DONE |
 | Knowledge system persists across restarts (JSON file backend) | ✅ DONE |
 | First-run startup wizard (`frontend/wizard.html`) captures API keys | ✅ DONE |
 | `/api/setup` GET/POST/reset endpoints save to `config/.env` | ✅ DONE |
@@ -193,8 +193,8 @@ Test suite passes (173 tests). Compliance checklist is documented. CI/CD pipelin
 
 | Item | Status |
 |---|---|
-| `docs/PHASE_AUDIT.md` covers all phases | ✅ DONE |
-| `docs/PHASE10_COMPLIANCE.md` exists | ✅ DONE |
+| `docs/legacy/phases/PHASE_AUDIT.md` covers all phases | ✅ DONE |
+| `docs/legacy/phases/PHASE10_COMPLIANCE.md` exists | ✅ DONE |
 | `tests/test_phase_integration.py` passes | ✅ DONE |
 | `tests/test_providers.py` — all 6 providers covered | ✅ DONE |
 | `tests/test_agents.py` — all 12 agent classes covered | ✅ DONE |

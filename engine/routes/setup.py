@@ -13,6 +13,7 @@ import asyncio
 import logging
 import os
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -193,9 +194,15 @@ async def bootstrap(body: BootstrapRequest):
     """
 
     repo_root = Path(__file__).resolve().parent.parent.parent
+
+    # Always use the current Python interpreter for installs so that
+    # bootstrap respects the active virtual environment on Windows and
+    # other platforms. This avoids relying on "python"/"pip" being on PATH.
+    python_exe = sys.executable or "python"
+
     commands: List[Dict[str, Any]] = [
-        {"cmd": ["python", "-m", "pip", "install", "--upgrade", "pip"], "cwd": repo_root},
-        {"cmd": ["pip", "install", "-r", "requirements.txt"], "cwd": repo_root},
+        {"cmd": [python_exe, "-m", "pip", "install", "--upgrade", "pip"], "cwd": repo_root},
+        {"cmd": [python_exe, "-m", "pip", "install", "-r", "requirements.txt"], "cwd": repo_root},
     ]
     if body.install_desktop:
         commands.append({"cmd": ["npm", "install"], "cwd": repo_root / "desktop"})

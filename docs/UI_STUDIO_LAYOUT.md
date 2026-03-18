@@ -7,6 +7,29 @@ The UI must follow this layout specification exactly.
 
 ---
 
+# 0. Studio Shell Lock (Immutable Layout)
+
+The Studio interface shell is **permanent** and must always be present.
+
+## Required Regions (never remove or replace)
+
+- **Top Navigation Bar** — Global navigation and system controls.
+- **Left Sidebar** — Primary module navigation and entry points.
+- **Main Workspace** — All module content and tools render here.
+- **Agent Console** — Dedicated panel for agent interaction and logs.
+- **Pipeline Monitor** — Dedicated panel for pipeline/status visualization.
+
+## Shell Rules
+
+1. These five regions **must always exist**; do not delete, replace, or relocate them.
+2. All UI components and module UIs **must render inside these regions**, not alongside or outside them.
+3. Variations to styling or contents are allowed only if the region boundaries and purpose remain intact.
+4. Do **not** add alternative top-level shells or bypass this layout.
+
+This shell lock ensures consistent Studio structure across all generated or hand-authored UI code.
+
+---
+
 # 1. Design Principles
 
 AgentForgeOS Studio is designed as a **multi-pane development command center** similar to professional IDEs and control systems.

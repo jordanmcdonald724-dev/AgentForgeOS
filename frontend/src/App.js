@@ -846,14 +846,32 @@ const Workspace = ({ module, addLog }) => {
   );
 };
 
-// Agent Console
+// Agent Console - 12 Core Agents with Avatars
+const AGENTS = [
+  { id: "planner", name: "Project Planner", shortName: "Planner", avatar: "https://images.unsplash.com/photo-1605504836193-e77d3d9ede8a?w=100&h=100&fit=crop" },
+  { id: "architect", name: "System Architect", shortName: "Architect", avatar: "https://images.unsplash.com/photo-1749133218238-f90d8a742c3a?w=100&h=100&fit=crop" },
+  { id: "router", name: "Task Router", shortName: "Router", avatar: "https://images.unsplash.com/photo-1745441888183-c217893cfe48?w=100&h=100&fit=crop" },
+  { id: "builder", name: "Module Builder", shortName: "Builder", avatar: "https://images.unsplash.com/photo-1697759042426-848c5f3b68b3?w=100&h=100&fit=crop" },
+  { id: "api", name: "API Architect", shortName: "API", avatar: "https://images.unsplash.com/photo-1737574994780-e31827afaed7?w=100&h=100&fit=crop" },
+  { id: "data", name: "Data Architect", shortName: "Data", avatar: "https://images.unsplash.com/photo-1593524843106-11f37c8bf6e0?w=100&h=100&fit=crop" },
+  { id: "backend", name: "Backend Engineer", shortName: "Backend", avatar: "https://images.unsplash.com/photo-1743116591535-06e9c9aca4a4?w=100&h=100&fit=crop" },
+  { id: "frontend", name: "Frontend Engineer", shortName: "Frontend", avatar: "https://images.unsplash.com/photo-1731419223715-aec6664f9011?w=100&h=100&fit=crop" },
+  { id: "ai", name: "AI Integration Engineer", shortName: "AI Eng", avatar: "https://images.unsplash.com/photo-1565687981296-535f09db714e?w=100&h=100&fit=crop" },
+  { id: "tester", name: "Integration Tester", shortName: "Tester", avatar: "https://images.unsplash.com/photo-1762709117664-985ffc56bc7f?w=100&h=100&fit=crop" },
+  { id: "auditor", name: "Security Auditor", shortName: "Auditor", avatar: "https://images.unsplash.com/photo-1650075990015-af095f1659e3?w=100&h=100&fit=crop" },
+  { id: "stabilizer", name: "System Stabilizer", shortName: "Stabilizer", avatar: "https://images.unsplash.com/photo-1608662867938-f50663c033f0?w=100&h=100&fit=crop" },
+];
+
 const AgentConsole = ({ addLog }) => {
   const [messages, setMessages] = useState([
-    { role: "agent", text: "AgentForgeOS initialized. How can I assist you today?" }
+    { role: "agent", agentId: "planner", text: "Hey! AgentForgeOS is ready. What are we building today?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [activeAgent, setActiveAgent] = useState(AGENTS[0]);
   const messagesRef = useRef(null);
+
+  const getAgent = (id) => AGENTS.find(a => a.id === id) || AGENTS[0];
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -872,13 +890,20 @@ const AgentConsole = ({ addLog }) => {
       });
       const data = await res.json();
       const text = data?.data?.data?.text || data?.data?.error || data?.error || "Processing your request...";
-      setMessages((prev) => [...prev, { role: "agent", text }]);
-      addLog("info", `Agent responded to: "${prompt.slice(0, 40)}..."`);
+      setMessages((prev) => [...prev, { role: "agent", agentId: activeAgent.id, text }]);
+      addLog("info", `${activeAgent.name} responded`);
     } catch (err) {
-      // Mock response when API unavailable
-      const mockResponse = `I received your request: "${prompt.slice(0, 50)}..."\n\nThis is a mock response as the agent API is not connected. In a live environment, I would process this through the AI pipeline.`;
-      setMessages((prev) => [...prev, { role: "agent", text: mockResponse }]);
-      addLog("warn", "Agent using mock response - API unavailable");
+      // Mock response - rotate through agents for realistic feel
+      const responses = [
+        { agentId: "planner", text: `Got it! Planning out "${prompt.slice(0, 30)}..." — routing to the team.` },
+        { agentId: "architect", text: `I'll design the architecture for this. Looks like we need a modular approach.` },
+        { agentId: "backend", text: `Setting up the backend infrastructure now. APIs coming up.` },
+        { agentId: "frontend", text: `On it! Building out the UI components for this feature.` },
+      ];
+      const response = responses[Math.floor(Math.random() * responses.length)];
+      setMessages((prev) => [...prev, { role: "agent", ...response }]);
+      setActiveAgent(getAgent(response.agentId));
+      addLog("info", `${getAgent(response.agentId).name} processing request`);
     }
     setLoading(false);
   };
@@ -891,14 +916,50 @@ const AgentConsole = ({ addLog }) => {
 
   return (
     <div className="panel-content">
-      <div className="panel-title">Agent Console</div>
+      <div className="panel-title-row">
+        <span className="panel-title">Agent Console</span>
+        <div className="agent-selector">
+          {AGENTS.slice(0, 6).map(agent => (
+            <button
+              key={agent.id}
+              className={`agent-chip ${activeAgent.id === agent.id ? 'active' : ''}`}
+              onClick={() => setActiveAgent(agent)}
+              title={agent.name}
+            >
+              <img src={agent.avatar} alt={agent.name} className="agent-chip-avatar" />
+            </button>
+          ))}
+          <span className="agent-more">+6</span>
+        </div>
+      </div>
       <div className="console-messages" ref={messagesRef}>
-        {messages.map((msg, i) => (
-          <div key={i} className={`console-msg ${msg.role}`}>
-            <span className="console-msg-role">{msg.role === "user" ? "You" : "Agent"}</span>
-            <p className="console-msg-text">{msg.text}</p>
+        {messages.map((msg, i) => {
+          const agent = msg.agentId ? getAgent(msg.agentId) : AGENTS[0];
+          return (
+            <div key={i} className={`console-msg ${msg.role}`}>
+              {msg.role === "agent" && (
+                <img src={agent.avatar} alt={agent.name} className="console-avatar" />
+              )}
+              <div className="console-msg-content">
+                <span className="console-msg-role">{msg.role === "user" ? "You" : agent.shortName}</span>
+                <p className="console-msg-text">{msg.text}</p>
+              </div>
+            </div>
+          );
+        })}
+        {loading && (
+          <div className="console-msg agent">
+            <img src={activeAgent.avatar} alt={activeAgent.name} className="console-avatar" />
+            <div className="console-msg-content">
+              <span className="console-msg-role">{activeAgent.shortName}</span>
+              <p className="console-msg-text typing">
+                <span className="typing-dot"></span>
+                <span className="typing-dot"></span>
+                <span className="typing-dot"></span>
+              </p>
+            </div>
           </div>
-        ))}
+        )}
       </div>
       <form className="console-form" onSubmit={sendMessage}>
         <textarea

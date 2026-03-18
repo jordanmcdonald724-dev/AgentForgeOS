@@ -51,9 +51,9 @@ Backend: ✅ `/api/v2/command/preview`, `/api/v2/projects/{id}/status` both exis
 
 | ID | Status | Task |
 |----|--------|------|
-| CC-1 | ❌ | Surface `GET /api/v2/research/categories` as selectable context in the UI |
-| CC-2 | ❌ | Pass selected categories as `research_sources[]` in the preview request body |
-| CC-3 | ❌ | Display `simulation` response fields (complexity, duration_estimate, feasible) |
+| CC-1 | ✅ | Surface `GET /api/v2/research/categories` as selectable context in the UI |
+| CC-2 | ✅ | Pass selected categories as `research_sources[]` in the preview request body |
+| CC-3 | ✅ | Display `simulation` response fields (complexity, duration_estimate, feasible) |
 
 ---
 

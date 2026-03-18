@@ -75,7 +75,7 @@ def create_app() -> FastAPI:
     app = FastAPI(title=settings.app_name, lifespan=engine_lifespan)
     cors_origins = [
         origin.strip()
-        for origin in os.getenv("CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+        for origin in (os.getenv("CORS_ORIGINS") or ",".join(DEFAULT_CORS_ORIGINS)).split(",")
         if origin.strip()
     ]
     app.add_middleware(

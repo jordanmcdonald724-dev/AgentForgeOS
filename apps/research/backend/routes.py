@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 import os
 
 router = APIRouter(prefix="/research", tags=["research"])
@@ -84,17 +85,26 @@ async def search_knowledge(body: Dict[str, Any] = {}):
         return {"success": False, "data": None, "error": str(exc)}
 
 
+class VideoIngestRequest(BaseModel):
+    video_source: str
+
+
+class InternetScanRequest(BaseModel):
+    query: str
+    num_results: int = 10
+
+
 # Add a route for video ingestion
 from research.video_processor import process_video
 
-@router.post("/api/research/video")
-def ingest_video(video_source: str):
+@router.post("/video")
+def ingest_video(payload: VideoIngestRequest):
     """Ingest a video file or YouTube URL."""
     output_dir = "./temp"
     os.makedirs(output_dir, exist_ok=True)
 
     try:
-        transcription = process_video(video_source, output_dir)
+        transcription = process_video(payload.video_source, output_dir)
         return {"success": True, "transcription": transcription}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -103,11 +113,11 @@ def ingest_video(video_source: str):
 # Add route for internet scanning
 from research.internet_scanner import perform_web_search, fetch_webpage_content
 
-@router.post("/api/research/scan")
-def scan_internet(query: str, num_results: int = 10):
+@router.post("/scan")
+def scan_internet(payload: InternetScanRequest):
     """Scan the internet for information based on a query."""
     try:
-        results = perform_web_search(query, num_results)
+        results = perform_web_search(payload.query, payload.num_results)
         return {"success": True, "results": results}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

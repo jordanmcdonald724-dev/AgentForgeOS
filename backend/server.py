@@ -10,10 +10,11 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 
-# Import sandbox router
+# Import routers
 from backend.routes.sandbox import sandbox_router
-# from backend.routes.monitoring import monitoring_router  # Temporarily disabled due to Pydantic issue
+from backend.routes.monitoring import monitoring_router
 from backend.routes.plugins import plugins_router
+from apps.research.backend.routes import router as research_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -73,7 +74,8 @@ async def get_status_checks():
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(sandbox_router)
-# app.include_router(monitoring_router)  # Temporarily disabled due to Pydantic issue
+app.include_router(monitoring_router, prefix="/api")
+app.include_router(research_router, prefix="/api")
 app.include_router(plugins_router)
 
 app.add_middleware(

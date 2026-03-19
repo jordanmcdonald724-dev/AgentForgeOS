@@ -1,6 +1,8 @@
 from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, RedirectResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -17,6 +19,7 @@ from backend.routes.plugins import plugins_router
 from apps.research.backend.routes import router as research_router
 
 ROOT_DIR = Path(__file__).parent
+FRONTEND_ROOT = ROOT_DIR.parent / "frontend"
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
@@ -77,6 +80,23 @@ app.include_router(sandbox_router)
 app.include_router(monitoring_router, prefix="/api")
 app.include_router(research_router, prefix="/api")
 app.include_router(plugins_router)
+
+# Serve Emergent UI / frontend assets
+dist_dir = FRONTEND_ROOT / "dist"
+serve_dir = dist_dir if dist_dir.is_dir() and (dist_dir / "index.html").exists() else FRONTEND_ROOT
+if serve_dir.is_dir():
+    app.mount("/", StaticFiles(directory=str(serve_dir), html=True), name="frontend")
+
+    @app.get("/", include_in_schema=False)
+    async def serve_root():
+        index_path = serve_dir / "index.html"
+        if index_path.is_file():
+            return FileResponse(str(index_path))
+        return RedirectResponse("/docs")
+else:
+    @app.get("/", include_in_schema=False)
+    async def root_redirect():
+        return RedirectResponse("/docs")
 
 app.add_middleware(
     CORSMiddleware,

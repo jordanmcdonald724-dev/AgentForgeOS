@@ -10,11 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from .config import get_settings
-from .database import db
-from .module_loader import load_modules, collect_module_routers
-from .worker_system import worker_system
-from .routes import (
+from engine.config import get_settings
+from engine.database import db
+from engine.module_loader import load_modules, collect_module_routers
+from engine.worker_system import worker_system
+from engine.routes import (
     modules_router,
     agent_router,
     setup_router,
@@ -23,10 +23,10 @@ from .routes import (
     v2_infrastructure_router,
     v2_research_router,
 )
-from .websocket_routes import websocket_router, cleanup_websocket_connections
+from engine.websocket_routes import websocket_router, cleanup_websocket_connections
 from engine.routes.pipeline import router as pipeline_router
-from control.module_registry import module_registry
 from engine.ws import execution_ws
+from control.module_registry import module_registry
 
 logger = logging.getLogger(__name__)
 DEFAULT_CORS_ORIGINS = (
@@ -152,4 +152,21 @@ def create_app() -> FastAPI:
     if serve_dir.is_dir():
         app.mount("/", StaticFiles(directory=str(serve_dir), html=True), name="frontend")
 
+    # Mount the Emergent UI static files
+    app.mount("/emergent-ui", StaticFiles(directory="d:/AgentForgeOS/frontend"), name="emergent-ui")
+
+    # Add route to serve the Emergent UI wizard.html file
+    @app.get("/emergent-ui", include_in_schema=False)
+    def serve_emergent_ui():
+        emergent_ui_path = FRONTEND_ROOT / "wizard.html"
+        if emergent_ui_path.is_file():
+            return FileResponse(str(emergent_ui_path), media_type="text/html")
+        return {"detail": "File not found"}
+
     return app
+
+
+if __name__ == "__main__":
+    import uvicorn
+    app = create_app()
+    uvicorn.run(app, host="0.0.0.0", port=8000)

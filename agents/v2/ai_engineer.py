@@ -56,16 +56,16 @@ class AIEngineerAgent:
         """Handle AI engineering task with advanced model routing."""
         project_root = self._resolve_project_root(task)
         use_case = task.inputs.get("use_case", "generic")
-        task_inputs = task.inputs
+        task.inputs
         
         # Determine route kind
-        kind = self._determine_route_kind(use_case, task_inputs)
+        kind = self._determine_route_kind(use_case, task.inputs)
         
         # Select optimal route
         requirements = {
-            'max_tokens': task_inputs.get('max_tokens'),
-            'temperature': task_inputs.get('temperature'),
-            'quality': task_inputs.get('quality', 'standard')
+            'max_tokens': task.inputs.get('max_tokens'),
+            'temperature': task.inputs.get('temperature'),
+            'quality': task.inputs.get('quality', 'standard')
         }
         
         selected_route = self.router.select_route(kind, requirements)
@@ -109,6 +109,10 @@ class AIEngineerAgent:
         # Write artifacts
         routes_path = project_root / "model_routes.json"
         logs_path = project_root / "inference_logs.json"
+
+        # Write model_routes.json
+        with routes_path.open("w") as f:
+            json.dump({"routes": "example_routes"}, f)
 
         routes_path.write_text(json.dumps(routes_config, indent=2), encoding="utf-8")
         logs_path.write_text(json.dumps(logs, indent=2), encoding="utf-8")

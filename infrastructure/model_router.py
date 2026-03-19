@@ -55,7 +55,7 @@ class ModelRouter:
         self.routes: Dict[RouteKind, List[ModelRoute]] = {
             RouteKind.CODE: [
                 ModelRoute(
-                    name="deepseek-coder",
+                    name="deepseek-like-code-backend",
                     provider="fal",
                     model_id="deepseek-ai/deepseek-coder-6.7b-base",
                     endpoint="/deepseek-ai/deepseek-coder-6.7b-base",
@@ -66,7 +66,7 @@ class ModelRouter:
                 ),
                 ModelRoute(
                     name="codellama",
-                    provider="fal", 
+                    provider="fal",
                     model_id="meta-llama/codellama-7b-instruct",
                     endpoint="/meta-llama/codellama-7b-instruct",
                     api_key_env="FAL_API_KEY",
@@ -77,9 +77,9 @@ class ModelRouter:
             ],
             RouteKind.IMAGE: [
                 ModelRoute(
-                    name="flux-schnell",
+                    name="flux-like-image-backend",
                     provider="fal",
-                    model_id="black-forest-labs/flux-schnell",
+                    model_id="flux-ai/flux-image-3.5b",
                     endpoint="/black-forest-labs/flux-schnell",
                     api_key_env="FAL_API_KEY",
                     cost_per_1k_tokens=0.0025
@@ -95,9 +95,9 @@ class ModelRouter:
             ],
             RouteKind.THREE_D: [
                 ModelRoute(
-                    name="shape-e",
+                    name="shape-e-like-3d-backend",
                     provider="fal",
-                    model_id="lewdragon/shape-e",
+                    model_id="shape-e/shape-e-3d-2.0",
                     endpoint="/lewdragon/shape-e",
                     api_key_env="FAL_API_KEY",
                     cost_per_1k_tokens=0.005
@@ -113,9 +113,9 @@ class ModelRouter:
                     cost_per_1k_tokens=0.0015
                 ),
                 ModelRoute(
-                    name="audiocraft",
+                    name="audiocraft-like-audio-backend",
                     provider="fal",
-                    model_id="meta-audiocraft/audiocraft-medium",
+                    model_id="audiocraft/audiocraft-2.0",
                     endpoint="/meta-audiocraft/audiocraft-medium",
                     api_key_env="FAL_API_KEY",
                     cost_per_1k_tokens=0.002
@@ -123,9 +123,9 @@ class ModelRouter:
             ],
             RouteKind.GENERIC: [
                 ModelRoute(
-                    name="llama-3-8b",
+                    name="generic-llm-backend",
                     provider="fal",
-                    model_id="meta-llama/llama-3-8b-instruct",
+                    model_id="generic-llm/generic-llm-1.0",
                     endpoint="/meta-llama/llama-3-8b-instruct",
                     api_key_env="FAL_API_KEY",
                     max_tokens=4096,

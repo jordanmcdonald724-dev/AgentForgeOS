@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+import os
 
 router = APIRouter(prefix="/research", tags=["research"])
 
@@ -81,3 +82,32 @@ async def search_knowledge(body: Dict[str, Any] = {}):
         return {"success": True, "data": results, "error": None}
     except Exception as exc:
         return {"success": False, "data": None, "error": str(exc)}
+
+
+# Add a route for video ingestion
+from research.video_processor import process_video
+
+@router.post("/api/research/video")
+def ingest_video(video_source: str):
+    """Ingest a video file or YouTube URL."""
+    output_dir = "./temp"
+    os.makedirs(output_dir, exist_ok=True)
+
+    try:
+        transcription = process_video(video_source, output_dir)
+        return {"success": True, "transcription": transcription}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Add route for internet scanning
+from research.internet_scanner import perform_web_search, fetch_webpage_content
+
+@router.post("/api/research/scan")
+def scan_internet(query: str, num_results: int = 10):
+    """Scan the internet for information based on a query."""
+    try:
+        results = perform_web_search(query, num_results)
+        return {"success": True, "results": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

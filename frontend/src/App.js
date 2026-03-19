@@ -285,7 +285,6 @@ const ProjectPage = ({ isOpen, onClose, addLog }) => {
 // 2. WORKSPACE PAGE
 const WorkspacePage = ({ isOpen, onClose, addLog }) => {
   const [layout, setLayout] = useState("default");
-  const [theme, setTheme] = useState("dark");
   const [activeModules, setActiveModules] = useState(["studio", "builds", "research", "sandbox"]);
 
   const layouts = [

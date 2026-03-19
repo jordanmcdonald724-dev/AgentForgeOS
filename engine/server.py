@@ -1,5 +1,6 @@
 import logging
 import os
+import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Iterable, Optional
@@ -22,6 +23,7 @@ from .routes import (
     v2_infrastructure_router,
     v2_research_router,
 )
+from .websocket_routes import websocket_router, cleanup_websocket_connections
 from engine.routes.pipeline import router as pipeline_router
 from control.module_registry import module_registry
 from engine.ws import execution_ws
@@ -50,9 +52,20 @@ async def engine_lifespan(app: FastAPI):
     load_modules(registry=module_registry)
     await db.connect()
     await worker_system.start()
+    
+    # Start WebSocket cleanup task
+    cleanup_task = asyncio.create_task(cleanup_websocket_connections())
+    
     try:
         yield
     finally:
+        # Cancel cleanup task
+        cleanup_task.cancel()
+        try:
+            await cleanup_task
+        except asyncio.CancelledError:
+            pass
+        
         await worker_system.shutdown()
         await db.disconnect()
 
@@ -99,6 +112,7 @@ def create_app() -> FastAPI:
             v2_orchestration_router,
             v2_infrastructure_router,
             v2_research_router,
+            websocket_router,  # Add WebSocket router
         ],
         prefix="/api",
     )

@@ -28,7 +28,7 @@ class TestV2SynapseAgent(unittest.TestCase):
             },
         )
 
-        result = agent.handle_task(task)
+        result = agent.handle_task_sync(task)  # Use sync wrapper
 
         routes_path = self.project_root / "model_routes.json"
         logs_path = self.project_root / "inference_logs.json"
@@ -42,7 +42,7 @@ class TestV2SynapseAgent(unittest.TestCase):
             logs = json.load(f)
 
         self.assertEqual(routes.get("use_case"), "code")
-        self.assertIn("route", routes)
+        self.assertIn("selected_route", routes)  # Fixed key name
         self.assertIsInstance(logs, list)
         self.assertGreaterEqual(len(logs), 1)
 

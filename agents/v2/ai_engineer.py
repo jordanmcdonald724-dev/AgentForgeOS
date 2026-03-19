@@ -110,10 +110,6 @@ class AIEngineerAgent:
         routes_path = project_root / "model_routes.json"
         logs_path = project_root / "inference_logs.json"
 
-        # Write model_routes.json
-        with routes_path.open("w") as f:
-            json.dump({"routes": "example_routes"}, f)
-
         routes_path.write_text(json.dumps(routes_config, indent=2), encoding="utf-8")
         logs_path.write_text(json.dumps(logs, indent=2), encoding="utf-8")
 

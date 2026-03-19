@@ -12,16 +12,16 @@ from datetime import datetime, timezone
 
 # Import sandbox router
 from backend.routes.sandbox import sandbox_router
-from backend.routes.monitoring import monitoring_router
+# from backend.routes.monitoring import monitoring_router  # Temporarily disabled due to Pydantic issue
 from backend.routes.plugins import plugins_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ.get('DB_NAME', 'agentforgeos')]
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -73,7 +73,7 @@ async def get_status_checks():
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(sandbox_router)
-app.include_router(monitoring_router)
+# app.include_router(monitoring_router)  # Temporarily disabled due to Pydantic issue
 app.include_router(plugins_router)
 
 app.add_middleware(

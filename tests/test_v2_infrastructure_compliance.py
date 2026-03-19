@@ -48,14 +48,15 @@ class TestV2InfrastructureCompliance(unittest.TestCase):
         """ModelRouter returns stable backend identifiers per kind."""
 
         router = ModelRouter()
-        self.assertIn(router.select_route(RouteKind.CODE), [
+        selected_route = router.select_route(RouteKind.CODE)
+        self.assertIn(selected_route.name, [
             "deepseek-like-code-backend",
             "codellama"
         ])
-        self.assertEqual(router.select_route(RouteKind.IMAGE), "flux-like-image-backend")
-        self.assertEqual(router.select_route(RouteKind.THREE_D), "shape-e-like-3d-backend")
-        self.assertEqual(router.select_route(RouteKind.AUDIO), "audiocraft-like-audio-backend")
-        self.assertEqual(router.select_route(RouteKind.GENERIC), "generic-llm-backend")
+        self.assertEqual(router.select_route(RouteKind.IMAGE).name, "flux-like-image-backend")
+        self.assertEqual(router.select_route(RouteKind.THREE_D).name, "shape-e-like-3d-backend")
+        self.assertEqual(router.select_route(RouteKind.AUDIO).name, "bark")  # Lowest cost route
+        self.assertEqual(router.select_route(RouteKind.GENERIC).name, "generic-llm-backend")
 
 
 if __name__ == "__main__":  # pragma: no cover

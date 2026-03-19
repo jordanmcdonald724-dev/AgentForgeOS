@@ -19,12 +19,12 @@ if __name__ == "__main__":
     print("=" * 50)
     
     try:
-        # Start the backend server
-        import backend.server
-        print("✅ Server module imported successfully")
-        
-        # Check if we can create the app
-        app = backend.server.app
+        # Start the unified engine server
+        from engine.server import create_app
+        import uvicorn
+
+        app = create_app()
+        print("✅ Engine server created successfully")
         print(f"✅ FastAPI app created with {len(app.routes)} routes")
         
         # Show some key routes
@@ -37,16 +37,17 @@ if __name__ == "__main__":
             for route in api_routes[:10]:
                 print(f"   {route}")
         
+        host = os.environ.get("HOST", "0.0.0.0")
+        port = int(os.environ.get("PORT", 8000))
+
         print("\n🎉 Server is ready to start!")
-        print("🌐 Starting server on http://localhost:8000")
-        print("📚 API docs available at http://localhost:8000/docs")
-        
-        # Start the server
-        import uvicorn
+        print(f"🌐 Starting server on http://{host}:{port}")
+        print(f"📚 API docs available at http://{host}:{port}/docs")
+
         uvicorn.run(
-            backend.server.app,
-            host="0.0.0.0",
-            port=8000,
+            app,
+            host=host,
+            port=port,
             log_level="info"
         )
         

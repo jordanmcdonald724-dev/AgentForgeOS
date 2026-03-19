@@ -23,6 +23,8 @@ from engine.routes import (
     v2_infrastructure_router,
     v2_research_router,
 )
+from backend.routes.monitoring import monitoring_router
+from apps.research.backend.routes import router as research_backend_router
 from engine.websocket_routes import websocket_router, cleanup_websocket_connections
 from engine.routes.pipeline import router as pipeline_router
 from engine.ws import execution_ws
@@ -112,6 +114,8 @@ def create_app() -> FastAPI:
             v2_orchestration_router,
             v2_infrastructure_router,
             v2_research_router,
+            monitoring_router,
+            research_backend_router,
             websocket_router,  # Add WebSocket router
         ],
         prefix="/api",

@@ -1,0 +1,25 @@
+{
+  "agent_id": "task_router",
+  "pipeline_role": "Task Router",
+  "display_name": "Task Router",
+  "task_types": ["planning", "coordination"],
+  "system_prompt_path": "config/agents/task_router.system.md",
+  "inputs": {
+    "prompt": "Director plan and Architect spec distilled into executable work items",
+    "context": "Pipeline context including project constraints, current phase, and prior artifacts"
+  },
+  "outputs": {
+    "primary": "Ordered task queue with assignments, dependencies, priorities, and verification gates",
+    "format": "Structured task list grouped by agent and phase with dependency edges"
+  },
+  "permissions": {
+    "may_write_code": false,
+    "may_modify_files": false,
+    "may_invoke_tools": false
+  },
+  "failure_handling": {
+    "on_blocker": "Escalate to Director with options; re-sequence tasks to unblock parallel work",
+    "on_conflict": "Resolve by dependency correctness and phase gates; request Architect clarification if needed"
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "id": "game_dev",
+  "name": "game_dev",
+  "display_name": "Game Dev",
+  "version": "1.0",
+  "icon": "gamepad",
+  "entry_route": "/api/modules/game_dev",
+  "ui_entry": "GameDevPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "GameDevModule"
+}

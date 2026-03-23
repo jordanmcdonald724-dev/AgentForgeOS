@@ -1,0 +1,25 @@
+{
+  "agent_id": "refactor_agent",
+  "pipeline_role": "System Stabilizer",
+  "display_name": "Refactor Agent",
+  "task_types": ["optimization", "debugging"],
+  "system_prompt_path": "config/agents/refactor_agent.system.md",
+  "inputs": {
+    "prompt": "Performance report and refactor targets with constraints",
+    "context": "Pipeline context including benchmarks, failing tests, and code ownership boundaries"
+  },
+  "outputs": {
+    "primary": "Minimal safe refactors and optimizations with before/after evidence",
+    "format": "Change summary, impacted files, verification results, and rollback notes"
+  },
+  "permissions": {
+    "may_write_code": true,
+    "may_modify_files": true,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_regression": "Revert or adjust until tests pass; keep changes minimal and targeted",
+    "on_unclear_ownership": "Escalate to Architect/Task Router; do not rewrite unrelated modules"
+  }
+}
+

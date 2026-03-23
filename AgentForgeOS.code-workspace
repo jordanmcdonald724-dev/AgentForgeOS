@@ -1,0 +1,30 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/env311/Scripts/python.exe",
+        "python.testing.pytestEnabled": false,
+        "python.testing.unittestEnabled": true,
+        "python.testing.unittestArgs": [
+            "-s",
+            "tests",
+            "-v"
+        ],
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.diagnosticSeverityOverrides": {
+            "reportMissingTypeArgument": "none",
+            "reportUnknownArgumentType": "none",
+            "reportUnknownMemberType": "none",
+            "reportUnknownParameterType": "none",
+            "reportUnknownVariableType": "none",
+            "reportUnknownReturnType": "none",
+            "reportMissingImports": "none",
+            "reportUnusedImport": "none",
+            "reportUnusedFunction": "none",
+            "reportUnusedVariable": "none"
+        }
+    }
+}

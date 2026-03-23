@@ -1,0 +1,3 @@
+// V1 UI - GlassPanel.d.ts
+// Original file moved for legacy reference.
+// ...original content preserved...

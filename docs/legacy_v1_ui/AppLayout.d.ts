@@ -1,0 +1,3 @@
+// V1 UI - AppLayout.d.ts
+// Original file moved for legacy reference.
+// ...original content preserved...

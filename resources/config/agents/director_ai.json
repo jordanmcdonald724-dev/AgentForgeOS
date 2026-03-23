@@ -1,0 +1,25 @@
+{
+  "agent_id": "director_ai",
+  "pipeline_role": "Project Planner",
+  "display_name": "Director AI",
+  "task_types": ["planning", "conversation"],
+  "system_prompt_path": "config/agents/director_ai.system.md",
+  "inputs": {
+    "prompt": "User request or upstream agent output",
+    "context": "Pipeline context including project constraints and prior artifacts"
+  },
+  "outputs": {
+    "primary": "Vision packet, milestone plan, phase gates, and agent assignments",
+    "format": "Structured sections with explicit acceptance criteria and next actions"
+  },
+  "permissions": {
+    "may_write_code": false,
+    "may_modify_files": false,
+    "may_invoke_tools": false
+  },
+  "failure_handling": {
+    "on_missing_info": "Proceed with documented assumptions and request missing data as follow-ups",
+    "on_conflict": "Select option that preserves architecture and shipping readiness; record rationale"
+  }
+}
+

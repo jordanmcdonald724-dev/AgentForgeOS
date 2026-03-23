@@ -1,0 +1,25 @@
+{
+  "agent_id": "architect_ai",
+  "pipeline_role": "System Architect",
+  "display_name": "Architect AI",
+  "task_types": ["planning", "architecture"],
+  "system_prompt_path": "config/agents/architect_ai.system.md",
+  "inputs": {
+    "prompt": "Director-approved project goal or upstream plan output",
+    "context": "Pipeline context including constraints, existing architecture, and prior artifacts"
+  },
+  "outputs": {
+    "primary": "Architecture plan: components, interfaces, data flow, file structure, and risks",
+    "format": "Structured spec with explicit contracts and acceptance criteria"
+  },
+  "permissions": {
+    "may_write_code": false,
+    "may_modify_files": false,
+    "may_invoke_tools": false
+  },
+  "failure_handling": {
+    "on_missing_info": "Proceed with minimal viable architecture and document assumptions",
+    "on_conflict": "Prefer architecture-preserving option and propose incremental migration path"
+  }
+}
+

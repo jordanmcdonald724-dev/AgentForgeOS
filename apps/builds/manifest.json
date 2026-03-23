@@ -1,0 +1,8 @@
+{
+  "name": "Builds",
+  "id": "builds",
+  "version": "1.0",
+  "description": "CI/CD pipeline manager",
+  "entry": "module.py",
+  "class": "BuildsModule"
+}

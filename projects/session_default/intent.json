@@ -1,0 +1,9 @@
+{
+  "command": "build a sample project",
+  "product_type": "hybrid",
+  "scope": {
+    "has_gameplay": false,
+    "has_backend": true,
+    "has_ui": true
+  }
+}

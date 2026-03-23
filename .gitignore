@@ -1,0 +1,76 @@
+# IDE / editor
+.idea/
+.vscode/
+.vs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node / JS
+node_modules/
+**/node_modules/
+**/dist/
+**/build/
+**/.next/
+**/out/
+coverage/
+.cache/
+.pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env311/
+__pypackages__/
+env*/
+
+# Env / secrets
+*.env
+*.env.*
+*token.json*
+*credentials.json*
+*.pem
+
+# Large / generated artifacts
+**/*.zip
+**/*.tar
+**/*.tar.gz
+**/*.tgz
+
+# Local release outputs (never commit)
+dist_backend*/
+build_backend*/
+AgentForgeOS-App/release/
+AgentForgeOS-App/release-*/
+AgentForgeOS-App/release2/
+
+# Local engine config + logs (never commit)
+resources/config/engine_config.user.json
+resources/logs/
+
+# Local workspace state (never commit)
+resources/workspace/
+resources/database/loops/
+resources/database/deployments.json
+resources/database/game_dev_projects.json
+resources/database/preflight.json
+resources/resources/
+resources/assets/asset_*.txt
+agentforge_workspace/
+compliance_report.json
+
+# Desktop/Electron build artifacts
+AgentForgeOS-App/release-*/
+AgentForgeOS-App/win-unpacked/
+AgentForgeOS-App/dist/
+AgentForgeOS-App/**/*.exe
+AgentForgeOS-App/**/*.dll
+AgentForgeOS-App/**/*.msi

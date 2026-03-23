@@ -1,0 +1,25 @@
+{
+  "agent_id": "learning_agent",
+  "pipeline_role": "Learning Agent",
+  "display_name": "Learning Agent",
+  "task_types": ["research", "analysis"],
+  "system_prompt_path": "config/agents/learning_agent.system.md",
+  "inputs": {
+    "prompt": "Build outcomes, logs, reports, and pipeline performance data",
+    "context": "Pipeline context including failures, timings, routing logs, and release notes"
+  },
+  "outputs": {
+    "primary": "Postmortem report with prioritized recommendations and measurable follow-ups",
+    "format": "Structured report: patterns, root causes, recommendations, and next-iteration action items"
+  },
+  "permissions": {
+    "may_write_code": false,
+    "may_modify_files": false,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_missing_data": "State gaps explicitly; infer cautiously; propose instrumentation improvements",
+    "on_conflicting_signals": "Request more evidence; prioritize reproducible metrics and logs"
+  }
+}
+

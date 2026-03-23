@@ -1,0 +1,25 @@
+{
+  "agent_id": "asset_generator",
+  "pipeline_role": "Asset Generator",
+  "display_name": "Asset Generator",
+  "task_types": ["ui_design", "production", "optimization"],
+  "system_prompt_path": "config/agents/asset_generator.system.md",
+  "inputs": {
+    "prompt": "Task Router asset requirements and style constraints",
+    "context": "Pipeline context including engine targets, platform constraints, and performance budgets"
+  },
+  "outputs": {
+    "primary": "Asset deliverables with naming, folder placement, metadata, and performance notes",
+    "format": "Asset list with paths, formats, LOD/compression details, and integration checklist"
+  },
+  "permissions": {
+    "may_write_code": false,
+    "may_modify_files": true,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_missing_style_guidance": "Propose a minimal style baseline and request confirmation; keep assets cohesive",
+    "on_perf_issue": "Reduce resolution/polycount and add LODs; preserve readability; document tradeoffs"
+  }
+}
+

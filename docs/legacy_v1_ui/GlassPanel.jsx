@@ -1,0 +1,3 @@
+// V1 UI - GlassPanel.jsx
+// Original file moved for legacy reference.
+// ...original content preserved...

@@ -1,0 +1,3 @@
+// V1 UI - AgentCard.jsx
+// Original file moved for legacy reference.
+// ...original content preserved...

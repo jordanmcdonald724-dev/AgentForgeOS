@@ -1,0 +1,12 @@
+{
+  "id": "sandbox",
+  "name": "sandbox",
+  "display_name": "Sandbox",
+  "version": "1.0",
+  "icon": "flask",
+  "entry_route": "/api/modules/sandbox",
+  "ui_entry": "SandboxPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "SandboxModule"
+}

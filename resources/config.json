@@ -1,0 +1,19 @@
+{
+  "workspace_path": "",
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000
+  },
+  "bridge": {},
+  "logging": {},
+  "providers": {
+    "llm": "ollama"
+  },
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "model": "llama3"
+  },
+  "comfyui": {},
+  "piper": {},
+  "bridge_token": "e134cd260cf64062a2febff09e70e8b3"
+}

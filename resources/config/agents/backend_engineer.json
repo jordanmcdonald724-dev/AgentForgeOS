@@ -1,0 +1,25 @@
+{
+  "agent_id": "backend_engineer",
+  "pipeline_role": "Backend Engineer",
+  "display_name": "Backend Engineer",
+  "task_types": ["coding", "debugging"],
+  "system_prompt_path": "config/agents/backend_engineer.system.md",
+  "inputs": {
+    "prompt": "Task Router work item and Architect contract references",
+    "context": "Pipeline context including constraints, API contracts, and dependencies"
+  },
+  "outputs": {
+    "primary": "Implementation changes with verification evidence (tests/builds) and file references",
+    "format": "Response includes outcome summary, modified files, and validation results"
+  },
+  "permissions": {
+    "may_write_code": true,
+    "may_modify_files": true,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_test_failure": "Fix root cause; do not suppress; rerun verification",
+    "on_dependency_missing": "Surface blocker with exact missing contract and proposed minimal fix"
+  }
+}
+

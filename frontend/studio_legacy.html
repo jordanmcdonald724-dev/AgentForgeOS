@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentForgeOS Studio</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="studio">
+    <header class="nav">
+      <span class="badge">AgentForgeOS</span>
+      <span class="pill">Project ▾</span>
+      <span class="pill">Workspace ▾</span>
+      <span class="pill">Providers</span>
+      <span class="pill">System Status</span>
+      <span class="pill">Settings</span>
+      <span class="pill">Profile</span>
+    </header>
+    <main class="layout-main">
+      <aside class="sidebar">
+        <h2>Modules</h2>
+        <div id="module-list" class="nav-list">
+          <div class="nav-item nav-item--muted">Loading modules...</div>
+        </div>
+      </aside>
+      <section class="workspace">
+        <div class="workspace-card">
+          <div class="title">Main Workspace</div>
+          <div class="module-header">
+            <div id="active-module-name" class="module-name">Loading modules...</div>
+            <div id="active-module-version" class="module-version"></div>
+          </div>
+          <p id="active-module-description">Modules are loading from the backend.</p>
+        </div>
+        <div id="module-panel" class="workspace-card module-panel">
+          <div class="module-panel-placeholder">Select a module from the sidebar to view its workspace.</div>
+        </div>
+      </section>
+    </main>
+    <!-- ...existing code... -->
+  </body>
+</html>

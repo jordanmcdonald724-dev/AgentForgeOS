@@ -1,0 +1,54 @@
+{
+  "name": "agentforgeos",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$env:ELECTRON_BUILDER_CACHE=\\\"$PWD\\\\.cache\\\\electron-builder\\\\\\\"; $out=\\\"release\\\"; try { Remove-Item -Recurse -Force (Join-Path $PWD $out) -ErrorAction Stop } catch { $out=\\\"release-\\\" + (Get-Date -Format \\\"yyyyMMdd-HHmmss\\\") }; npm run build:raw -- --config.directories.output=$out\"",
+    "build:raw": "electron-builder",
+    "build:squirrel": "node build_squirrel.js"
+  },
+  "build": {
+    "appId": "com.agentforgeos.app",
+    "productName": "AgentForgeOS",
+    "files": [
+      "main.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist_backend2/backend.exe",
+        "to": "backend.exe"
+      },
+      {
+        "from": "../resources/config/engine_config.json",
+        "to": "resources/config/engine_config.json"
+      },
+      {
+        "from": "../resources/config/agents",
+        "to": "resources/config/agents"
+      },
+      {
+        "from": "resources",
+        "to": "resources"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false
+    },
+    "directories": {
+      "output": "release"
+    }
+  },
+  "devDependencies": {
+    "debug": "^4.4.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2",
+    "electron-winstaller": "^5.4.0"
+  },
+  "dependencies": {
+    "yauzl": "^3.2.1"
+  }
+}

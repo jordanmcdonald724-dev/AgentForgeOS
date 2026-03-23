@@ -1,0 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg-void: #050507;
+  --bg-deep: #0a0a0c;
+  --bg-surface: #0f0f12;
+  --bg-elevated: #141418;
+  --bg-card: #1a1a1f;
+  
+  --border-subtle: #1f1f26;
+  --border-default: #2a2a33;
+  --border-hover: #3a3a45;
+  
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  
+  --accent-red: #dc2626;
+  --accent-red-hover: #ef4444;
+  --accent-red-dim: rgba(220, 38, 38, 0.15);
+  --accent-red-glow: rgba(220, 38, 38, 0.08);
+  
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  --status-info: #3b82f6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Pulse Animation - Subtle */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes border-pulse {
+  0%, 100% {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 0 0 var(--accent-red-glow);
+  }
+  50% {
+    border-color: var(--accent-red-hover);
+    box-shadow: 0 0 8px 2px var(--accent-red-glow);
+  }
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+.pulse-active {
+  animation: border-pulse 2s ease-in-out infinite;
+}
+
+.pulse-dot {
+  animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+/* Typography */
+.font-display {
+  font-family: 'Exo 2', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glass Effect */
+.glass {
+  background: rgba(15, 15, 18, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Card Styles */
+.card-surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.card-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+}
+
+/* Focus States */
+input:focus, textarea:focus, select:focus, button:focus-visible {
+  outline: none;
+  border-color: var(--accent-red) !important;
+}
+
+/* Selection */
+::selection {
+  background: var(--accent-red-dim);
+  color: var(--text-primary);
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Pulse Animation - Subtle */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes border-pulse {
+  0%, 100% {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 0 0 var(--accent-red-glow);
+  }
+  50% {
+    border-color: var(--accent-red-hover);
+    box-shadow: 0 0 8px 2px var(--accent-red-glow);
+  }
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+.pulse-active {
+  animation: border-pulse 2s ease-in-out infinite;
+}
+
+.pulse-dot {
+  animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+/* Typography */
+.font-display {
+  font-family: 'Exo 2', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glass Effect */
+.glass {
+  background: rgba(15, 15, 18, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Card Styles */
+.card-surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.card-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+}

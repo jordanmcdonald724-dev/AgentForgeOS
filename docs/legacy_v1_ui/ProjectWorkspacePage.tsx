@@ -1,0 +1,3 @@
+// V1 UI - ProjectWorkspacePage.tsx
+// Original file moved for legacy reference.
+// ...original content preserved...

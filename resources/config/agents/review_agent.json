@@ -1,0 +1,25 @@
+{
+  "agent_id": "review_agent",
+  "pipeline_role": "Integration Tester",
+  "display_name": "Review Agent",
+  "task_types": ["debugging", "testing", "review"],
+  "system_prompt_path": "config/agents/review_agent.system.md",
+  "inputs": {
+    "prompt": "Release candidate or change summary plus acceptance criteria",
+    "context": "Pipeline context including test commands, build artifacts, and known risk areas"
+  },
+  "outputs": {
+    "primary": "Pass/fail decision with reproducible evidence and bug reports",
+    "format": "Test report with failures, repro steps, logs, severity, and next actions"
+  },
+  "permissions": {
+    "may_write_code": false,
+    "may_modify_files": false,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_test_failure": "Isolate failing subsystem, collect evidence, assign fixes via Task Router",
+    "on_flaky_behavior": "Stabilize by reproduction minimization and deterministic test cases"
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "id": "deployment",
+  "name": "deployment",
+  "display_name": "Deployment",
+  "version": "1.0",
+  "icon": "rocket",
+  "entry_route": "/api/modules/deployment",
+  "ui_entry": "DeploymentPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "DeploymentModule"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "studio",
+  "name": "studio",
+  "display_name": "Studio",
+  "version": "1.0",
+  "icon": "layout",
+  "entry_route": "/api/modules/studio",
+  "ui_entry": "StudioPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "StudioModule"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "builds",
+  "name": "builds",
+  "display_name": "Build Pipelines",
+  "version": "1.0",
+  "icon": "wrench",
+  "entry_route": "/api/modules/builds",
+  "ui_entry": "BuildsPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "BuildsModule"
+}

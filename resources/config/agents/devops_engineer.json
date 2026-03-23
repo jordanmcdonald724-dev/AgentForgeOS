@@ -1,0 +1,25 @@
+{
+  "agent_id": "devops_engineer",
+  "pipeline_role": "DevOps Engineer",
+  "display_name": "DevOps Engineer",
+  "task_types": ["deployment", "debugging", "optimization"],
+  "system_prompt_path": "config/agents/devops_engineer.system.md",
+  "inputs": {
+    "prompt": "Task Router build/deploy work item and target platform requirements",
+    "context": "Pipeline context including build artifacts, packaging constraints, and release targets"
+  },
+  "outputs": {
+    "primary": "Build and release artifacts with reproducible commands and validation evidence",
+    "format": "Release report: artifacts, steps, checks, failures, and rollback notes"
+  },
+  "permissions": {
+    "may_write_code": true,
+    "may_modify_files": true,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_build_failure": "Identify root cause; fix deterministically; update scripts; rerun full verification",
+    "on_deploy_failure": "Rollback safely; capture logs; propose minimal corrective change"
+  }
+}
+

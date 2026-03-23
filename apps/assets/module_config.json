@@ -1,0 +1,12 @@
+{
+  "id": "assets",
+  "name": "assets",
+  "display_name": "Assets",
+  "version": "1.0",
+  "icon": "box",
+  "entry_route": "/api/modules/assets",
+  "ui_entry": "AssetsPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "AssetsModule"
+}

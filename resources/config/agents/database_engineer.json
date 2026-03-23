@@ -1,0 +1,25 @@
+{
+  "agent_id": "database_engineer",
+  "pipeline_role": "Data Architect",
+  "display_name": "Database Engineer",
+  "task_types": ["planning", "coding", "debugging"],
+  "system_prompt_path": "config/agents/database_engineer.system.md",
+  "inputs": {
+    "prompt": "Task Router data/persistence work item and Architect data contracts",
+    "context": "Pipeline context including schema requirements, retention, and migration constraints"
+  },
+  "outputs": {
+    "primary": "Schema/data design and persistence implementation guidance with migration and backup plan",
+    "format": "Structured schema definition, access patterns, migrations, and verification checklist"
+  },
+  "permissions": {
+    "may_write_code": true,
+    "may_modify_files": true,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_migration_risk": "Provide rollback and restore plan; reduce blast radius; stage migrations safely",
+    "on_data_integrity_issue": "Prioritize correctness; add validation and recovery; document incident and fix"
+  }
+}
+

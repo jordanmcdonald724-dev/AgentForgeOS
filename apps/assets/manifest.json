@@ -1,0 +1,8 @@
+{
+  "name": "Assets",
+  "id": "assets",
+  "version": "1.0",
+  "description": "Image, audio, and model generation",
+  "entry": "module.py",
+  "class": "AssetsModule"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "saas_builder",
+  "name": "saas_builder",
+  "display_name": "SaaS Builder",
+  "version": "1.0",
+  "icon": "building",
+  "entry_route": "/api/modules/saas_builder",
+  "ui_entry": "SaasBuilderPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "SaaSBuilderModule"
+}

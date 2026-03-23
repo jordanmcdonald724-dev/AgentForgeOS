@@ -1,0 +1,43 @@
+warning: in the working copy of 'agents/v2/research_agent.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'control/execution_monitor.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'engine/server.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'providers/comfyui_provider.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'providers/fal_provider.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'providers/ollama_provider.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'providers/openai_provider.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'research/embedding_service.py', LF will be replaced by CRLF the next time Git touches it
+D	.vs/AgentForgeOS.slnx/FileContentIndex/028e165c-a779-466f-b3d9-d7b1f70e7259.vsidx
+M	.vs/AgentForgeOS.slnx/v18/.wsuo
+M	.vs/AgentForgeOS/CopilotIndices/18.4.106.63888/CodeChunks.db
+M	.vs/AgentForgeOS/CopilotIndices/18.4.106.63888/SemanticSymbols.db
+M	.vs/VSWorkspaceState.json
+M	.vs/slnx.sqlite
+M	agents/v2/research_agent.py
+M	apps/research/backend/routes.py
+M	build_system/simulation_engine.py
+M	control/agent_supervisor.py
+M	control/execution_monitor.py
+M	engine/routes/pipeline.py
+M	engine/routes/v2_orchestration.py
+M	engine/routes/v2_research.py
+M	engine/server.py
+D	frontend/dist/assets/index-B0eYUKvt.js
+D	frontend/dist/assets/index-DiOo6Mqw.css
+M	frontend/index.html
+M	frontend/node_modules/.package-lock.json
+M	frontend/package-lock.json
+M	frontend/package.json
+M	frontend/src/App.css
+M	knowledge/embedding_service.py
+M	models/settings.py
+M	orchestration/runtime.py
+M	providers/comfyui_provider.py
+M	providers/fal_provider.py
+M	providers/ollama_provider.py
+M	providers/openai_provider.py
+M	research/embedding_service.py
+M	research/ingestion.py
+M	services/embedding_service.py
+M	tests/test_v2_knowledge_compliance.py
+M	tests/test_v2_orchestration_runtime.py

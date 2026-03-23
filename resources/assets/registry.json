@@ -1,0 +1,746 @@
+{
+  "assets": [
+    {
+      "id": "asset_01248ef91835",
+      "type": "icon",
+      "name": "asset_01248ef91835",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_01248ef91835.txt",
+      "created_at": "2026-03-21T20:05:35.000370+00:00"
+    },
+    {
+      "id": "asset_406da613a861",
+      "type": "icon",
+      "name": "asset_406da613a861",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_406da613a861.txt",
+      "created_at": "2026-03-21T20:05:43.081297+00:00"
+    },
+    {
+      "id": "asset_b79cdeb71400",
+      "type": "icon",
+      "name": "asset_b79cdeb71400",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_b79cdeb71400.txt",
+      "created_at": "2026-03-21T20:07:39.965212+00:00"
+    },
+    {
+      "id": "asset_a4de3f617e91",
+      "type": "icon",
+      "name": "asset_a4de3f617e91",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_a4de3f617e91.txt",
+      "created_at": "2026-03-21T20:08:22.146293+00:00"
+    },
+    {
+      "id": "asset_78c524e34bc9",
+      "type": "icon",
+      "name": "asset_78c524e34bc9",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_78c524e34bc9.txt",
+      "created_at": "2026-03-21T20:14:15.477056+00:00"
+    },
+    {
+      "id": "asset_ac6e056a50d6",
+      "type": "icon",
+      "name": "asset_ac6e056a50d6",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ac6e056a50d6.txt",
+      "created_at": "2026-03-21T20:14:24.013319+00:00"
+    },
+    {
+      "id": "asset_747c6ef230f4",
+      "type": "icon",
+      "name": "asset_747c6ef230f4",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_747c6ef230f4.txt",
+      "created_at": "2026-03-21T20:20:38.846746+00:00"
+    },
+    {
+      "id": "asset_69fcf40f714b",
+      "type": "icon",
+      "name": "asset_69fcf40f714b",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_69fcf40f714b.txt",
+      "created_at": "2026-03-21T20:20:48.343161+00:00"
+    },
+    {
+      "id": "asset_65b93ac3f9da",
+      "type": "icon",
+      "name": "asset_65b93ac3f9da",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_65b93ac3f9da.txt",
+      "created_at": "2026-03-21T20:22:25.500812+00:00"
+    },
+    {
+      "id": "asset_9a6c9b5a2900",
+      "type": "icon",
+      "name": "asset_9a6c9b5a2900",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_9a6c9b5a2900.txt",
+      "created_at": "2026-03-21T20:24:42.979673+00:00"
+    },
+    {
+      "id": "asset_6fec5c508f59",
+      "type": "icon",
+      "name": "asset_6fec5c508f59",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_6fec5c508f59.txt",
+      "created_at": "2026-03-21T20:25:27.890169+00:00"
+    },
+    {
+      "id": "asset_b64e220fb212",
+      "type": "icon",
+      "name": "asset_b64e220fb212",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_b64e220fb212.txt",
+      "created_at": "2026-03-21T20:47:31.891569+00:00"
+    },
+    {
+      "id": "asset_da32e64eac5b",
+      "type": "icon",
+      "name": "asset_da32e64eac5b",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_da32e64eac5b.txt",
+      "created_at": "2026-03-21T20:48:14.808088+00:00"
+    },
+    {
+      "id": "asset_7ac1e664e57a",
+      "type": "icon",
+      "name": "asset_7ac1e664e57a",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_7ac1e664e57a.txt",
+      "created_at": "2026-03-21T21:02:18.428099+00:00"
+    },
+    {
+      "id": "asset_2f4f7c10e0b1",
+      "type": "icon",
+      "name": "asset_2f4f7c10e0b1",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_2f4f7c10e0b1.txt",
+      "created_at": "2026-03-21T21:03:03.479040+00:00"
+    },
+    {
+      "id": "asset_d26a1825f465",
+      "type": "icon",
+      "name": "asset_d26a1825f465",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_d26a1825f465.txt",
+      "created_at": "2026-03-21T21:38:47.763369+00:00"
+    },
+    {
+      "id": "asset_817cab683bd4",
+      "type": "icon",
+      "name": "asset_817cab683bd4",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_817cab683bd4.txt",
+      "created_at": "2026-03-21T21:39:34.016207+00:00"
+    },
+    {
+      "id": "asset_845f65c094dc",
+      "type": "icon",
+      "name": "asset_845f65c094dc",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_845f65c094dc.txt",
+      "created_at": "2026-03-21T21:42:53.341121+00:00"
+    },
+    {
+      "id": "asset_78abe09e4c3c",
+      "type": "icon",
+      "name": "asset_78abe09e4c3c",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_78abe09e4c3c.txt",
+      "created_at": "2026-03-21T21:44:03.129662+00:00"
+    },
+    {
+      "id": "asset_86769495e6ac",
+      "type": "icon",
+      "name": "asset_86769495e6ac",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_86769495e6ac.txt",
+      "created_at": "2026-03-21T21:44:51.053992+00:00"
+    },
+    {
+      "id": "asset_0001ed1ef8ab",
+      "type": "icon",
+      "name": "asset_0001ed1ef8ab",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_0001ed1ef8ab.txt",
+      "created_at": "2026-03-21T21:45:36.747092+00:00"
+    },
+    {
+      "id": "asset_bf34ffdd3cdc",
+      "type": "icon",
+      "name": "asset_bf34ffdd3cdc",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_bf34ffdd3cdc.txt",
+      "created_at": "2026-03-21T21:46:42.409073+00:00"
+    },
+    {
+      "id": "asset_9f63bcce6cf7",
+      "type": "icon",
+      "name": "asset_9f63bcce6cf7",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_9f63bcce6cf7.txt",
+      "created_at": "2026-03-21T21:47:51.496152+00:00"
+    },
+    {
+      "id": "asset_c44d8efc4a37",
+      "type": "icon",
+      "name": "asset_c44d8efc4a37",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_c44d8efc4a37.txt",
+      "created_at": "2026-03-21T22:03:04.467860+00:00"
+    },
+    {
+      "id": "asset_eed68547fa09",
+      "type": "icon",
+      "name": "asset_eed68547fa09",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_eed68547fa09.txt",
+      "created_at": "2026-03-21T22:12:00.539434+00:00"
+    },
+    {
+      "id": "asset_9d4e7794cbdd",
+      "type": "icon",
+      "name": "asset_9d4e7794cbdd",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_9d4e7794cbdd.txt",
+      "created_at": "2026-03-21T22:23:30.231531+00:00"
+    },
+    {
+      "id": "asset_e5de718f1a72",
+      "type": "icon",
+      "name": "asset_e5de718f1a72",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_e5de718f1a72.txt",
+      "created_at": "2026-03-21T22:30:50.798078+00:00"
+    },
+    {
+      "id": "asset_a63747f9c7fe",
+      "type": "icon",
+      "name": "asset_a63747f9c7fe",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_a63747f9c7fe.txt",
+      "created_at": "2026-03-21T22:40:42.377897+00:00"
+    },
+    {
+      "id": "asset_5e665b4b87f2",
+      "type": "icon",
+      "name": "asset_5e665b4b87f2",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_5e665b4b87f2.txt",
+      "created_at": "2026-03-21T22:52:26.390390+00:00"
+    },
+    {
+      "id": "asset_ed9439c21232",
+      "type": "icon",
+      "name": "asset_ed9439c21232",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ed9439c21232.txt",
+      "created_at": "2026-03-21T23:01:56.377299+00:00"
+    },
+    {
+      "id": "asset_322a6ce77e60",
+      "type": "icon",
+      "name": "asset_322a6ce77e60",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_322a6ce77e60.txt",
+      "created_at": "2026-03-21T23:19:49.289059+00:00"
+    },
+    {
+      "id": "asset_e2989faf702d",
+      "type": "icon",
+      "name": "asset_e2989faf702d",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_e2989faf702d.txt",
+      "created_at": "2026-03-22T04:26:48.433536+00:00"
+    },
+    {
+      "id": "asset_8dc1b7b1c80e",
+      "type": "icon",
+      "name": "asset_8dc1b7b1c80e",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_8dc1b7b1c80e.txt",
+      "created_at": "2026-03-22T04:47:11.924920+00:00"
+    },
+    {
+      "id": "asset_fd8f54971856",
+      "type": "icon",
+      "name": "asset_fd8f54971856",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_fd8f54971856.txt",
+      "created_at": "2026-03-22T04:55:31.863010+00:00"
+    },
+    {
+      "id": "asset_6e3c8983ce1e",
+      "type": "icon",
+      "name": "asset_6e3c8983ce1e",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_6e3c8983ce1e.txt",
+      "created_at": "2026-03-22T04:57:49.728368+00:00"
+    },
+    {
+      "id": "asset_ae264686e0bc",
+      "type": "icon",
+      "name": "asset_ae264686e0bc",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ae264686e0bc.txt",
+      "created_at": "2026-03-22T04:58:55.124270+00:00"
+    },
+    {
+      "id": "asset_d436fb836ded",
+      "type": "icon",
+      "name": "asset_d436fb836ded",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_d436fb836ded.txt",
+      "created_at": "2026-03-22T05:03:53.415736+00:00"
+    },
+    {
+      "id": "asset_ed41cf15c8c6",
+      "type": "icon",
+      "name": "asset_ed41cf15c8c6",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ed41cf15c8c6.txt",
+      "created_at": "2026-03-22T05:05:18.678515+00:00"
+    },
+    {
+      "id": "asset_f854352c9352",
+      "type": "icon",
+      "name": "asset_f854352c9352",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_f854352c9352.txt",
+      "created_at": "2026-03-22T05:06:25.062269+00:00"
+    },
+    {
+      "id": "asset_ff43671560c9",
+      "type": "icon",
+      "name": "asset_ff43671560c9",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ff43671560c9.txt",
+      "created_at": "2026-03-22T05:07:43.808945+00:00"
+    },
+    {
+      "id": "asset_cb366e26239f",
+      "type": "icon",
+      "name": "asset_cb366e26239f",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_cb366e26239f.txt",
+      "created_at": "2026-03-22T05:11:40.976148+00:00"
+    },
+    {
+      "id": "asset_7d2db428f807",
+      "type": "icon",
+      "name": "asset_7d2db428f807",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_7d2db428f807.txt",
+      "created_at": "2026-03-22T13:39:37.889972+00:00"
+    },
+    {
+      "id": "asset_4b6484016567",
+      "type": "icon",
+      "name": "asset_4b6484016567",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_4b6484016567.txt",
+      "created_at": "2026-03-22T14:38:00.991298+00:00"
+    },
+    {
+      "id": "asset_8fec1634c338",
+      "type": "icon",
+      "name": "asset_8fec1634c338",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_8fec1634c338.txt",
+      "created_at": "2026-03-22T14:56:10.136992+00:00"
+    },
+    {
+      "id": "asset_63b53f581a58",
+      "type": "icon",
+      "name": "asset_63b53f581a58",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_63b53f581a58.txt",
+      "created_at": "2026-03-22T15:05:31.628840+00:00"
+    },
+    {
+      "id": "asset_800d94fad091",
+      "type": "icon",
+      "name": "asset_800d94fad091",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_800d94fad091.txt",
+      "created_at": "2026-03-22T15:20:22.914213+00:00"
+    },
+    {
+      "id": "asset_c0a62b84a041",
+      "type": "icon",
+      "name": "asset_c0a62b84a041",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_c0a62b84a041.txt",
+      "created_at": "2026-03-22T15:21:41.071762+00:00"
+    },
+    {
+      "id": "asset_d4d603bcc0fb",
+      "type": "icon",
+      "name": "asset_d4d603bcc0fb",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_d4d603bcc0fb.txt",
+      "created_at": "2026-03-22T15:22:52.844285+00:00"
+    },
+    {
+      "id": "asset_3b3ed5e2a302",
+      "type": "icon",
+      "name": "asset_3b3ed5e2a302",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_3b3ed5e2a302.txt",
+      "created_at": "2026-03-22T15:26:45.163872+00:00"
+    },
+    {
+      "id": "asset_013a800b6935",
+      "type": "icon",
+      "name": "asset_013a800b6935",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_013a800b6935.txt",
+      "created_at": "2026-03-22T15:55:23.180358+00:00"
+    },
+    {
+      "id": "asset_389e23158854",
+      "type": "icon",
+      "name": "asset_389e23158854",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_389e23158854.txt",
+      "created_at": "2026-03-22T15:55:40.872829+00:00"
+    },
+    {
+      "id": "asset_ad7601ba5bed",
+      "type": "icon",
+      "name": "asset_ad7601ba5bed",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ad7601ba5bed.txt",
+      "created_at": "2026-03-22T16:04:17.224337+00:00"
+    },
+    {
+      "id": "asset_3ad8d8155511",
+      "type": "icon",
+      "name": "asset_3ad8d8155511",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_3ad8d8155511.txt",
+      "created_at": "2026-03-22T16:06:52.146486+00:00"
+    },
+    {
+      "id": "asset_47cd99ae9797",
+      "type": "icon",
+      "name": "asset_47cd99ae9797",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_47cd99ae9797.txt",
+      "created_at": "2026-03-22T16:37:57.928936+00:00"
+    },
+    {
+      "id": "asset_1620421c6eef",
+      "type": "icon",
+      "name": "asset_1620421c6eef",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_1620421c6eef.txt",
+      "created_at": "2026-03-22T17:14:01.703904+00:00"
+    },
+    {
+      "id": "asset_f679e1d80f39",
+      "type": "icon",
+      "name": "asset_f679e1d80f39",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_f679e1d80f39.txt",
+      "created_at": "2026-03-22T20:30:17.117202+00:00"
+    },
+    {
+      "id": "asset_53384f7d185a",
+      "type": "icon",
+      "name": "asset_53384f7d185a",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_53384f7d185a.txt",
+      "created_at": "2026-03-22T20:42:14.078856+00:00"
+    },
+    {
+      "id": "asset_f193b949e245",
+      "type": "icon",
+      "name": "asset_f193b949e245",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_f193b949e245.txt",
+      "created_at": "2026-03-22T21:04:33.456873+00:00"
+    },
+    {
+      "id": "asset_841a3a6e5b08",
+      "type": "icon",
+      "name": "asset_841a3a6e5b08",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_841a3a6e5b08.txt",
+      "created_at": "2026-03-22T21:53:15.703349+00:00"
+    },
+    {
+      "id": "asset_49fbadd7740e",
+      "type": "icon",
+      "name": "asset_49fbadd7740e",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_49fbadd7740e.txt",
+      "created_at": "2026-03-22T22:00:53.127594+00:00"
+    },
+    {
+      "id": "asset_959ebd178625",
+      "type": "icon",
+      "name": "asset_959ebd178625",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_959ebd178625.txt",
+      "created_at": "2026-03-22T22:08:18.040754+00:00"
+    },
+    {
+      "id": "asset_69dc2744e8cf",
+      "type": "icon",
+      "name": "asset_69dc2744e8cf",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_69dc2744e8cf.txt",
+      "created_at": "2026-03-22T22:15:19.951124+00:00"
+    },
+    {
+      "id": "asset_0e672f427675",
+      "type": "icon",
+      "name": "asset_0e672f427675",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_0e672f427675.txt",
+      "created_at": "2026-03-22T22:26:46.628370+00:00"
+    },
+    {
+      "id": "asset_dfb40bcce599",
+      "type": "icon",
+      "name": "asset_dfb40bcce599",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_dfb40bcce599.txt",
+      "created_at": "2026-03-22T22:30:30.578730+00:00"
+    },
+    {
+      "id": "asset_22e4e1e68d7f",
+      "type": "icon",
+      "name": "asset_22e4e1e68d7f",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_22e4e1e68d7f.txt",
+      "created_at": "2026-03-22T22:34:16.041821+00:00"
+    },
+    {
+      "id": "asset_467d3f2455c5",
+      "type": "icon",
+      "name": "asset_467d3f2455c5",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_467d3f2455c5.txt",
+      "created_at": "2026-03-22T22:37:42.899817+00:00"
+    },
+    {
+      "id": "asset_9e37595bfd55",
+      "type": "icon",
+      "name": "asset_9e37595bfd55",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_9e37595bfd55.txt",
+      "created_at": "2026-03-22T22:40:58.631708+00:00"
+    },
+    {
+      "id": "asset_8e14de066ff6",
+      "type": "icon",
+      "name": "asset_8e14de066ff6",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_8e14de066ff6.txt",
+      "created_at": "2026-03-22T22:44:41.192744+00:00"
+    },
+    {
+      "id": "asset_44698f01f9c2",
+      "type": "icon",
+      "name": "asset_44698f01f9c2",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_44698f01f9c2.txt",
+      "created_at": "2026-03-22T22:47:57.649136+00:00"
+    },
+    {
+      "id": "asset_651c95d1388a",
+      "type": "icon",
+      "name": "asset_651c95d1388a",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_651c95d1388a.txt",
+      "created_at": "2026-03-22T23:00:10.053577+00:00"
+    },
+    {
+      "id": "asset_92602510a57d",
+      "type": "icon",
+      "name": "asset_92602510a57d",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_92602510a57d.txt",
+      "created_at": "2026-03-22T23:13:21.939458+00:00"
+    },
+    {
+      "id": "asset_59297ce834cb",
+      "type": "icon",
+      "name": "asset_59297ce834cb",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_59297ce834cb.txt",
+      "created_at": "2026-03-22T23:24:33.171440+00:00"
+    },
+    {
+      "id": "asset_5898d0cc5398",
+      "type": "icon",
+      "name": "asset_5898d0cc5398",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_5898d0cc5398.txt",
+      "created_at": "2026-03-22T23:53:10.363471+00:00"
+    },
+    {
+      "id": "asset_ed0e2d62ed44",
+      "type": "icon",
+      "name": "asset_ed0e2d62ed44",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ed0e2d62ed44.txt",
+      "created_at": "2026-03-22T23:54:56.868116+00:00"
+    },
+    {
+      "id": "asset_4046d9830632",
+      "type": "icon",
+      "name": "asset_4046d9830632",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_4046d9830632.txt",
+      "created_at": "2026-03-22T23:56:24.907608+00:00"
+    },
+    {
+      "id": "asset_bf7403d5ebb7",
+      "type": "icon",
+      "name": "asset_bf7403d5ebb7",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_bf7403d5ebb7.txt",
+      "created_at": "2026-03-22T23:59:02.722209+00:00"
+    },
+    {
+      "id": "asset_f28b20de90ff",
+      "type": "icon",
+      "name": "asset_f28b20de90ff",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_f28b20de90ff.txt",
+      "created_at": "2026-03-23T00:01:05.285704+00:00"
+    },
+    {
+      "id": "asset_bfdfe079e9c4",
+      "type": "icon",
+      "name": "asset_bfdfe079e9c4",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_bfdfe079e9c4.txt",
+      "created_at": "2026-03-23T00:19:13.325115+00:00"
+    },
+    {
+      "id": "asset_d68307e933ef",
+      "type": "icon",
+      "name": "asset_d68307e933ef",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_d68307e933ef.txt",
+      "created_at": "2026-03-23T00:30:59.740281+00:00"
+    },
+    {
+      "id": "asset_5a3ca2ea65ef",
+      "type": "icon",
+      "name": "asset_5a3ca2ea65ef",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_5a3ca2ea65ef.txt",
+      "created_at": "2026-03-23T00:31:46.232016+00:00"
+    },
+    {
+      "id": "asset_a576d21b7221",
+      "type": "icon",
+      "name": "asset_a576d21b7221",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_a576d21b7221.txt",
+      "created_at": "2026-03-23T00:48:43.342498+00:00"
+    },
+    {
+      "id": "asset_8917f71b1c07",
+      "type": "icon",
+      "name": "asset_8917f71b1c07",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_8917f71b1c07.txt",
+      "created_at": "2026-03-23T00:56:29.496970+00:00"
+    },
+    {
+      "id": "asset_dd2b50916191",
+      "type": "icon",
+      "name": "asset_dd2b50916191",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_dd2b50916191.txt",
+      "created_at": "2026-03-23T01:08:53.702042+00:00"
+    },
+    {
+      "id": "asset_6679f60e8cae",
+      "type": "icon",
+      "name": "asset_6679f60e8cae",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_6679f60e8cae.txt",
+      "created_at": "2026-03-23T01:20:00.197395+00:00"
+    },
+    {
+      "id": "asset_a7eb7fb4ec12",
+      "type": "icon",
+      "name": "asset_a7eb7fb4ec12",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_a7eb7fb4ec12.txt",
+      "created_at": "2026-03-23T01:29:09.226368+00:00"
+    },
+    {
+      "id": "asset_cf9b208c64f1",
+      "type": "icon",
+      "name": "asset_cf9b208c64f1",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_cf9b208c64f1.txt",
+      "created_at": "2026-03-23T02:24:54.462189+00:00"
+    },
+    {
+      "id": "asset_7a2e812b906e",
+      "type": "icon",
+      "name": "asset_7a2e812b906e",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_7a2e812b906e.txt",
+      "created_at": "2026-03-23T02:38:17.821476+00:00"
+    },
+    {
+      "id": "asset_13f9c0a726c0",
+      "type": "icon",
+      "name": "asset_13f9c0a726c0",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_13f9c0a726c0.txt",
+      "created_at": "2026-03-23T02:51:08.149574+00:00"
+    },
+    {
+      "id": "asset_c167a45d628f",
+      "type": "icon",
+      "name": "asset_c167a45d628f",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_c167a45d628f.txt",
+      "created_at": "2026-03-23T02:54:59.721469+00:00"
+    },
+    {
+      "id": "asset_ae24c84d2746",
+      "type": "icon",
+      "name": "asset_ae24c84d2746",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_ae24c84d2746.txt",
+      "created_at": "2026-03-23T03:06:54.466009+00:00"
+    },
+    {
+      "id": "asset_d0467496d464",
+      "type": "icon",
+      "name": "asset_d0467496d464",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_d0467496d464.txt",
+      "created_at": "2026-03-23T03:10:34.074779+00:00"
+    },
+    {
+      "id": "asset_059d0a0d0dfd",
+      "type": "icon",
+      "name": "asset_059d0a0d0dfd",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_059d0a0d0dfd.txt",
+      "created_at": "2026-03-23T03:20:29.639821+00:00"
+    },
+    {
+      "id": "asset_c9486759e38b",
+      "type": "icon",
+      "name": "asset_c9486759e38b",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_c9486759e38b.txt",
+      "created_at": "2026-03-23T03:23:06.683664+00:00"
+    },
+    {
+      "id": "asset_4db5abce4a75",
+      "type": "icon",
+      "name": "asset_4db5abce4a75",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_4db5abce4a75.txt",
+      "created_at": "2026-03-23T03:32:18.063886+00:00"
+    },
+    {
+      "id": "asset_262269bdb376",
+      "type": "icon",
+      "name": "asset_262269bdb376",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_262269bdb376.txt",
+      "created_at": "2026-03-23T03:39:30.134630+00:00"
+    },
+    {
+      "id": "asset_0fbe6795e601",
+      "type": "icon",
+      "name": "asset_0fbe6795e601",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_0fbe6795e601.txt",
+      "created_at": "2026-03-23T03:45:36.052630+00:00"
+    },
+    {
+      "id": "asset_b9f8dfed1bdf",
+      "type": "icon",
+      "name": "asset_b9f8dfed1bdf",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_b9f8dfed1bdf.txt",
+      "created_at": "2026-03-23T03:51:18.166376+00:00"
+    },
+    {
+      "id": "asset_4eb940d02de6",
+      "type": "icon",
+      "name": "asset_4eb940d02de6",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_4eb940d02de6.txt",
+      "created_at": "2026-03-23T03:58:00.640971+00:00"
+    },
+    {
+      "id": "asset_3141262eefc6",
+      "type": "icon",
+      "name": "asset_3141262eefc6",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_3141262eefc6.txt",
+      "created_at": "2026-03-23T04:06:44.925815+00:00"
+    },
+    {
+      "id": "asset_f27ed6ff0ea8",
+      "type": "icon",
+      "name": "asset_f27ed6ff0ea8",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_f27ed6ff0ea8.txt",
+      "created_at": "2026-03-23T04:29:20.388247+00:00"
+    },
+    {
+      "id": "asset_782a50ce2a72",
+      "type": "icon",
+      "name": "asset_782a50ce2a72",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_782a50ce2a72.txt",
+      "created_at": "2026-03-23T04:48:57.772445+00:00"
+    },
+    {
+      "id": "asset_38d164fbfa03",
+      "type": "icon",
+      "name": "asset_38d164fbfa03",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_38d164fbfa03.txt",
+      "created_at": "2026-03-23T04:55:23.268560+00:00"
+    },
+    {
+      "id": "asset_79a397106983",
+      "type": "icon",
+      "name": "asset_79a397106983",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_79a397106983.txt",
+      "created_at": "2026-03-23T04:58:04.237223+00:00"
+    },
+    {
+      "id": "asset_5a21862dd611",
+      "type": "icon",
+      "name": "asset_5a21862dd611",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_5a21862dd611.txt",
+      "created_at": "2026-03-23T14:04:01.454003+00:00"
+    },
+    {
+      "id": "asset_4ddba0abdd7f",
+      "type": "icon",
+      "name": "asset_4ddba0abdd7f",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_4ddba0abdd7f.txt",
+      "created_at": "2026-03-23T14:19:18.666459+00:00"
+    },
+    {
+      "id": "asset_c175450785f5",
+      "type": "icon",
+      "name": "asset_c175450785f5",
+      "path": "D:\\AgentForgeOS\\resources\\assets\\asset_c175450785f5.txt",
+      "created_at": "2026-03-23T14:21:25.971676+00:00"
+    }
+  ]
+}

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentForgeOS — Setup Wizard</title>
+    <link rel="stylesheet" href="wizard.css" />
+  </head>
+  <body>
+    <div class="wizard-shell">
+      <aside class="wizard-sidebar">
+        <div class="brand">
+          <span class="brand-icon">⚙</span>
+          <span class="brand-name">AgentForgeOS</span>
+        </div>
+        <nav class="step-nav" id="step-nav" aria-label="Setup steps">
+          <div class="step-item" data-step="1">
+            <span class="step-dot"></span>
+            <span class="step-label">Welcome</span>
+          </div>
+          <div class="step-item" data-step="2">
+            <span class="step-dot"></span>
+            <span class="step-label">LLM Provider</span>
+          </div>
+          <div class="step-item" data-step="3">
+            <span class="step-dot"></span>
+            <span class="step-label">Image &amp; Voice</span>
+          </div>
+          <div class="step-item" data-step="4">
+            <span class="step-dot"></span>
+            <span class="step-label">Storage &amp; Bridge</span>
+          </div>
+          <div class="step-item" data-step="5">
+            <span class="step-dot"></span>
+            <span class="step-label">Review &amp; Save</span>
+          </div>
+        </nav>
+        <div class="sidebar-footer">v1.0 · First-run setup</div>
+      </aside>
+      <main class="wizard-main">
+        <header class="wizard-header">
+          <div class="wizard-header-title">
+            <div class="wizard-title">Setup Wizard</div>
+            <div class="wizard-subtitle" id="wizard-subtitle"></div>
+          </div>
+          <div class="wizard-status" id="wizard-status"></div>
+        </header>
+
+        <section class="wizard-content">
+          <form id="wizard-form" class="wizard-form">
+            <div class="step-panel" data-step="1">
+              <div class="panel-title">Welcome</div>
+              <div class="panel-text">
+                Configure your providers, workspace, and bridge settings. This runs locally and saves settings to your machine.
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="AGENTFORGE_HOST">Engine Host</label>
+                  <input id="AGENTFORGE_HOST" name="AGENTFORGE_HOST" type="text" placeholder="127.0.0.1" />
+                </div>
+                <div class="form-group">
+                  <label for="AGENTFORGE_PORT">Engine Port</label>
+                  <input id="AGENTFORGE_PORT" name="AGENTFORGE_PORT" type="number" placeholder="8000" />
+                </div>
+              </div>
+              <div class="row">
+                <button type="button" class="btn btn-secondary" id="btn-test-health">Test Connection</button>
+                <div class="hint" id="health-hint"></div>
+              </div>
+            </div>
+
+            <div class="step-panel" data-step="2">
+              <div class="panel-title">LLM Provider</div>
+              <div class="panel-text">Choose your language model provider and configure it.</div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="PROVIDER_LLM">LLM Provider</label>
+                  <select id="PROVIDER_LLM" name="PROVIDER_LLM">
+                    <option value="ollama">Ollama</option>
+                    <option value="openai">OpenAI</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="LOG_LEVEL">Log Level</label>
+                  <select id="LOG_LEVEL" name="LOG_LEVEL">
+                    <option value="INFO">INFO</option>
+                    <option value="DEBUG">DEBUG</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="ERROR">ERROR</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="form-grid" data-visible-when="PROVIDER_LLM=ollama">
+                <div class="form-group">
+                  <label for="OLLAMA_BASE_URL">Ollama Base URL</label>
+                  <input id="OLLAMA_BASE_URL" name="OLLAMA_BASE_URL" type="text" placeholder="http://localhost:11434" />
+                </div>
+                <div class="form-group">
+                  <label for="OLLAMA_MODEL">Ollama Model</label>
+                  <input id="OLLAMA_MODEL" name="OLLAMA_MODEL" type="text" placeholder="llama3" />
+                </div>
+              </div>
+
+              <div class="form-grid" data-visible-when="PROVIDER_LLM=openai">
+                <div class="form-group">
+                  <label for="OPENAI_API_KEY">OpenAI API Key</label>
+                  <input id="OPENAI_API_KEY" name="OPENAI_API_KEY" type="password" placeholder="sk-..." />
+                </div>
+                <div class="form-group">
+                  <label for="OPENAI_MODEL">OpenAI Model</label>
+                  <input id="OPENAI_MODEL" name="OPENAI_MODEL" type="text" placeholder="gpt-4o-mini" />
+                </div>
+              </div>
+            </div>
+
+            <div class="step-panel" data-step="3">
+              <div class="panel-title">Image &amp; Voice</div>
+              <div class="panel-text">Optional image generation and text-to-speech configuration.</div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="PROVIDER_IMAGE">Image Provider</label>
+                  <select id="PROVIDER_IMAGE" name="PROVIDER_IMAGE">
+                    <option value="">None</option>
+                    <option value="comfyui">ComfyUI</option>
+                    <option value="fal">Fal</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="PROVIDER_TTS">TTS Provider</label>
+                  <select id="PROVIDER_TTS" name="PROVIDER_TTS">
+                    <option value="">None</option>
+                    <option value="piper">Piper</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid" data-visible-when="PROVIDER_IMAGE=comfyui">
+                <div class="form-group">
+                  <label for="COMFYUI_BASE_URL">ComfyUI Base URL</label>
+                  <input id="COMFYUI_BASE_URL" name="COMFYUI_BASE_URL" type="text" placeholder="http://127.0.0.1:8188" />
+                </div>
+              </div>
+
+              <div class="form-grid" data-visible-when="PROVIDER_IMAGE=fal">
+                <div class="form-group">
+                  <label for="FAL_API_KEY">Fal API Key</label>
+                  <input id="FAL_API_KEY" name="FAL_API_KEY" type="password" placeholder="fal_..." />
+                </div>
+              </div>
+
+              <div class="form-grid" data-visible-when="PROVIDER_TTS=piper">
+                <div class="form-group">
+                  <label for="PIPER_MODEL_PATH">Piper Model Path</label>
+                  <input id="PIPER_MODEL_PATH" name="PIPER_MODEL_PATH" type="text" placeholder="C:\\path\\to\\piper\\model.onnx" />
+                </div>
+              </div>
+            </div>
+
+            <div class="step-panel" data-step="4">
+              <div class="panel-title">Storage &amp; Bridge</div>
+              <div class="panel-text">Choose where projects and files live and what the bridge can access.</div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="WORKSPACE_PATH">Workspace Path</label>
+                  <input id="WORKSPACE_PATH" name="WORKSPACE_PATH" type="text" placeholder="C:\\Users\\You\\Documents\\AgentForgeOS" />
+                </div>
+                <div class="form-group">
+                  <label for="BRIDGE_ROOT">Bridge Root</label>
+                  <input id="BRIDGE_ROOT" name="BRIDGE_ROOT" type="text" placeholder="C:\\AgentForgeProjects" />
+                </div>
+              </div>
+            </div>
+
+            <div class="step-panel" data-step="5">
+              <div class="panel-title">Review &amp; Save</div>
+              <div class="panel-text">Confirm your settings and save. You can re-run this wizard later.</div>
+              <pre class="review" id="review"></pre>
+              <div class="row">
+                <button type="button" class="btn btn-primary" id="btn-save">Save &amp; Launch</button>
+                <button type="button" class="btn btn-secondary" id="btn-reset">Reset Setup</button>
+              </div>
+              <div class="hint" id="save-hint"></div>
+            </div>
+          </form>
+        </section>
+
+        <footer class="wizard-footer">
+          <button type="button" class="btn btn-secondary" id="btn-back">Back</button>
+          <div class="spacer"></div>
+          <button type="button" class="btn btn-primary" id="btn-next">Next</button>
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      const API = "/api";
+
+      const state = {
+        step: 1,
+        config: {
+          AGENTFORGE_HOST: "127.0.0.1",
+          AGENTFORGE_PORT: "8000",
+          PROVIDER_LLM: "ollama",
+          OLLAMA_BASE_URL: "http://localhost:11434",
+          OLLAMA_MODEL: "llama3",
+          OPENAI_API_KEY: "",
+          OPENAI_MODEL: "gpt-4o-mini",
+          PROVIDER_IMAGE: "",
+          COMFYUI_BASE_URL: "http://127.0.0.1:8188",
+          FAL_API_KEY: "",
+          PROVIDER_TTS: "",
+          PIPER_MODEL_PATH: "",
+          WORKSPACE_PATH: "",
+          BRIDGE_ROOT: "",
+          LOG_LEVEL: "INFO",
+        },
+      };
+
+      const el = (id) => document.getElementById(id);
+      const panels = () => Array.from(document.querySelectorAll(".step-panel"));
+      const stepItems = () => Array.from(document.querySelectorAll(".step-item"));
+
+      function setStatus(text, kind) {
+        const node = el("wizard-status");
+        node.textContent = text || "";
+        node.className = `wizard-status ${kind || ""}`.trim();
+      }
+
+      function setHint(id, text, kind) {
+        const node = el(id);
+        node.textContent = text || "";
+        node.className = `hint ${kind || ""}`.trim();
+      }
+
+      function applyVisibilityRules() {
+        const rules = Array.from(document.querySelectorAll("[data-visible-when]"));
+        for (const node of rules) {
+          const rule = node.getAttribute("data-visible-when") || "";
+          const [k, v] = rule.split("=");
+          const show = k && state.config[k] === v;
+          node.style.display = show ? "" : "none";
+        }
+      }
+
+      function updateReview() {
+        const redacted = { ...state.config };
+        if (redacted.OPENAI_API_KEY) redacted.OPENAI_API_KEY = "********";
+        if (redacted.FAL_API_KEY) redacted.FAL_API_KEY = "********";
+        el("review").textContent = JSON.stringify(redacted, null, 2);
+      }
+
+      function render() {
+        for (const p of panels()) {
+          p.style.display = Number(p.getAttribute("data-step")) === state.step ? "" : "none";
+        }
+
+        for (const item of stepItems()) {
+          const step = Number(item.getAttribute("data-step"));
+          item.classList.toggle("active", step === state.step);
+          item.classList.toggle("done", step < state.step);
+        }
+
+        el("btn-back").disabled = state.step <= 1;
+        el("btn-next").style.display = state.step >= 5 ? "none" : "";
+
+        el("wizard-subtitle").textContent = `Step ${state.step} of 5`;
+
+        applyVisibilityRules();
+        updateReview();
+      }
+
+      function bindInputs() {
+        for (const [key, value] of Object.entries(state.config)) {
+          const node = el(key);
+          if (!node) continue;
+          node.value = value;
+          node.addEventListener("input", (e) => {
+            state.config[key] = e.target.value;
+            applyVisibilityRules();
+            updateReview();
+          });
+          node.addEventListener("change", (e) => {
+            state.config[key] = e.target.value;
+            applyVisibilityRules();
+            updateReview();
+          });
+        }
+      }
+
+      function stepTo(n) {
+        const clamped = Math.min(5, Math.max(1, Number(n) || 1));
+        state.step = clamped;
+        render();
+      }
+
+      async function loadSetupState() {
+        setStatus("Checking setup state…", "info");
+        try {
+          const resp = await fetch(`${API}/setup`, { method: "GET" });
+          const json = await resp.json();
+          if (json?.data?.setup_complete) {
+            window.location.href = "/";
+            return;
+          }
+          setStatus("Setup required.", "warning");
+        } catch (e) {
+          setStatus("Unable to reach backend.", "error");
+        }
+      }
+
+      async function testHealth() {
+        setHint("health-hint", "Testing…", "info");
+        try {
+          const resp = await fetch(`${API}/health`, { method: "GET" });
+          const json = await resp.json();
+          if (resp.ok && json?.success) {
+            setHint("health-hint", "Backend reachable.", "success");
+            return;
+          }
+          setHint("health-hint", "Backend did not return OK.", "warning");
+        } catch (e) {
+          setHint("health-hint", "Failed to reach backend.", "error");
+        }
+      }
+
+      function buildSavePayload() {
+        const cfg = { ...state.config };
+        for (const k of Object.keys(cfg)) {
+          if (typeof cfg[k] === "string" && cfg[k].trim() === "") {
+            delete cfg[k];
+          }
+        }
+        return { config: cfg };
+      }
+
+      async function saveAndLaunch() {
+        setHint("save-hint", "Saving…", "info");
+        try {
+          const payload = buildSavePayload();
+          const resp = await fetch(`${API}/setup/save`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const json = await resp.json();
+          if (!resp.ok || !json?.success) {
+            setHint("save-hint", "Save failed.", "error");
+            return;
+          }
+          setHint("save-hint", "Saved. Launching…", "success");
+          window.location.href = "/";
+        } catch (e) {
+          setHint("save-hint", "Save failed.", "error");
+        }
+      }
+
+      async function resetSetup() {
+        setHint("save-hint", "Resetting…", "info");
+        try {
+          const resp = await fetch(`${API}/setup/reset`, { method: "POST" });
+          const json = await resp.json();
+          if (!resp.ok || !json?.success) {
+            setHint("save-hint", "Reset failed.", "error");
+            return;
+          }
+          setHint("save-hint", "Reset complete.", "success");
+        } catch (e) {
+          setHint("save-hint", "Reset failed.", "error");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        bindInputs();
+        for (const item of stepItems()) {
+          item.addEventListener("click", () => stepTo(item.getAttribute("data-step")));
+        }
+        el("btn-back").addEventListener("click", () => stepTo(state.step - 1));
+        el("btn-next").addEventListener("click", () => stepTo(state.step + 1));
+        el("btn-test-health").addEventListener("click", testHealth);
+        el("btn-save").addEventListener("click", saveAndLaunch);
+        el("btn-reset").addEventListener("click", resetSetup);
+        render();
+        await loadSetupState();
+      });
+    </script>
+  </body>
+</html>

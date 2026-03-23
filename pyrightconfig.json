@@ -1,0 +1,13 @@
+{
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "none",
+  "reportMissingTypeArgument": "none",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownParameterType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownReturnType": "none",
+  "reportUnusedImport": "none",
+  "reportUnusedFunction": "none",
+  "reportUnusedVariable": "none"
+}

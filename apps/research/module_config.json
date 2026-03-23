@@ -1,0 +1,12 @@
+{
+  "id": "research",
+  "name": "research",
+  "display_name": "Research",
+  "version": "1.0",
+  "icon": "brain",
+  "entry_route": "/api/modules/research",
+  "ui_entry": "ResearchPanel",
+  "enabled": true,
+  "entry": "module.py",
+  "class": "ResearchModule"
+}

@@ -1,0 +1,27 @@
+"""Service layer infrastructure for AgentForgeOS."""
+
+from .agent_service import AgentService
+from .memory_manager import MemoryManager
+from .mongo_memory import MongoMemoryManager
+from .vector_store import VectorStore
+from .knowledge_graph import KnowledgeGraph
+from .embedding_service import EmbeddingService
+from .pattern_extractor import PatternExtractor
+from .project_genome_service import ProjectGenomeService
+from .autopsy_service import AutopsyService
+from .agent_pipeline import PipelineContext
+from .agent_registry import AGENT_REGISTRY
+
+__all__ = [
+    "AgentService",
+    "MemoryManager",
+    "MongoMemoryManager",
+    "VectorStore",
+    "KnowledgeGraph",
+    "EmbeddingService",
+    "PatternExtractor",
+    "ProjectGenomeService",
+    "AutopsyService",
+    "PipelineContext",
+    "AGENT_REGISTRY",
+]

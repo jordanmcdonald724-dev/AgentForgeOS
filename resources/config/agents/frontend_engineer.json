@@ -1,0 +1,25 @@
+{
+  "agent_id": "frontend_engineer",
+  "pipeline_role": "Frontend Engineer",
+  "display_name": "Frontend Engineer",
+  "task_types": ["ui_design", "coding", "debugging"],
+  "system_prompt_path": "config/agents/frontend_engineer.system.md",
+  "inputs": {
+    "prompt": "Task Router UI work item and Architect UI constraints",
+    "context": "Pipeline context including API contracts, design requirements, and platform constraints"
+  },
+  "outputs": {
+    "primary": "UI implementation changes with visual verification steps and file references",
+    "format": "Outcome summary, changed components, styling notes, and validation results"
+  },
+  "permissions": {
+    "may_write_code": true,
+    "may_modify_files": true,
+    "may_invoke_tools": true
+  },
+  "failure_handling": {
+    "on_layout_mismatch": "Adjust layout to match spec precisely; do not break existing flows",
+    "on_api_mismatch": "Coordinate with Backend Engineer; update UI to match contracts or request contract fix"
+  }
+}
+

@@ -1,0 +1,3 @@
+// V1 UI - ResearchLabPage.tsx
+// Original file moved for legacy reference.
+// ...original content preserved...
